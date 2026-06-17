@@ -1,33 +1,127 @@
-import { useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { auth } from '../../src/firebase/config';
+import { getUserProfile } from '../../src/firebase/userService';
+import { router } from 'expo-router';
+import { logoutUser } from '../../src/firebase/logoutservices';
+import { addXP } from '../../src/firebase/xpservices';
+import { completeModule } from '../../src/firebase/progressService';
 
 export default function DashboardScreen() {
-     const { name, sport,age } = useLocalSearchParams();
-     console.log("Name:", name);
-     console.log("Sport:", sport);
-     console.log("Age:", age);
+    const [name, setName] = useState('');
+const [sport, setSport] = useState('');
+const [age, setAge] = useState('');
+const [level, setLevel] = useState('');
+const [xp, setXp] = useState(0);
+const [streak, setStreak] = useState(0);
+useEffect(() => {
+  const loadProfile = async () => {
+    const currentUser = auth.currentUser;
+    //console.log("Current User:", currentUser);
+
+    if (!currentUser) {
+      return;
+    }
+
+    const result = await getUserProfile(currentUser.uid);
+    //console.log("User Data:", JSON.stringify(result.data));
+    //console.log("Firestore Result:", JSON.stringify(result));
+    if (!result.success) {
+      alert(result.error);
+      return;
+    }
+
+    const userData = result.data!;
+
+//console.log("USER DATA OBJECT:", userData);
+//console.log("NAME FIELD:", userData.name);
+//console.log("SPORT FIELD:", userData.sport);
+//console.log("AGE FIELD:", userData.age);
+
+setName(userData.name);
+setSport(userData.sport);
+setAge(String(userData.age));
+    setLevel(userData.level);
+    setXp(userData.xp);
+    setStreak(userData.streak);
+  };
+
+  loadProfile();
+}, []);
+     
   return (
     <View style={styles.container}>
      <Text style={styles.header}>
-  🏆 Welcome {JSON.stringify(name)}
+  🏆 Welcome {name}
 </Text>
+
 <Text style={styles.sportText}>
   Sport: {sport}
 </Text>
 
+<Text style={styles.sportText}>
+  Age: {age}
+</Text>
+
       <View style={styles.statsCard}>
-        <Text style={styles.statText}>Level: Rookie</Text>
-        <Text style={styles.statText}>XP: 0</Text>
-        <Text style={styles.statText}>🔥 Streak: 0</Text>
+       <Text style={styles.statText}>Level: {level}</Text>
+       <Text style={styles.statText}>XP: {xp}</Text>
+       <Text style={styles.statText}>
+  🔥 Streak: {streak} Day{streak === 1 ? '' : 's'}
+</Text>
       </View>
 
-      <TouchableOpacity style={styles.featureCard}>
-        <Text style={styles.featureTitle}>📚 Learning Journey</Text>
-      </TouchableOpacity>
+      <TouchableOpacity
+  style={styles.featureCard}
+  onPress={() => router.push('/learning-journey')}
+>
+  <Text style={styles.featureTitle}>
+    📚 Learning Journey
+  </Text>
+</TouchableOpacity>
 
       <TouchableOpacity style={styles.featureCard}>
         <Text style={styles.featureTitle}>🧪 Supplement Roulette</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+  style={styles.featureCard}
+  onPress={async () => {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) return;
+
+    const progressResult = await completeModule(
+      currentUser.uid,
+      'antiDopingBasics'
+    );
+
+    if (!progressResult.success) {
+      alert(progressResult.error);
+      return;
+    }
+
+    const xpResult = await addXP(
+      currentUser.uid,
+      20
+    );
+
+    if (!xpResult.success) {
+      alert(xpResult.error);
+      return;
+    }
+
+    setXp(xpResult.xp ?? 0);
+    setLevel(xpResult.level ?? 'Rookie');
+
+    alert('📚 Anti-Doping Basics completed! +20 XP');
+  }}
+>
+  <Text style={styles.featureTitle}>
+    📚 Complete Anti-Doping Basics
+  </Text>
+</TouchableOpacity>
+
 
       <TouchableOpacity style={styles.featureCard}>
         <Text style={styles.featureTitle}>📷 Medicine Scanner</Text>
@@ -36,6 +130,52 @@ export default function DashboardScreen() {
       <TouchableOpacity style={styles.featureCard}>
         <Text style={styles.featureTitle}>🏅 Leaderboard</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+  style={styles.logoutButton}
+  onPress={async () => {
+    const result = await logoutUser();
+
+    if (!result.success) {
+      alert(result.error);
+      return;
+    }
+
+    router.replace('/');
+  }}
+>
+  <Text style={styles.logoutText}>
+    Logout
+  </Text>
+</TouchableOpacity>
+{/*XP test button}
+<TouchableOpacity
+  style={styles.featureCard}
+  onPress={async () => {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) return;
+
+    const result = await addXP(
+      currentUser.uid,
+      10
+    );
+
+    if (!result.success) {
+      alert(result.error);
+      return;
+    }
+
+    setXp(result.xp ?? 0);
+setLevel(result.level ?? 'Rookie');
+
+    alert(`XP: ${result.xp}`);
+  }}
+>
+  <Text style={styles.featureTitle}>
+    ➕ Add 10 XP
+  </Text>
+</TouchableOpacity>
+*/}
     </View>
   );
 }
@@ -47,6 +187,18 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 
+  logoutButton: {
+  backgroundColor: '#DC2626',
+  padding: 16,
+  borderRadius: 12,
+  marginTop: 20,
+},
+
+logoutText: {
+  color: 'white',
+  textAlign: 'center',
+  fontWeight: 'bold',
+},
 
 
   header: {

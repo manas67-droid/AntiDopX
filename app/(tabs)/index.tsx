@@ -1,5 +1,5 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
@@ -27,7 +27,7 @@ export default function HomeScreen() {
       <TouchableOpacity
   style={styles.button}
   onPress={() => {
-    router.push('/onboarding');
+    router.push('/login');
   }}
 >
         <Text style={styles.buttonText}>

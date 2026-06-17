@@ -1,11 +1,15 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { registerUser } from '../src/firebase/authService';
+import { createUserProfile } from '../src/firebase/firestoreService';
 export default function AthleteRegisterScreen() {
     const [name, setName] = useState('');
     const [sport, setSport] = useState('');
     const [age, setAge] = useState('');
     const router = useRouter();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Athlete Registration</Text>
@@ -16,6 +20,22 @@ export default function AthleteRegisterScreen() {
   style={styles.input}
   value={name}
   onChangeText={setName}
+/>
+<TextInput
+  placeholder="Enter your email"
+  placeholderTextColor="#94A3B8"
+  style={styles.input}
+  value={email}
+  onChangeText={setEmail}
+  keyboardType="email-address"
+/>
+<TextInput
+  placeholder="Enter your password"
+  placeholderTextColor="#94A3B8"
+  style={styles.input}
+  value={password}
+  onChangeText={setPassword}
+  secureTextEntry
 />
 <Text
   style={{
@@ -44,35 +64,65 @@ export default function AthleteRegisterScreen() {
 
 <TouchableOpacity
   style={styles.button}
-  onPress={() => {
-    if (name.trim() === '') {
-      alert('Please enter your name');
-      return;
-    }
+  onPress={async () => {
 
-    if (sport.trim() === '') {
-      alert('Please enter your sport');
-      return;
-    }
+  if (name.trim() === '') {
+    alert('Please enter your name');
+    return;
+  }
+if (password.trim() === '') {
+  alert('Please enter your password');
+  return;
+}
+  if (email.trim() === '') {
+    alert('Please enter your email');
+    return;
+  }
 
-    if (age.trim() === '') {
-      alert('Please enter your age');
-      return;
-    }
+  if (sport.trim() === '') {
+  alert('Please enter your sport');
+  return;
+}
 
-    console.log("Submitting Name:", name);
-    console.log("Submitting Sport:", sport);
-    console.log("Submitting Age:", age);
+if (age.trim() === '') {
+  alert('Please enter your age');
+  return;
+}
 
-    router.push({
-      pathname: '/dashboard',
-      params: {
-        name: name,
-        sport: sport,
-        age: age,
-      },
-    });
-  }}
+  const result = await registerUser(email, password);
+  //console.log('Auth Result:', result);
+
+if (!result.success) {
+  alert(result.error);
+  return;
+}
+
+const profileResult = await createUserProfile(
+  result.user!.uid,
+  name,
+  email,
+  age,
+  sport
+);
+//console.log('Profile Result:', profileResult);
+
+if (!profileResult.success) {
+  alert(profileResult.error);
+  return;
+}
+
+alert('Account created successfully!');
+
+  router.push({
+    pathname: '/dashboard',
+    params: {
+      name,
+      sport,
+      age,
+    },
+  });
+
+}}
 >
   <Text style={styles.buttonText}>Continue</Text>
 </TouchableOpacity>
