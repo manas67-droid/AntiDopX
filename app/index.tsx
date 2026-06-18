@@ -1,80 +1,140 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import { Shield } from 'lucide-react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function WelcomeScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.logo}>
-        🏆 AntiDopX
-      </Text>
+    <LinearGradient
+      colors={['#26D0CE', '#1AB6D9']}
+      style={styles.container}
+    >
+      <SafeAreaView style={styles.content}>
+        <View style={styles.logoBox}>
+          <Shield size={40} color="white" />
+        </View>
 
-      <Text style={styles.subtitle}>
-        Learn. Compete. Stay Clean.
-      </Text>
+        <Text style={styles.title}>AntiDopX</Text>
 
-      <TouchableOpacity
-        style={styles.primaryButton}
-        onPress={() => router.push('/login')}
-      >
-        <Text style={styles.buttonText}>
-          Login
+        <Text style={styles.subtitle}>
+          Learn. Compete. Stay Clean.
         </Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.secondaryButton}
-        onPress={() =>
-          router.push('/athlete-register')
-        }
-      >
-        <Text style={styles.buttonText}>
-          Create Account
+        <Text style={styles.description}>
+          The anti-doping playbook for the next generation of athletes.
         </Text>
-      </TouchableOpacity>
-    </View>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.push('/athlete-register')}
+        >
+          <Text style={styles.buttonText}>Get Started</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => router.push('/(tabs)/dashboard')}
+        >
+          <Text style={styles.skip}>
+            Skip to demo →
+          </Text>
+        </TouchableOpacity>
+
+        <View style={styles.dots}>
+          <View style={[styles.dot, styles.activeDot]} />
+          <View style={styles.dot} />
+          <View style={styles.dot} />
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
-    justifyContent: 'center',
-    padding: 24,
   },
 
-  logo: {
-    color: 'white',
-    fontSize: 36,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 12,
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 30,
+  },
+
+  logoBox: {
+    width: 90,
+    height: 90,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+
+  title: {
+    fontSize: 44,
+    fontWeight: '800',
+    color: '#fff',
   },
 
   subtitle: {
-    color: '#94A3B8',
-    fontSize: 18,
+    marginTop: 8,
+    fontSize: 22,
+    fontWeight: '600',
+    color: '#fff',
+  },
+
+  description: {
+    marginTop: 16,
+    fontSize: 16,
     textAlign: 'center',
-    marginBottom: 50,
+    color: 'rgba(255,255,255,0.85)',
+    lineHeight: 24,
+    maxWidth: 320,
   },
 
-  primaryButton: {
-    backgroundColor: '#2563EB',
-    padding: 16,
-    borderRadius: 14,
-    marginBottom: 16,
-  },
-
-  secondaryButton: {
-    backgroundColor: '#1E293B',
-    padding: 16,
-    borderRadius: 14,
+  button: {
+    marginTop: 50,
+    width: '100%',
+    backgroundColor: '#fff',
+    paddingVertical: 18,
+    borderRadius: 999,
+    alignItems: 'center',
   },
 
   buttonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: '#1AB6D9',
+    fontWeight: '700',
+    fontSize: 18,
+  },
+
+  skip: {
+    marginTop: 22,
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 15,
+  },
+
+  dots: {
+    flexDirection: 'row',
+    marginTop: 30,
+  },
+
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255,255,255,0.4)',
+    marginHorizontal: 4,
+  },
+
+  activeDot: {
+    width: 24,
+    backgroundColor: '#fff',
   },
 });
