@@ -1,184 +1,186 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import {
-  Alert,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { auth } from '../../src/firebase/config';
-import { getUserProfile } from '../../src/firebase/userService';
 import { logoutUser } from '../../src/firebase/logoutservices';
+import { completeModule } from '../../src/firebase/progressService';
+import { getUserProfile } from '../../src/firebase/userService';
+import { addXP } from '../../src/firebase/xpservices';
 
 export default function DashboardScreen() {
-  const [name, setName] = useState('');
-  const [sport, setSport] = useState('');
-  const [age, setAge] = useState('');
-  const [level, setLevel] = useState('');
-  const [xp, setXp] = useState(0);
-  const [streak, setStreak] = useState(0);
+    const [name, setName] = useState('');
+const [sport, setSport] = useState('');
+const [age, setAge] = useState('');
+const [level, setLevel] = useState('');
+const [xp, setXp] = useState(0);
+const [streak, setStreak] = useState(0);
+useEffect(() => {
+  const loadProfile = async () => {
+    const currentUser = auth.currentUser;
+    //console.log("Current User:", currentUser);
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      const currentUser = auth.currentUser;
+    if (!currentUser) {
+      return;
+    }
 
-      if (!currentUser) {
-        return;
-      }
+    const result = await getUserProfile(currentUser.uid);
+    //console.log("User Data:", JSON.stringify(result.data));
+    //console.log("Firestore Result:", JSON.stringify(result));
+    if (!result.success) {
+      alert(result.error);
+      return;
+    }
 
-      const result = await getUserProfile(currentUser.uid);
+    const userData = result.data!;
 
-      if (!result.success) {
-        Alert.alert('Error', result.error);
-        return;
-      }
+//console.log("USER DATA OBJECT:", userData);
+//console.log("NAME FIELD:", userData.name);
+//console.log("SPORT FIELD:", userData.sport);
+//console.log("AGE FIELD:", userData.age);
 
-      const userData = result.data!;
+setName(userData.name);
+setSport(userData.sport);
+setAge(String(userData.age));
+    setLevel(userData.level);
+    setXp(userData.xp);
+    setStreak(userData.streak);
+  };
 
-      setName(userData.name || '');
-      setSport(userData.sport || '');
-      setAge(String(userData.age || ''));
-      setLevel(userData.level || 'Rookie');
-      setXp(userData.xp || 0);
-      setStreak(userData.streak || 0);
-    };
+  loadProfile();
+}, []);
+     
+  return (
+    <View style={styles.container}>
+     <Text style={styles.greeting}>
+  👋 Welcome Back
+</Text>
 
-    loadProfile();
-  }, []);
+<Text style={styles.name}>
+  {name}
+</Text>
 
-  const handleLogout = async () => {
+<View style={styles.profileCard}>
+  <Text style={styles.profileText}>
+  🏅 Sport: {sport}
+</Text>
+
+<Text style={styles.profileText}>
+  🎂 Age: {age}
+</Text>
+</View>
+
+      <View style={styles.statsCard}>
+       <Text style={styles.statText}>Level: {level}</Text>
+       <Text style={styles.statText}>XP: {xp}</Text>
+       <Text style={styles.statText}>
+  🔥 Streak: {streak} Day{streak === 1 ? '' : 's'}
+</Text>
+      </View>
+
+      <TouchableOpacity
+  style={styles.featureCard}
+  onPress={() => router.push('/learning-journey')}
+>
+  <Text style={styles.featureTitle}>
+    📚 Learning Journey
+  </Text>
+</TouchableOpacity>
+
+      <TouchableOpacity style={styles.featureCard}>
+        <Text style={styles.featureTitle}>🧪 Supplement Roulette</Text>
+      </TouchableOpacity>
+
+<TouchableOpacity
+  style={styles.featureCard}
+  onPress={() => router.push('/achievements')}
+>
+  <Text style={styles.featureTitle}>
+    🏆 Achievements
+  </Text>
+</TouchableOpacity>
+
+<TouchableOpacity
+  style={styles.featureCard}
+  onPress={() => router.push('/challenges')}
+>
+  <Text style={styles.featureTitle}>
+    🎮 Play & Compete
+  </Text>
+</TouchableOpacity>
+
+<TouchableOpacity
+  style={styles.featureCard}
+  onPress={() => router.push('/learning-journey')}
+>
+  <Text style={styles.featureTitle}>
+    📚 Learning Journey
+  </Text>
+</TouchableOpacity>
+
+      <TouchableOpacity
+  style={styles.featureCard}
+  onPress={async () => {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) return;
+
+    const progressResult = await completeModule(
+      currentUser.uid,
+      'antiDopingBasics'
+    );
+
+    if (!progressResult.success) {
+      alert(progressResult.error);
+      return;
+    }
+
+    const xpResult = await addXP(
+      currentUser.uid,
+      20
+    );
+
+    if (!xpResult.success) {
+      alert(xpResult.error);
+      return;
+    }
+
+    setXp(xpResult.xp ?? 0);
+    setLevel(xpResult.level ?? 'Rookie');
+
+    alert('📚 Anti-Doping Basics completed! +20 XP');
+  }}
+>
+  <Text style={styles.featureTitle}>
+    📚 Complete Anti-Doping Basics
+  </Text>
+</TouchableOpacity>
+
+
+      <TouchableOpacity style={styles.featureCard}>
+        <Text style={styles.featureTitle}>📷 Medicine Scanner</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.featureCard}>
+        <Text style={styles.featureTitle}>🏅 Leaderboard</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+  style={styles.logoutButton}
+  onPress={async () => {
     const result = await logoutUser();
 
     if (!result.success) {
-      Alert.alert('Error', result.error);
+      alert(result.error);
       return;
     }
 
     router.replace('/');
-  };
+  }}
+>
+  <Text style={styles.logoutText}>
+    Logout
+  </Text>
+</TouchableOpacity>
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.header}>
-        🏆 Welcome {name}
-      </Text>
-
-      <Text style={styles.sportText}>
-        Sport: {sport}
-      </Text>
-
-      <Text style={styles.sportText}>
-        Age: {age}
-      </Text>
-
-      <View style={styles.statsCard}>
-        <Text style={styles.statText} selectable>
-          Level: {level}
-        </Text>
-
-        <Text style={styles.statText} selectable>
-          XP: {xp}
-        </Text>
-
-        <Text style={styles.statText} selectable>
-          Streak: {streak} Day{streak === 1 ? '' : 's'}
-        </Text>
-      </View>
-
-      <TouchableOpacity
-        style={styles.featureCard}
-        onPress={() => router.push('/learning-journey')}
-      >
-        <Text style={styles.featureTitle}>
-          Learning Journey
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.featureCard}
-        onPress={() => router.push('/modules/anti-doping-basics')}
-      >
-        <Text style={styles.featureTitle}>
-          Open Anti-Doping Basics
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.featureCard}
-        onPress={() => router.push('/supplement-roulette')}
-      >
-        <Text style={styles.featureTitle}>
-          Supplement Roulette
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.featureCard}
-        onPress={() => router.push('/medicine-scanner')}
-      >
-        <Text style={styles.featureTitle}>
-          Medicine Scanner
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.featureCard}
-        onPress={() => router.push('/leaderboard')}
-      >
-        <Text style={styles.featureTitle}>
-          Leaderboard
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={async () => {
-          const result = await logoutUser();
-
-          if (!result.success) {
-            alert(result.error);
-            return;
-          }
-
-          router.replace('/');
-        }}
-      >
-        <Text style={styles.logoutText}>
-          Logout
-        </Text>
-      </TouchableOpacity>
-
-      {/*XP test button}
-      <TouchableOpacity
-        style={styles.featureCard}
-        onPress={async () => {
-          const currentUser = auth.currentUser;
-
-          if (!currentUser) return;
-
-          const result = await addXP(
-            currentUser.uid,
-            10
-          );
-
-          if (!result.success) {
-            alert(result.error);
-            return;
-          }
-
-          setXp(result.xp ?? 0);
-          setLevel(result.level ?? 'Rookie');
-
-          alert(`XP: ${result.xp}`);
-        }}
-      >
-        <Text style={styles.featureTitle}>
-          ➕ Add 10 XP
-        </Text>
-      </TouchableOpacity>
-      */}
     </View>
   );
 }
@@ -186,33 +188,42 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#2915ab',
+    padding: 20,
   },
 
-  contentContainer: {
-    padding: 20,
-    paddingBottom: 48,
-  },
+  logoutButton: {
+  backgroundColor: '#ed0909bd',
+  padding: 16,
+  borderRadius: 12,
+  marginTop: 20,
+},
+
+logoutText: {
+  color: 'white',
+  textAlign: 'center',
+  fontWeight: 'bold',
+},
+
 
   header: {
     color: 'white',
     fontSize: 28,
     fontWeight: 'bold',
-    marginTop: 40,
+    marginTop: 60,
     marginBottom: 24,
   },
 
-  sportText: {
-    color: '#94A3B8',
-    fontSize: 16,
-    marginBottom: 12,
-  },
+    sportText: {
+  color: '#94A3B8',
+  fontSize: 16,
+  marginBottom: 20,
+},
 
   statsCard: {
     backgroundColor: '#1E293B',
     padding: 20,
-    borderRadius: 12,
-    marginTop: 8,
+    borderRadius: 16,
     marginBottom: 24,
   },
 
@@ -225,7 +236,7 @@ const styles = StyleSheet.create({
   featureCard: {
     backgroundColor: '#2563EB',
     padding: 20,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 16,
   },
 
@@ -235,17 +246,29 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  logoutButton: {
-    backgroundColor: '#DC2626',
-    padding: 16,
-    borderRadius: 12,
-    marginTop: 20,
+  greeting: {
+  color: '#94A3B8',
+  fontSize: 16,
+  marginTop: 20,
   },
 
-  logoutText: {
-    color: 'white',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 16,
+  name: {
+  color: 'white',
+  fontSize: 28,
+  fontWeight: 'bold',
+  marginBottom: 20,
+  },
+
+  profileCard: {
+  backgroundColor: '#1E293B',
+  padding: 16,
+  borderRadius: 16,
+  marginBottom: 20,
+  },
+
+  profileText: {
+  color: 'white',
+  fontSize: 16,
+  marginBottom: 6,
   },
 });
