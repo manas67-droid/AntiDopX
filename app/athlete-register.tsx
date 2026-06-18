@@ -1,12 +1,12 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
+  ScrollView,
 } from 'react-native';
 
 export default function AthleteRegisterScreen() {
@@ -280,5 +280,43 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#94A3B8',
     marginTop: 24,
+  },
+});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#131e39',
+    padding: 24,
+    justifyContent: 'center',
+  },
+
+  title: {
+    color: 'white',
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 30,
+    textAlign: 'center',
+  },
+
+  input: {
+    backgroundColor: '#1E293B',
+    color: 'white',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+
+  button: {
+    backgroundColor: '#2563EB',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
