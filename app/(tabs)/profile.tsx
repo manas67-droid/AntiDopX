@@ -5,7 +5,7 @@ import {
 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -13,8 +13,41 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { auth } from "../../src/firebase/config";
+import { getUserProfile } from "../../src/firebase/userService";
+
 
 export default function ProfileScreen() {
+  const [name, setName] = useState('');
+  const [sport, setSport] = useState('');
+  const [xp, setXp] = useState(0);
+  const [streak, setStreak] = useState(0);
+  
+  useEffect(() => {
+  const loadProfile = async () => {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) return;
+
+    const result = await getUserProfile(
+      currentUser.uid
+    );
+
+    if (!result.success || !result.data)
+      return;
+
+    const user = result.data;
+
+    setName(user.name || '');
+    setSport(user.sport || '');
+    setXp(user.xp || 0);
+    setStreak(user.streak || 0);
+  };
+
+  loadProfile();
+}, []);
+    
+
   return (
     <ScrollView
       style={styles.container}
@@ -34,17 +67,6 @@ export default function ProfileScreen() {
             color="white"
           />
         </TouchableOpacity>
-
-        <TouchableOpacity
-            style={styles.featureCard}
-            onPress={() => router.push('/analytics')}
-        >
-
-            <Text style={styles.featureTitle}>
-            📈 Analytics
-            </Text>
-        </TouchableOpacity>
-
       </View>
 
       {/* Profile Card */}
@@ -56,17 +78,24 @@ export default function ProfileScreen() {
         <View style={styles.profileRow}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
-              AS
+              {name
+                ? name
+                   .split(' ')
+                   .map(word => word[0])
+                   .join('')
+                   .slice(0, 2)
+                   .toUpperCase()
+                : 'AT'}
             </Text>
           </View>
 
           <View style={{ flex: 1 }}>
             <Text style={styles.userName}>
-              Arjun Sharma
+              {name || 'Athlete'}
             </Text>
 
             <Text style={styles.userInfo}>
-              Runner • Mumbai Academy
+               {sport || 'Athlete'}
             </Text>
 
             <View style={styles.badge}>
@@ -88,13 +117,13 @@ export default function ProfileScreen() {
         <View style={styles.statsRow}>
           <StatCard
             icon="bolt"
-            value="2340"
+            value={String(xp)}
             label="XP"
           />
 
           <StatCard
             icon="fire"
-            value="12"
+            value={String(streak)}
             label="Streak"
           />
 
@@ -110,8 +139,8 @@ export default function ProfileScreen() {
 
       <View style={styles.quickRow}>
         <QuickCard
-          title="6 Badges"
-          subtitle="View all"
+          title="Achievements"
+          subtitle="View Badges"
           icon="trophy"
           onPress={() =>
             router.push("/achievements")
@@ -176,7 +205,14 @@ export default function ProfileScreen() {
 
       <TouchableOpacity
         style={styles.logoutButton}
+        activeOpacity={0.8}
       >
+        <MaterialIcons
+          name="logout"
+          size={22}
+          color="white"
+        />
+
         <Text style={styles.logoutText}>
           Logout
         </Text>
@@ -289,193 +325,250 @@ function MenuRow({
   );
 }
 
-/* -------------------------------- */
-/* STYLES */
-/* -------------------------------- */
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0F172A",
-    padding: 20,
+    backgroundColor: '#0F172A',
+    paddingHorizontal: 20,
   },
 
   headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 40,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 50,
     marginBottom: 20,
   },
 
   headerTitle: {
-    color: "white",
-    fontSize: 28,
-    fontWeight: "700",
+    color: '#FFFFFF',
+    fontSize: 30,
+    fontWeight: '700',
   },
 
   settingsBtn: {
-    backgroundColor: "#1E293B",
-    padding: 10,
-    borderRadius: 12,
+    backgroundColor: '#1E293B',
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   profileCard: {
-    borderRadius: 24,
-    padding: 20,
+    backgroundColor: '#14C8E8',
+    borderRadius: 30,
+    padding: 24,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    elevation: 8,
   },
 
   profileRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
   },
 
   avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 20,
-    backgroundColor:
-      "rgba(255,255,255,0.25)",
-    justifyContent: "center",
-    alignItems: "center",
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.3)',
+
     marginRight: 16,
   },
 
   avatarText: {
-    color: "white",
-    fontSize: 24,
-    fontWeight: "700",
+    color: '#FFFFFF',
+    fontSize: 28,
+    fontWeight: '700',
   },
 
   userName: {
-    color: "white",
-    fontSize: 22,
-    fontWeight: "700",
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: '700',
   },
 
   userInfo: {
-    color: "#DBEAFE",
+    color: '#EAFBFF',
+    fontSize: 14,
     marginTop: 4,
   },
 
   badge: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    backgroundColor: 'rgba(255,255,255,0.18)',
+
+    alignSelf: 'flex-start',
+
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+
+    borderRadius: 999,
     marginTop: 10,
   },
 
   badgeText: {
-    color: "white",
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '600',
     marginLeft: 6,
-    fontSize: 12,
   },
 
   statsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
   },
 
   statCard: {
-    backgroundColor:
-      "rgba(255,255,255,0.15)",
     flex: 1,
-    padding: 12,
-    borderRadius: 16,
-    alignItems: "center",
+
+    backgroundColor: 'rgba(255,255,255,0.15)',
+
+    borderRadius: 18,
+    paddingVertical: 16,
+
+    alignItems: 'center',
+
     marginHorizontal: 4,
   },
 
   statValue: {
-    color: "white",
-    fontWeight: "700",
-    fontSize: 18,
-    marginTop: 4,
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '700',
   },
 
   statLabel: {
-    color: "#DBEAFE",
+    color: '#EAFBFF',
     fontSize: 12,
+    marginTop: 4,
   },
 
   quickRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 20,
   },
 
   quickCard: {
-    width: "48%",
-    backgroundColor: "#1E293B",
+    width: '48%',
+    backgroundColor: '#1E293B',
     padding: 18,
-    borderRadius: 20,
+    borderRadius: 22,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
   },
 
   quickTitle: {
-    color: "white",
-    fontWeight: "700",
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 15,
     marginTop: 10,
   },
 
   quickSubtitle: {
-    color: "#94A3B8",
+    color: '#94A3B8',
     marginTop: 4,
     fontSize: 12,
   },
 
-  featureCard: {
-  backgroundColor: '#1E293B',
-  padding: 16,
-  borderRadius: 16,
-  marginBottom: 12,
-},
-
-featureTitle: {
-  color: 'white',
-  fontSize: 16,
-  fontWeight: '600',
-},
-
   sectionTitle: {
-    color: "white",
-    fontSize: 20,
-    fontWeight: "700",
-    marginTop: 28,
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '700',
+    marginTop: 30,
     marginBottom: 12,
   },
 
+  featureCard: {
+    backgroundColor: '#1E293B',
+    padding: 18,
+    borderRadius: 18,
+    marginBottom: 12,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+
+  featureTitle: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
   row: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#1E293B",
-    padding: 16,
-    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    backgroundColor: '#1E293B',
+
+    padding: 18,
+    borderRadius: 18,
     marginBottom: 10,
   },
 
   rowTitle: {
     flex: 1,
-    color: "white",
+    color: '#FFFFFF',
     fontSize: 15,
+    fontWeight: '500',
   },
 
   rowValue: {
-    color: "#94A3B8",
+    color: '#94A3B8',
     marginRight: 8,
   },
 
   logoutButton: {
-    backgroundColor: "#DC2626",
-    padding: 18,
-    borderRadius: 16,
+    backgroundColor: '#EF4444',
+
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    paddingVertical: 18,
+
+    borderRadius: 18,
+
     marginTop: 30,
     marginBottom: 40,
   },
 
   logoutText: {
-    color: "white",
-    textAlign: "center",
-    fontWeight: "700",
+    color: '#FFFFFF',
     fontSize: 16,
+    fontWeight: '700',
+    marginLeft: 8,
   },
 });
