@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 
 import { auth } from '../../src/firebase/config';
-import { getUserProfile } from '../../src/firebase/userService';
 import { logoutUser } from '../../src/firebase/logoutservices';
+import { getUserProfile } from '../../src/firebase/userService';
 
 export default function DashboardScreen() {
   const [name, setName] = useState('');
@@ -149,6 +149,30 @@ export default function DashboardScreen() {
           Logout
         </Text>
       </TouchableOpacity>
+      <TouchableOpacity
+  style={styles.featureCard}
+  onPress={() => router.push('/quiz')}
+>
+ <Text style={styles.featureTitle}>
+    🧠 Quiz Arena
+  </Text>
+</TouchableOpacity>
+<TouchableOpacity
+  style={styles.featureCard}
+  onPress={() => router.push('/roulette')}
+>
+  <Text style={styles.featureTitle}>
+    🎲 Supplement Roulette
+  </Text>
+</TouchableOpacity>
+<TouchableOpacity
+  style={styles.featureCard}
+  onPress={() => router.push('/scanner')}
+>
+  <Text style={styles.featureTitle}>
+    📷 Medicine Scanner
+  </Text>
+</TouchableOpacity>
 
       {/*XP test button}
       <TouchableOpacity
