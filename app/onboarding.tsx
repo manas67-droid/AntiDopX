@@ -1,5 +1,5 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function OnboardingScreen() {
   return (
@@ -12,7 +12,7 @@ export default function OnboardingScreen() {
 
       <Text style={styles.subtitle}>
         Many athletes fail doping tests because
-        they do not know the rules.
+        they don't know the rules.
       </Text>
 
       <Text style={styles.description}>
@@ -27,7 +27,7 @@ export default function OnboardingScreen() {
   }}
 >
         <Text style={styles.buttonText}>
-          I am Ready
+          I'm Ready
         </Text>
       </TouchableOpacity>
     </View>
