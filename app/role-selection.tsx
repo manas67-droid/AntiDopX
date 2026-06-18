@@ -35,35 +35,55 @@ export default function RoleSelectionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
-    padding: 24,
+    backgroundColor: '#14C8E8',
     justifyContent: 'center',
+    paddingHorizontal: 24,
   },
 
   title: {
-    color: 'white',
-    fontSize: 28,
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontSize: 36,
+    fontWeight: '700',
     textAlign: 'center',
     marginBottom: 40,
+    lineHeight: 44,
   },
 
   card: {
-    backgroundColor: '#1E293B',
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 16,
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+    borderRadius: 24,
+    marginBottom: 18,
     alignItems: 'center',
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 5,
   },
 
   emoji: {
-    fontSize: 40,
-    marginBottom: 10,
+    fontSize: 52,
+    marginBottom: 14,
   },
 
   cardTitle: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
+    color: '#0F172A',
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
+
+  cardDescription: {
+    color: '#64748B',
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+    paddingHorizontal: 8,
   },
 });
