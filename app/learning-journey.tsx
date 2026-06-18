@@ -1,24 +1,31 @@
 import { useEffect, useState } from 'react';
 import {
+  ScrollView,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
 } from 'react-native';
+import { router } from 'expo-router';
 
 import { auth } from '../src/firebase/config';
 import { getUserProfile } from '../src/firebase/userService';
-import { router } from 'expo-router';
+import {
+  learningModules,
+  type ModuleKey,
+} from '../src/learning/modules';
+
+type ProgressState = Record<ModuleKey, boolean>;
+
+const createInitialProgress = (): ProgressState =>
+  learningModules.reduce((state, module) => {
+    state[module.moduleKey] = false;
+    return state;
+  }, {} as ProgressState);
 
 export default function LearningJourneyScreen() {
-  const [progress, setProgress] = useState({
-    antiDopingBasics: false,
-    wadaRules: false,
-    testingProcedures: false,
-    tue: false,
-    supplements: false,
-  });
-
+  const [progress, setProgress] = useState<ProgressState>(
+    createInitialProgress
+  );
   const [completionPercent, setCompletionPercent] =
     useState(0);
 
@@ -36,32 +43,21 @@ export default function LearningJourneyScreen() {
 
       const userProgress =
         result.data.progress || {};
+      const nextProgress = createInitialProgress();
 
-      setProgress({
-        antiDopingBasics:
-          userProgress.antiDopingBasics || false,
-
-        wadaRules:
-          userProgress.wadaRules || false,
-
-        testingProcedures:
-          userProgress.testingProcedures || false,
-
-        tue:
-          userProgress.tue || false,
-
-        supplements:
-          userProgress.supplements || false,
+      learningModules.forEach((module) => {
+        nextProgress[module.moduleKey] =
+          Boolean(userProgress[module.moduleKey]);
       });
 
-      const completedModules =
-        Object.values(userProgress)
-          .filter(Boolean).length;
+      setProgress(nextProgress);
 
-      const totalModules = 5;
+      const completedModules = learningModules.filter(
+        (module) => nextProgress[module.moduleKey]
+      ).length;
 
       const percent = Math.round(
-        (completedModules / totalModules) * 100
+        (completedModules / learningModules.length) * 100
       );
 
       setCompletionPercent(percent);
@@ -71,50 +67,37 @@ export default function LearningJourneyScreen() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        📚 Learning Journey
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      contentInsetAdjustmentBehavior="automatic"
+    >
+      <Text style={styles.title} selectable>
+        Learning Journey
       </Text>
 
-      <Text style={styles.progressText}>
+      <Text style={styles.progressText} selectable>
         Progress: {completionPercent}%
       </Text>
 
-      <TouchableOpacity
-        onPress={() =>
-          router.push('/modules/anti-doping-basics')
-        }
-      >
-        <Text style={styles.module}>
-          {progress.antiDopingBasics ? '✅' : '⬜'} Anti-Doping
-          Basics
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() =>
-          router.push('/modules/wada-rules')
-        }
-      >
-        <Text style={styles.module}>
-          {progress.wadaRules ? '✅' : '⬜'} WADA Rules
-        </Text>
-      </TouchableOpacity>
-
-      <Text style={styles.module}>
-        {progress.testingProcedures ? '✅' : '⬜'} Testing
-        Procedures
-      </Text>
-
-      <Text style={styles.module}>
-        {progress.tue ? '✅' : '⬜'} TUE
-      </Text>
-
-      <Text style={styles.module}>
-        {progress.supplements ? '✅' : '⬜'} Supplements &
-        Risks
-      </Text>
-    </View>
+      {learningModules.map((module) => (
+        <TouchableOpacity
+          key={module.moduleKey}
+          style={styles.moduleCard}
+          onPress={() => router.push(module.route)}
+        >
+          <Text style={styles.moduleStatus} selectable>
+            {progress[module.moduleKey] ? 'Completed' : 'Not started'}
+          </Text>
+          <Text style={styles.moduleTitle} selectable>
+            {module.shortTitle}
+          </Text>
+          <Text style={styles.moduleReward} selectable>
+            +{module.xpReward} XP
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
   );
 }
 
@@ -122,27 +105,50 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F172A',
+  },
+
+  contentContainer: {
+    gap: 14,
     padding: 20,
+    paddingBottom: 48,
   },
 
   title: {
     color: 'white',
     fontSize: 28,
     fontWeight: 'bold',
-    marginTop: 60,
-    marginBottom: 30,
+    marginTop: 40,
   },
 
   progressText: {
     color: '#60A5FA',
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 24,
+    marginBottom: 10,
   },
 
-  module: {
+  moduleCard: {
+    backgroundColor: '#1E293B',
+    borderRadius: 12,
+    gap: 8,
+    padding: 16,
+  },
+
+  moduleStatus: {
+    color: '#93C5FD',
+    fontSize: 13,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+
+  moduleTitle: {
     color: 'white',
     fontSize: 18,
-    marginBottom: 20,
+    fontWeight: '700',
+  },
+
+  moduleReward: {
+    color: '#CBD5E1',
+    fontSize: 14,
   },
 });

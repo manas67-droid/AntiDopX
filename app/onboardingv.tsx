@@ -53,11 +53,11 @@ export default function SportSelectionScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>
-        What's your sport?
+        What is your sport?
       </Text>
 
       <Text style={styles.subtitle}>
-        We'll personalize your learning
+        We will personalize your learning
         experience.
       </Text>
 

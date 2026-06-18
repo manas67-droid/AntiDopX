@@ -1,13 +1,14 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
+import { evaluateAchievements } from '../src/firebase/achievementService';
 import { loginUser } from '../src/firebase/loginService';
 import { updateDailyStreak } from '../src/firebase/streakService';
 
@@ -23,17 +24,26 @@ export default function LoginScreen() {
       return;
     }
 
-    //console.log('Login Result:', result);
     const streakResult = await updateDailyStreak(result.user!.uid);
 
     if (!streakResult.success) {
       alert(streakResult.error);
       return;
     }
-    //console.log('Streak Result:', streakResult);
+
+    const achievementResult = await evaluateAchievements(result.user!.uid);
+    const unlockedText =
+      achievementResult.success &&
+      achievementResult.data.newlyUnlocked.length > 0
+        ? `\nUnlocked: ${achievementResult.data.newlyUnlocked.join(', ')}`
+        : '';
+
+    if (!achievementResult.success) {
+      alert(achievementResult.error);
+    }
 
     alert(
-      `Login successful 🔥 Streak: ${streakResult.streak} Day${streakResult.streak === 1 ? '' : 's'}`
+      `Login successful. Streak: ${streakResult.streak} Day${streakResult.streak === 1 ? '' : 's'}${unlockedText}`
     );
 
     router.replace('/dashboard');

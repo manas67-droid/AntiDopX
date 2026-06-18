@@ -1,4 +1,5 @@
 import { doc, setDoc } from 'firebase/firestore';
+import { defaultAchievements } from './achievementService';
 import { db } from './config';
 
 export const createUserProfile = async (
@@ -29,6 +30,8 @@ export const createUserProfile = async (
   tue: false,
   wadaRules: false,
 },
+
+  achievements: defaultAchievements,
 
   createdAt: new Date().toISOString(),
 });

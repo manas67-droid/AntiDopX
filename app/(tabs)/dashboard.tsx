@@ -1,182 +1,149 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { auth } from '../../src/firebase/config';
-import { getUserProfile } from '../../src/firebase/userService';
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { router } from 'expo-router';
+
+import { auth } from '../../src/firebase/config';
 import { logoutUser } from '../../src/firebase/logoutservices';
-import { addXP } from '../../src/firebase/xpservices';
-import { completeModule } from '../../src/firebase/progressService';
+import { getUserProfile } from '../../src/firebase/userService';
 
 export default function DashboardScreen() {
-    const [name, setName] = useState('');
-const [sport, setSport] = useState('');
-const [age, setAge] = useState('');
-const [level, setLevel] = useState('');
-const [xp, setXp] = useState(0);
-const [streak, setStreak] = useState(0);
-useEffect(() => {
-  const loadProfile = async () => {
-    const currentUser = auth.currentUser;
-    //console.log("Current User:", currentUser);
+  const [name, setName] = useState('');
+  const [sport, setSport] = useState('');
+  const [age, setAge] = useState('');
+  const [level, setLevel] = useState('');
+  const [xp, setXp] = useState(0);
+  const [streak, setStreak] = useState(0);
 
-    if (!currentUser) {
-      return;
-    }
+  useEffect(() => {
+    const loadProfile = async () => {
+      const currentUser = auth.currentUser;
 
-    const result = await getUserProfile(currentUser.uid);
-    //console.log("User Data:", JSON.stringify(result.data));
-    //console.log("Firestore Result:", JSON.stringify(result));
-    if (!result.success) {
-      alert(result.error);
-      return;
-    }
+      if (!currentUser) {
+        return;
+      }
 
-    const userData = result.data!;
+      const result = await getUserProfile(currentUser.uid);
 
-//console.log("USER DATA OBJECT:", userData);
-//console.log("NAME FIELD:", userData.name);
-//console.log("SPORT FIELD:", userData.sport);
-//console.log("AGE FIELD:", userData.age);
+      if (!result.success) {
+        Alert.alert('Error', result.error);
+        return;
+      }
 
-setName(userData.name);
-setSport(userData.sport);
-setAge(String(userData.age));
-    setLevel(userData.level);
-    setXp(userData.xp);
-    setStreak(userData.streak);
-  };
+      const userData = result.data!;
 
-  loadProfile();
-}, []);
-     
-  return (
-    <View style={styles.container}>
-     <Text style={styles.header}>
-  🏆 Welcome {name}
-</Text>
+      setName(userData.name || '');
+      setSport(userData.sport || '');
+      setAge(String(userData.age || ''));
+      setLevel(userData.level || 'Rookie');
+      setXp(userData.xp || 0);
+      setStreak(userData.streak || 0);
+    };
 
-<Text style={styles.sportText}>
-  Sport: {sport}
-</Text>
+    loadProfile();
+  }, []);
 
-<Text style={styles.sportText}>
-  Age: {age}
-</Text>
-
-      <View style={styles.statsCard}>
-       <Text style={styles.statText}>Level: {level}</Text>
-       <Text style={styles.statText}>XP: {xp}</Text>
-       <Text style={styles.statText}>
-  🔥 Streak: {streak} Day{streak === 1 ? '' : 's'}
-</Text>
-      </View>
-
-      <TouchableOpacity
-  style={styles.featureCard}
-  onPress={() => router.push('/learning-journey')}
->
-  <Text style={styles.featureTitle}>
-    📚 Learning Journey
-  </Text>
-</TouchableOpacity>
-
-      <TouchableOpacity style={styles.featureCard}>
-        <Text style={styles.featureTitle}>🧪 Supplement Roulette</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-  style={styles.featureCard}
-  onPress={async () => {
-    const currentUser = auth.currentUser;
-
-    if (!currentUser) return;
-
-    const progressResult = await completeModule(
-      currentUser.uid,
-      'antiDopingBasics'
-    );
-
-    if (!progressResult.success) {
-      alert(progressResult.error);
-      return;
-    }
-
-    const xpResult = await addXP(
-      currentUser.uid,
-      20
-    );
-
-    if (!xpResult.success) {
-      alert(xpResult.error);
-      return;
-    }
-
-    setXp(xpResult.xp ?? 0);
-    setLevel(xpResult.level ?? 'Rookie');
-
-    alert('📚 Anti-Doping Basics completed! +20 XP');
-  }}
->
-  <Text style={styles.featureTitle}>
-    📚 Complete Anti-Doping Basics
-  </Text>
-</TouchableOpacity>
-
-
-      <TouchableOpacity style={styles.featureCard}>
-        <Text style={styles.featureTitle}>📷 Medicine Scanner</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.featureCard}>
-        <Text style={styles.featureTitle}>🏅 Leaderboard</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-  style={styles.logoutButton}
-  onPress={async () => {
+  const handleLogout = async () => {
     const result = await logoutUser();
 
     if (!result.success) {
-      alert(result.error);
+      Alert.alert('Error', result.error);
       return;
     }
 
     router.replace('/');
-  }}
->
-  <Text style={styles.logoutText}>
-    Logout
-  </Text>
-</TouchableOpacity>
-{/*XP test button}
-<TouchableOpacity
-  style={styles.featureCard}
-  onPress={async () => {
-    const currentUser = auth.currentUser;
+  };
 
-    if (!currentUser) return;
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      contentInsetAdjustmentBehavior="automatic"
+    >
+      <Text style={styles.header} selectable>
+        Welcome {name}
+      </Text>
 
-    const result = await addXP(
-      currentUser.uid,
-      10
-    );
+      <Text style={styles.sportText} selectable>
+        Sport: {sport}
+      </Text>
 
-    if (!result.success) {
-      alert(result.error);
-      return;
-    }
+      <Text style={styles.sportText} selectable>
+        Age: {age}
+      </Text>
 
-    setXp(result.xp ?? 0);
-setLevel(result.level ?? 'Rookie');
+      <View style={styles.statsCard}>
+        <Text style={styles.statText} selectable>
+          Level: {level}
+        </Text>
+        <Text style={styles.statText} selectable>
+          XP: {xp}
+        </Text>
+        <Text style={styles.statText} selectable>
+          Streak: {streak} Day{streak === 1 ? '' : 's'}
+        </Text>
+      </View>
 
-    alert(`XP: ${result.xp}`);
-  }}
->
-  <Text style={styles.featureTitle}>
-    ➕ Add 10 XP
-  </Text>
-</TouchableOpacity>
-*/}
-    </View>
+      <TouchableOpacity
+        style={styles.featureCard}
+        onPress={() => router.push('/learning-journey')}
+      >
+        <Text style={styles.featureTitle}>
+          Learning Journey
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.featureCard}
+        onPress={() => router.push('/modules/anti-doping-basics')}
+      >
+        <Text style={styles.featureTitle}>
+          Open Anti-Doping Basics
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.featureCard}
+        onPress={() => router.push('/supplement-roulette')}
+      >
+        <Text style={styles.featureTitle}>
+          Supplement Roulette
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.featureCard}
+        onPress={() => router.push('/medicine-scanner')}
+      >
+        <Text style={styles.featureTitle}>
+          Medicine Scanner
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.featureCard}
+        onPress={() => router.push('/leaderboard')}
+      >
+        <Text style={styles.featureTitle}>
+          Leaderboard
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={handleLogout}
+      >
+        <Text style={styles.logoutText}>
+          Logout
+        </Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 }
 
@@ -184,41 +151,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F172A',
-    padding: 20,
   },
 
-  logoutButton: {
-  backgroundColor: '#DC2626',
-  padding: 16,
-  borderRadius: 12,
-  marginTop: 20,
-},
-
-logoutText: {
-  color: 'white',
-  textAlign: 'center',
-  fontWeight: 'bold',
-},
-
+  contentContainer: {
+    padding: 20,
+    paddingBottom: 48,
+  },
 
   header: {
     color: 'white',
     fontSize: 28,
     fontWeight: 'bold',
-    marginTop: 60,
+    marginTop: 40,
     marginBottom: 24,
   },
 
-    sportText: {
-  color: '#94A3B8',
-  fontSize: 16,
-  marginBottom: 20,
-},
+  sportText: {
+    color: '#94A3B8',
+    fontSize: 16,
+    marginBottom: 12,
+  },
 
   statsCard: {
     backgroundColor: '#1E293B',
     padding: 20,
-    borderRadius: 16,
+    borderRadius: 12,
+    marginTop: 8,
     marginBottom: 24,
   },
 
@@ -231,7 +189,7 @@ logoutText: {
   featureCard: {
     backgroundColor: '#2563EB',
     padding: 20,
-    borderRadius: 16,
+    borderRadius: 12,
     marginBottom: 16,
   },
 
@@ -239,5 +197,18 @@ logoutText: {
     color: 'white',
     fontSize: 18,
     fontWeight: '600',
+  },
+
+  logoutButton: {
+    backgroundColor: '#DC2626',
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 4,
+  },
+
+  logoutText: {
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 });
