@@ -12,7 +12,7 @@ import {
 import {
   getLeaderboard,
   type LeaderboardEntry,
-} from '../src/firebase/leaderboardService';
+} from '../../src/firebase/leaderboardService';
 
 export default function LeaderboardScreen() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
