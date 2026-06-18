@@ -2,20 +2,15 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   Alert,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { router } from 'expo-router';
 
 import { auth } from '../../src/firebase/config';
 import { getUserProfile } from '../../src/firebase/userService';
-import { router } from 'expo-router';
 import { logoutUser } from '../../src/firebase/logoutservices';
-import { addXP } from '../../src/firebase/xpservices';
-import { completeModule } from '../../src/firebase/progressService';
 
 export default function DashboardScreen() {
   const [name, setName] = useState('');
@@ -66,25 +61,27 @@ export default function DashboardScreen() {
 
   return (
     <View style={styles.container}>
-     <Text style={styles.header}>
-  🏆 Welcome {name}
-</Text>
+      <Text style={styles.header}>
+        🏆 Welcome {name}
+      </Text>
 
-<Text style={styles.sportText}>
-  Sport: {sport}
-</Text>
+      <Text style={styles.sportText}>
+        Sport: {sport}
+      </Text>
 
-<Text style={styles.sportText}>
-  Age: {age}
-</Text>
+      <Text style={styles.sportText}>
+        Age: {age}
+      </Text>
 
       <View style={styles.statsCard}>
         <Text style={styles.statText} selectable>
           Level: {level}
         </Text>
+
         <Text style={styles.statText} selectable>
           XP: {xp}
         </Text>
+
         <Text style={styles.statText} selectable>
           Streak: {streak} Day{streak === 1 ? '' : 's'}
         </Text>
@@ -136,51 +133,52 @@ export default function DashboardScreen() {
       </TouchableOpacity>
 
       <TouchableOpacity
-  style={styles.logoutButton}
-  onPress={async () => {
-    const result = await logoutUser();
+        style={styles.logoutButton}
+        onPress={async () => {
+          const result = await logoutUser();
 
-    if (!result.success) {
-      alert(result.error);
-      return;
-    }
+          if (!result.success) {
+            alert(result.error);
+            return;
+          }
 
-    router.replace('/');
-  }}
->
-  <Text style={styles.logoutText}>
-    Logout
-  </Text>
-</TouchableOpacity>
-{/*XP test button}
-<TouchableOpacity
-  style={styles.featureCard}
-  onPress={async () => {
-    const currentUser = auth.currentUser;
+          router.replace('/');
+        }}
+      >
+        <Text style={styles.logoutText}>
+          Logout
+        </Text>
+      </TouchableOpacity>
 
-    if (!currentUser) return;
+      {/*XP test button}
+      <TouchableOpacity
+        style={styles.featureCard}
+        onPress={async () => {
+          const currentUser = auth.currentUser;
 
-    const result = await addXP(
-      currentUser.uid,
-      10
-    );
+          if (!currentUser) return;
 
-    if (!result.success) {
-      alert(result.error);
-      return;
-    }
+          const result = await addXP(
+            currentUser.uid,
+            10
+          );
 
-    setXp(result.xp ?? 0);
-setLevel(result.level ?? 'Rookie');
+          if (!result.success) {
+            alert(result.error);
+            return;
+          }
 
-    alert(`XP: ${result.xp}`);
-  }}
->
-  <Text style={styles.featureTitle}>
-    ➕ Add 10 XP
-  </Text>
-</TouchableOpacity>
-*/}
+          setXp(result.xp ?? 0);
+          setLevel(result.level ?? 'Rookie');
+
+          alert(`XP: ${result.xp}`);
+        }}
+      >
+        <Text style={styles.featureTitle}>
+          ➕ Add 10 XP
+        </Text>
+      </TouchableOpacity>
+      */}
     </View>
   );
 }
@@ -235,5 +233,19 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: '600',
+  },
+
+  logoutButton: {
+    backgroundColor: '#DC2626',
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 20,
+  },
+
+  logoutText: {
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
