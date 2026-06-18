@@ -1,8 +1,9 @@
+import React, { useEffect } from 'react';
 import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 import { router } from 'expo-router';
@@ -149,4 +150,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 20,
   },
+
+  module: {
+    color: 'white',
+    fontSize: 16,
+    marginBottom: 12,
+    padding: 12,
+    backgroundColor: '#1E293B',
+    borderRadius: 8,
+  },
 });
+
+function useState<T>(initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
+  return React.useState(initialValue);
+}
+
