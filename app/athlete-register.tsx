@@ -1,139 +1,291 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { registerUser } from '../src/firebase/authService';
-import { createUserProfile } from '../src/firebase/firestoreService';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  ScrollView,
+} from 'react-native';
+
 export default function AthleteRegisterScreen() {
-    const [name, setName] = useState('');
-    const [sport, setSport] = useState('');
-    const [age, setAge] = useState('');
-    const router = useRouter();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+  const router = useRouter();
+
+  const [isLogin, setIsLogin] = useState(false);
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleContinue = () => {
+    if (!email.trim()) {
+      alert('Enter Email');
+      return;
+    }
+
+    if (!password.trim()) {
+      alert('Enter Password');
+      return;
+    }
+
+    if (isLogin) {
+      // Existing user
+      router.replace('/(tabs)/dashboard');
+    } else {
+      // New user
+      router.push('/onboarding');
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Athlete Registration</Text>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+    >
+      <TouchableOpacity
+        onPress={() => router.back()}
+      >
+        <Text style={styles.back}>
+          ← Back
+        </Text>
+      </TouchableOpacity>
 
-     <TextInput
-  placeholder="Enter your name"
-  placeholderTextColor="#94A3B8"
-  style={styles.input}
-  value={name}
-  onChangeText={setName}
-/>
-<TextInput
-  placeholder="Enter your email"
-  placeholderTextColor="#94A3B8"
-  style={styles.input}
-  value={email}
-  onChangeText={setEmail}
-  keyboardType="email-address"
-/>
-<TextInput
-  placeholder="Enter your password"
-  placeholderTextColor="#94A3B8"
-  style={styles.input}
-  value={password}
-  onChangeText={setPassword}
-  secureTextEntry
-/>
-<Text
-  style={{
-    color: 'white',
-    marginBottom: 16,
-  }}
->
-  Hello, {name}
-</Text>
-<TextInput
-  placeholder="Enter your sport"
-  placeholderTextColor="#94A3B8"
-  style={styles.input}
-  value={sport}
-  onChangeText={setSport}
-/>
+      <View style={styles.header}>
+        <Text style={styles.title}>
+          Welcome, Athlete
+        </Text>
 
-    <TextInput
-  placeholder="Enter your age"
-  placeholderTextColor="#94A3B8"
-  keyboardType="numeric"
-  style={styles.input}
-  value={age}
-  onChangeText={setAge}
-/>
+        <Text style={styles.subtitle}>
+          Start your clean sport journey
+        </Text>
+      </View>
 
-<TouchableOpacity
-  style={styles.button}
-  onPress={async () => {
+      <View style={styles.card}>
+        {/* Toggle */}
 
-  if (name.trim() === '') {
-    alert('Please enter your name');
-    return;
-  }
-if (password.trim() === '') {
-  alert('Please enter your password');
-  return;
-}
-  if (email.trim() === '') {
-    alert('Please enter your email');
-    return;
-  }
+        <View style={styles.toggleContainer}>
+          <TouchableOpacity
+            style={[
+              styles.toggleButton,
+              isLogin && styles.activeToggle,
+            ]}
+            onPress={() => setIsLogin(true)}
+          >
+            <Text
+              style={[
+                styles.toggleText,
+                isLogin && styles.activeText,
+              ]}
+            >
+              Log In
+            </Text>
+          </TouchableOpacity>
 
-  if (sport.trim() === '') {
-  alert('Please enter your sport');
-  return;
-}
+          <TouchableOpacity
+            style={[
+              styles.toggleButton,
+              !isLogin && styles.activeToggle,
+            ]}
+            onPress={() => setIsLogin(false)}
+          >
+            <Text
+              style={[
+                styles.toggleText,
+                !isLogin && styles.activeText,
+              ]}
+            >
+              Sign Up
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-if (age.trim() === '') {
-  alert('Please enter your age');
-  return;
-}
+        {/* Email */}
 
-  const result = await registerUser(email, password);
-  //console.log('Auth Result:', result);
+        <TextInput
+          placeholder="athlete@email.com"
+          placeholderTextColor="#94A3B8"
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+        />
 
-if (!result.success) {
-  alert(result.error);
-  return;
-}
+        {/* Password */}
 
-const profileResult = await createUserProfile(
-  result.user!.uid,
-  name,
-  email,
-  age,
-  sport
-);
-//console.log('Profile Result:', profileResult);
+        <TextInput
+          placeholder="Password"
+          placeholderTextColor="#94A3B8"
+          secureTextEntry
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+        />
 
-if (!profileResult.success) {
-  alert(profileResult.error);
-  return;
-}
+        {isLogin && (
+          <TouchableOpacity>
+            <Text style={styles.forgot}>
+              Forgot password?
+            </Text>
+          </TouchableOpacity>
+        )}
 
-alert('Account created successfully!');
+        {/* Main Button */}
 
-  router.push({
-    pathname: '/dashboard',
-    params: {
-      name,
-      sport,
-      age,
-    },
-  });
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={handleContinue}
+        >
+          <Text style={styles.primaryButtonText}>
+            {isLogin
+              ? 'Login'
+              : 'Start Your Clean Sport Journey'}
+          </Text>
+        </TouchableOpacity>
 
-}}
->
-  <Text style={styles.buttonText}>Continue</Text>
-</TouchableOpacity>
-    </View>
+        <Text style={styles.or}>OR</Text>
+
+        {/* Google */}
+
+        <TouchableOpacity style={styles.googleButton}>
+          <Text style={styles.googleText}>
+            Continue with Google
+          </Text>
+        </TouchableOpacity>
+
+        <Text style={styles.footer}>
+          By continuing you agree to our Terms.
+        </Text>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
+    backgroundColor: '#00BCEB',
+    paddingTop: 60,
+  },
+
+  back: {
+    color: '#fff',
+    fontSize: 16,
+    marginLeft: 20,
+  },
+
+  header: {
+    paddingHorizontal: 24,
+    marginTop: 40,
+    marginBottom: 30,
+  },
+
+  title: {
+    fontSize: 34,
+    fontWeight: '700',
+    color: '#fff',
+  },
+
+  subtitle: {
+    fontSize: 18,
+    color: '#E2E8F0',
+    marginTop: 8,
+  },
+
+  card: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    padding: 24,
+    minHeight: 700,
+  },
+
+  toggleContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#EEF5F8',
+    borderRadius: 40,
+    padding: 4,
+    marginBottom: 30,
+  },
+
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 30,
+    alignItems: 'center',
+  },
+
+  activeToggle: {
+    backgroundColor: '#fff',
+  },
+
+  toggleText: {
+    color: '#64748B',
+    fontWeight: '600',
+  },
+
+  activeText: {
+    color: '#000',
+    fontWeight: '700',
+  },
+
+  input: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 18,
+    padding: 18,
+    fontSize: 16,
+    marginBottom: 16,
+  },
+
+  forgot: {
+    alignSelf: 'flex-end',
+    color: '#00BCEB',
+    marginBottom: 20,
+  },
+
+  primaryButton: {
+    backgroundColor: '#00BCEB',
+    padding: 18,
+    borderRadius: 35,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+
+  primaryButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+
+  or: {
+    textAlign: 'center',
+    marginVertical: 24,
+    color: '#64748B',
+  },
+
+  googleButton: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 35,
+    padding: 18,
+    alignItems: 'center',
+  },
+
+  googleText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  footer: {
+    textAlign: 'center',
+    color: '#94A3B8',
+    marginTop: 24,
+  },
+});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#131e39',
     padding: 24,
     justifyContent: 'center',
   },
