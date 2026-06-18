@@ -1,5 +1,5 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 export default function RoleSelectionScreen() {
   return (
     <View style={styles.container}>
@@ -8,7 +8,7 @@ export default function RoleSelectionScreen() {
  <TouchableOpacity
   style={styles.card}
   onPress={() => {
-    router.push('/athlete-register');
+    router.push('/sport-selection');
   }}
 >
         <Text style={styles.emoji}>🏃</Text>
