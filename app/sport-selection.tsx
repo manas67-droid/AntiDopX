@@ -1,4 +1,3 @@
-import { FontAwesome5 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -13,32 +12,47 @@ const sports = [
   {
     id: "athletics",
     title: "Athletics",
-    icon: "running",
+    icon: "🏃",
   },
   {
     id: "football",
     title: "Football",
-    icon: "futbol",
+    icon: "⚽",
   },
   {
     id: "cricket",
     title: "Cricket",
-    icon: "trophy",
+    icon: "🏏",
   },
   {
     id: "swimming",
     title: "Swimming",
-    icon: "swimmer",
+    icon: "🏊",
   },
   {
     id: "boxing",
     title: "Boxing",
-    icon: "fist-raised",
+    icon: "🥊",
+  },
+  {
+    id: "badminton",
+    title: "Badminton",
+    icon: "🏸",
+  },
+  {
+    id: "weightlifting",
+    title: "Weightlifting",
+    icon: "🏋️",
+  },
+  {
+    id: "martial-arts",
+    title: "Martial Arts",
+    icon: "🥋",
   },
   {
     id: "other",
     title: "Other",
-    icon: "ellipsis-h",
+    icon: "🎯",
   },
 ];
 
@@ -79,11 +93,9 @@ export default function SportSelectionScreen() {
               setSelectedSport(item.id)
             }
           >
-            <FontAwesome5
-              name={item.icon}
-              size={30}
-              color="#2563EB"
-            />
+            <Text style={styles.sportEmoji}>
+               {item.icon}
+            </Text>
 
             <Text style={styles.cardText}>
               {item.title}
@@ -113,56 +125,85 @@ export default function SportSelectionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0F172A",
-    paddingHorizontal: 20,
+    backgroundColor: '#14C8E8',
+    paddingHorizontal: 24,
+    paddingTop: 40,
   },
 
   title: {
-    color: "#fff",
-    fontSize: 30,
-    fontWeight: "700",
-    marginTop: 20,
+    color: '#FFFFFF',
+    fontSize: 36,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 10,
   },
 
   subtitle: {
-    color: "#94A3B8",
-    marginTop: 8,
+    color: '#EAFBFF',
     fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 30,
+    lineHeight: 24,
   },
 
   card: {
     flex: 1,
-    backgroundColor: "#1E293B",
+    backgroundColor: '#FFFFFF',
     borderRadius: 24,
-    padding: 24,
+    padding: 20,
     margin: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 140,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 150,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 5,
   },
 
   activeCard: {
-    borderWidth: 2,
-    borderColor: "#2563EB",
+    borderWidth: 3,
+    borderColor: '#0EA5E9',
+    transform: [{ scale: 1.02 }],
   },
 
   cardText: {
-    color: "#fff",
-    marginTop: 12,
-    fontWeight: "600",
+    color: '#0F172A',
+    marginTop: 14,
+    fontWeight: '700',
+    fontSize: 18,
+  },
+
+  sportEmoji: {
+    fontSize: 48,
   },
 
   button: {
-    backgroundColor: "#2563EB",
+    backgroundColor: '#FFFFFF',
     paddingVertical: 18,
-    borderRadius: 18,
-    marginBottom: 24,
+    borderRadius: 999,
+    marginBottom: 30,
+    marginTop: 20,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 6,
   },
 
   buttonText: {
-    color: "#fff",
-    textAlign: "center",
-    fontWeight: "700",
-    fontSize: 16,
+    color: '#14C8E8',
+    textAlign: 'center',
+    fontWeight: '700',
+    fontSize: 18,
   },
 });
