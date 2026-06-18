@@ -47,7 +47,7 @@ export default function SportSelectionScreen() {
     useState<string>("");
 
  const handleContinue = () => {
-  router.push("/role-selection");
+  router.push("/(tabs)/dashboard",);
 };
 
   return (
