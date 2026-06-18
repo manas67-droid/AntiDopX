@@ -1,120 +1,151 @@
-import { useEffect, useState } from 'react';
 import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-} from 'react-native';
+  FontAwesome5,
+  Ionicons,
+  MaterialIcons,
+} from '@expo/vector-icons';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { auth } from '../src/firebase/config';
-import { getUserProfile } from '../src/firebase/userService';
-import { router } from 'expo-router';
+const modules = [
+  {
+    id: 1,
+    title: 'Anti-Doping Basics',
+    lessons: 8,
+    xp: 240,
+    status: 'done',
+    icon: 'shield-alt',
+  },
+  {
+    id: 2,
+    title: 'Prohibited Substances',
+    lessons: 10,
+    xp: 320,
+    status: 'active',
+    icon: 'flask',
+  },
+  {
+    id: 3,
+    title: 'Testing Procedures',
+    lessons: 6,
+    xp: 200,
+    status: 'unlocked',
+    icon: 'file-alt',
+  },
+  {
+    id: 4,
+    title: 'TUE Process',
+    lessons: 5,
+    xp: 180,
+    status: 'locked',
+    icon: 'lock',
+  },
+  {
+    id: 5,
+    title: 'Supplement Awareness',
+    lessons: 7,
+    xp: 220,
+    status: 'locked',
+    icon: 'capsules',
+  },
+  {
+    id: 6,
+    title: 'Play True Ethics',
+    lessons: 4,
+    xp: 160,
+    status: 'locked',
+    icon: 'star',
+  },
+];
 
 export default function LearningJourneyScreen() {
-  const [progress, setProgress] = useState({
-    antiDopingBasics: false,
-    wadaRules: false,
-    testingProcedures: false,
-    tue: false,
-    supplements: false,
-  });
-
-  const [completionPercent, setCompletionPercent] =
-    useState(0);
-
-  useEffect(() => {
-    const loadProgress = async () => {
-      const currentUser = auth.currentUser;
-
-      if (!currentUser) return;
-
-      const result = await getUserProfile(
-        currentUser.uid
-      );
-
-      if (!result.success || !result.data) return;
-
-      const userProgress =
-        result.data.progress || {};
-
-      setProgress({
-        antiDopingBasics:
-          userProgress.antiDopingBasics || false,
-
-        wadaRules:
-          userProgress.wadaRules || false,
-
-        testingProcedures:
-          userProgress.testingProcedures || false,
-
-        tue:
-          userProgress.tue || false,
-
-        supplements:
-          userProgress.supplements || false,
-      });
-
-      const completedModules =
-        Object.values(userProgress)
-          .filter(Boolean).length;
-
-      const totalModules = 5;
-
-      const percent = Math.round(
-        (completedModules / totalModules) * 100
-      );
-
-      setCompletionPercent(percent);
-    };
-
-    loadProgress();
-  }, []);
-
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>
-        📚 Learning Journey
+        Learning Path
       </Text>
 
-      <Text style={styles.progressText}>
-        Progress: {completionPercent}%
+      <Text style={styles.subtitle}>
+        Master clean sport one module at a time
       </Text>
 
-      <TouchableOpacity
-        onPress={() =>
-          router.push('/modules/anti-doping-basics')
-        }
-      >
-        <Text style={styles.module}>
-          {progress.antiDopingBasics ? '✅' : '⬜'} Anti-Doping
-          Basics
+      {/* Current Module Card */}
+
+      <View style={styles.currentCard}>
+        <Text style={styles.currentLabel}>
+          CURRENT MODULE
         </Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={() =>
-          router.push('/modules/wada-rules')
-        }
-      >
-        <Text style={styles.module}>
-          {progress.wadaRules ? '✅' : '⬜'} WADA Rules
+        <Text style={styles.currentTitle}>
+          Prohibited Substances
         </Text>
-      </TouchableOpacity>
 
-      <Text style={styles.module}>
-        {progress.testingProcedures ? '✅' : '⬜'} Testing
-        Procedures
-      </Text>
+        <View style={styles.progressBar}>
+          <View style={styles.progressFill} />
+        </View>
 
-      <Text style={styles.module}>
-        {progress.tue ? '✅' : '⬜'} TUE
-      </Text>
+        <Text style={styles.progressText}>
+          6 / 10 Lessons
+        </Text>
+      </View>
 
-      <Text style={styles.module}>
-        {progress.supplements ? '✅' : '⬜'} Supplements &
-        Risks
-      </Text>
-    </View>
+      {/* Modules */}
+
+      {modules.map((module) => (
+        <View
+          key={module.id}
+          style={[
+            styles.moduleCard,
+            module.status === 'active' &&
+              styles.activeCard,
+          ]}
+        >
+          <View style={styles.iconContainer}>
+            <FontAwesome5
+              name={module.icon as any}
+              size={24}
+              color="white"
+            />
+          </View>
+
+          <View style={{ flex: 1 }}>
+            <Text style={styles.status}>
+              {module.status.toUpperCase()}
+            </Text>
+
+            <Text style={styles.moduleTitle}>
+              {module.title}
+            </Text>
+
+            <Text style={styles.moduleInfo}>
+              {module.lessons} Lessons • +{module.xp} XP
+            </Text>
+          </View>
+
+          {module.status === 'done' && (
+            <MaterialIcons
+              name="check-circle"
+              size={28}
+              color="#10B981"
+            />
+          )}
+
+          {module.status === 'active' && (
+            <Ionicons
+              name="star"
+              size={28}
+              color="#F59E0B"
+            />
+          )}
+
+          {module.status === 'locked' && (
+            <Ionicons
+              name="lock-closed"
+              size={24}
+              color="#94A3B8"
+            />
+          )}
+        </View>
+      ))}
+    </ScrollView>
   );
 }
 
@@ -129,20 +160,95 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 28,
     fontWeight: 'bold',
-    marginTop: 60,
-    marginBottom: 30,
+    marginTop: 20,
+  },
+
+  subtitle: {
+    color: '#94A3B8',
+    marginTop: 6,
+    marginBottom: 20,
+  },
+
+  currentCard: {
+    backgroundColor: '#2563EB',
+    padding: 20,
+    borderRadius: 20,
+    marginBottom: 25,
+  },
+
+  currentLabel: {
+    color: '#BFDBFE',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+
+  currentTitle: {
+    color: 'white',
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginTop: 8,
+  },
+
+  progressBar: {
+    height: 10,
+    backgroundColor: '#93C5FD',
+    borderRadius: 10,
+    marginTop: 16,
+    overflow: 'hidden',
+  },
+
+  progressFill: {
+    width: '60%',
+    height: '100%',
+    backgroundColor: 'white',
   },
 
   progressText: {
-    color: '#60A5FA',
-    fontSize: 18,
+    color: 'white',
+    marginTop: 8,
     fontWeight: '600',
-    marginBottom: 24,
   },
 
-  module: {
+  moduleCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1E293B',
+    padding: 16,
+    borderRadius: 18,
+    marginBottom: 14,
+  },
+
+  activeCard: {
+    borderWidth: 2,
+    borderColor: '#2563EB',
+  },
+
+  iconContainer: {
+    width: 55,
+    height: 55,
+    borderRadius: 15,
+    backgroundColor: '#2563EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+
+  status: {
+    color: '#94A3B8',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+
+  moduleTitle: {
     color: 'white',
-    fontSize: 18,
-    marginBottom: 20,
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 2,
+  },
+
+  moduleInfo: {
+    color: '#CBD5E1',
+    marginTop: 4,
+    fontSize: 13,
   },
 });
