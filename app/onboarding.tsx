@@ -36,51 +36,65 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#14C8E8',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    paddingHorizontal: 28,
   },
 
   logo: {
-    fontSize: 70,
-    marginBottom: 20,
+    fontSize: 90,
+    marginBottom: 30,
   },
 
   title: {
-    color: 'white',
-    fontSize: 30,
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontSize: 38,
+    fontWeight: '700',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
+    lineHeight: 46,
   },
 
   subtitle: {
-    color: '#CBD5E1',
-    fontSize: 18,
+    color: '#EAFBFF',
+    fontSize: 20,
     textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 28,
+    marginBottom: 18,
+    lineHeight: 30,
+    fontWeight: '500',
   },
 
   description: {
-    color: '#94A3B8',
+    color: '#D9F6FC',
     fontSize: 16,
     textAlign: 'center',
-    marginBottom: 40,
-    lineHeight: 24,
+    marginBottom: 50,
+    lineHeight: 26,
+    paddingHorizontal: 10,
   },
 
   button: {
-    backgroundColor: '#2563EB',
-    paddingHorizontal: 40,
-    paddingVertical: 16,
-    borderRadius: 14,
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 18,
+    paddingHorizontal: 50,
+    borderRadius: 999,
+    minWidth: 220,
+    alignItems: 'center',
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 6,
   },
 
   buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#14C8E8',
+    fontSize: 18,
+    fontWeight: '700',
   },
 });
