@@ -7,8 +7,8 @@ import {
 } from 'react-native';
 
 import { router } from 'expo-router';
-import { auth } from '../src/firebase/config';
-import { getUserProfile } from '../src/firebase/userService';
+import { auth } from '../../src/firebase/config';
+import { getUserProfile } from '../../src/firebase/userService';
 
 export default function LearningJourneyScreen() {
   const [progress, setProgress] = useState({
@@ -82,7 +82,7 @@ export default function LearningJourneyScreen() {
 
       <TouchableOpacity
         onPress={() =>
-          router.push('/modules/anti-doping-basics')
+          router.push('./modules/anti-doping-basics')
         }
       >
         <Text style={styles.module}>
@@ -93,7 +93,7 @@ export default function LearningJourneyScreen() {
 
       <TouchableOpacity
         onPress={() =>
-          router.push('/modules/wada-rules')
+          router.push('./modules/wada-rules')
         }
       >
         <Text style={styles.module}>
@@ -164,4 +164,3 @@ const styles = StyleSheet.create({
 function useState<T>(initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
   return React.useState(initialValue);
 }
-
