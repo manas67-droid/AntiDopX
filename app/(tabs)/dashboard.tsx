@@ -1,11 +1,11 @@
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { auth } from '../../src/firebase/config';
-import { getUserProfile } from '../../src/firebase/userService';
-import { router } from 'expo-router';
 import { logoutUser } from '../../src/firebase/logoutservices';
-import { addXP } from '../../src/firebase/xpservices';
 import { completeModule } from '../../src/firebase/progressService';
+import { getUserProfile } from '../../src/firebase/userService';
+import { addXP } from '../../src/firebase/xpservices';
 
 export default function DashboardScreen() {
     const [name, setName] = useState('');
@@ -51,16 +51,21 @@ setAge(String(userData.age));
      
   return (
     <View style={styles.container}>
-     <Text style={styles.header}>
-  🏆 Welcome {name}
+     <Text style={styles.greeting}>
+  👋 Welcome Back
 </Text>
 
-<Text style={styles.sportText}>
-  Sport: {sport}
+<Text style={styles.name}>
+  {name}
 </Text>
 
-<Text style={styles.sportText}>
-  Age: {age}
+<View style={styles.profileCard}>
+  <Text style={styles.profileText}>
+  🏅 Sport: {sport}
+</Text>
+</View>
+<Text style={styles.profileText}>
+  🎂 Age: {age}
 </Text>
 
       <View style={styles.statsCard}>
@@ -147,35 +152,7 @@ setAge(String(userData.age));
     Logout
   </Text>
 </TouchableOpacity>
-{/*XP test button}
-<TouchableOpacity
-  style={styles.featureCard}
-  onPress={async () => {
-    const currentUser = auth.currentUser;
 
-    if (!currentUser) return;
-
-    const result = await addXP(
-      currentUser.uid,
-      10
-    );
-
-    if (!result.success) {
-      alert(result.error);
-      return;
-    }
-
-    setXp(result.xp ?? 0);
-setLevel(result.level ?? 'Rookie');
-
-    alert(`XP: ${result.xp}`);
-  }}
->
-  <Text style={styles.featureTitle}>
-    ➕ Add 10 XP
-  </Text>
-</TouchableOpacity>
-*/}
     </View>
   );
 }
@@ -239,5 +216,31 @@ logoutText: {
     color: 'white',
     fontSize: 18,
     fontWeight: '600',
+  },
+
+  greeting: {
+  color: '#94A3B8',
+  fontSize: 16,
+  marginTop: 20,
+  },
+
+  name: {
+  color: 'white',
+  fontSize: 28,
+  fontWeight: 'bold',
+  marginBottom: 20,
+  },
+
+  profileCard: {
+  backgroundColor: '#1E293B',
+  padding: 16,
+  borderRadius: 16,
+  marginBottom: 20,
+  },
+
+  profileText: {
+  color: 'white',
+  fontSize: 16,
+  marginBottom: 6,
   },
 });
