@@ -111,7 +111,7 @@ export default function LeaderboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#fff',
   },
 
   contentContainer: {
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
 
   refreshButton: {
     alignSelf: 'flex-start',
-    backgroundColor: '#2563EB',
+    backgroundColor: '#14C8E8',
     borderRadius: 12,
     paddingHorizontal: 18,
     paddingVertical: 12,
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
 
   rank: {
-    color: '#60A5FA',
+    color: '#277ce5',
     fontSize: 18,
     fontVariant: ['tabular-nums'],
     fontWeight: 'bold',
