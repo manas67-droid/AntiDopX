@@ -142,73 +142,147 @@ export default function DashboardScreen() {
 
     {/* QUICK PLAY */}
 
-    <Text style={styles.sectionTitle}>
-      Quick Play
+<Text style={styles.sectionTitle}>
+  Quick Play
+</Text>
+
+<View style={styles.grid}>
+  <TouchableOpacity
+    style={styles.gridCard}
+    onPress={() => router.push('/learning-journey')}
+  >
+    <Text style={styles.gridIcon}>📚</Text>
+    <Text style={styles.gridTitle}>Learn</Text>
+    <Text style={styles.gridSubtitle}>6 Modules</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={styles.gridCard}
+    onPress={() => router.push('/supplement-roulette')}
+  >
+    <Text style={styles.gridIcon}>🧪</Text>
+    <Text style={styles.gridTitle}>Supplement Spin</Text>
+    <Text style={styles.gridSubtitle}>Risk Roulette</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={styles.gridCard}
+    onPress={() => router.push('/medicine-scanner')}
+  >
+    <Text style={styles.gridIcon}>📷</Text>
+    <Text style={styles.gridTitle}>Med Scanner</Text>
+    <Text style={styles.gridSubtitle}>AI Check</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={styles.gridCard}
+    onPress={() => router.push('/challenges')}
+  >
+    <Text style={styles.gridIcon}>🧠</Text>
+    <Text style={styles.gridTitle}>Quiz Arena</Text>
+    <Text style={styles.gridSubtitle}>Beat The Clock</Text>
+  </TouchableOpacity>
+</View>
+
+{/* THIS WEEK */}
+
+<View style={styles.weekHeader}>
+  <Text style={styles.sectionTitle}>
+    This Week
+  </Text>
+
+  <Text style={styles.eventCount}>
+    3 events
+  </Text>
+</View>
+
+<View style={styles.eventCard}>
+  <View style={styles.dayCircle}>
+    <Text style={styles.dayText}>THU</Text>
+  </View>
+
+  <View style={{ flex: 1 }}>
+    <Text style={styles.eventTitle}>
+      Clean Sport Tournament
     </Text>
 
-    <View style={styles.grid}>
-      <TouchableOpacity
-        style={styles.gridCard}
-        onPress={() =>
-          router.push('/learning-journey')
-        }
-      >
-        <Text style={styles.gridIcon}>📚</Text>
-        <Text style={styles.gridTitle}>Learn</Text>
-      </TouchableOpacity>
+    <Text style={styles.eventSubtitle}>
+      Compete with athletes
+    </Text>
+  </View>
 
-      <TouchableOpacity
-        style={styles.gridCard}
-        onPress={() =>
-          router.push('/supplement-roulette')
-        }
-      >
-        <Text style={styles.gridIcon}>🧪</Text>
-        <Text style={styles.gridTitle}>Supplement</Text>
-      </TouchableOpacity>
+  <View style={styles.liveBadge}>
+    <Text style={styles.liveText}>LIVE</Text>
+  </View>
+</View>
 
-      <TouchableOpacity
-        style={styles.gridCard}
-        onPress={() =>
-          router.push('/medicine-scanner')
-        }
-      >
-        <Text style={styles.gridIcon}>📷</Text>
-        <Text style={styles.gridTitle}>Scanner</Text>
-      </TouchableOpacity>
+<View style={styles.eventCard}>
+  <View style={styles.dayCircle}>
+    <Text style={styles.dayText}>SAT</Text>
+  </View>
 
-      <TouchableOpacity
-        style={styles.gridCard}
-        onPress={() =>
-          router.push('/challenges')
-        }
-      >
-        <Text style={styles.gridIcon}>🎮</Text>
-        <Text style={styles.gridTitle}>Quiz Arena</Text>
-      </TouchableOpacity>
+  <View style={{ flex: 1 }}>
+    <Text style={styles.eventTitle}>
+      TUE Process Workshop
+    </Text>
 
-      <TouchableOpacity
-        style={styles.gridCard}
-        onPress={() =>
-          router.push('/achievements')
-        }
-      >
-        <Text style={styles.gridIcon}>🏆</Text>
-        <Text style={styles.gridTitle}>Achievements</Text>
-      </TouchableOpacity>
+    <Text style={styles.eventSubtitle}>
+      Interactive Lesson
+    </Text>
+  </View>
 
-      <TouchableOpacity
-        style={styles.gridCard}
-        onPress={() =>
-          router.push('/leaderboard')
-        }
-      >
-        <Text style={styles.gridIcon}>🥇</Text>
-        <Text style={styles.gridTitle}>Leaderboard</Text>
-      </TouchableOpacity>
-    </View>
+  <View style={styles.newBadge}>
+    <Text style={styles.liveText}>NEW</Text>
+  </View>
+</View>
 
-    <View style={{ height: 100 }} />
+{/* BADGES */}
+
+<View style={styles.badgeHeader}>
+  <Text style={styles.sectionTitle}>
+    Recent Badges
+  </Text>
+
+  <Text style={styles.viewAll}>
+    View all
+  </Text>
+</View>
+
+<View style={styles.badgesRow}>
+  <View style={styles.badgeCard}>
+    <Text style={styles.badgeIcon}>🏅</Text>
+    <Text style={styles.badgeName}>First Lesson</Text>
+  </View>
+
+  <View style={styles.badgeCard}>
+    <Text style={styles.badgeIcon}>🛡️</Text>
+    <Text style={styles.badgeName}>Clean Athlete</Text>
+  </View>
+
+  <View style={styles.badgeCard}>
+    <Text style={styles.badgeIcon}>🔥</Text>
+    <Text style={styles.badgeName}>7 Day Streak</Text>
+  </View>
+
+  <View style={styles.badgeCard}>
+    <Text style={styles.badgeIcon}>💊</Text>
+    <Text style={styles.badgeName}>Supp Expert</Text>
+  </View>
+</View>
+
+{/* RANK CARD */}
+
+<View style={styles.rankCard}>
+  <Text style={styles.rankTitle}>
+    🏆 Your Rank
+  </Text>
+
+  <Text style={styles.rankText}>
+    #42 nationally • Top 5%
+  </Text>
+</View>
+
+<View style={{ height: 120 }} />
   </ScrollView>
 );
 }
@@ -216,7 +290,7 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#fff',
   },
 
   hero: {
@@ -391,5 +465,125 @@ const styles = StyleSheet.create({
     color: '#0F172A',
   },
 
+  gridSubtitle: {
+  color: '#64748B',
+  marginTop: 4,
+},
+
+weekHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingHorizontal: 20,
+},
+
+eventCount: {
+  color: '#64748B',
+},
+
+eventCard: {
+  backgroundColor: '#fff',
+  marginHorizontal: 20,
+  marginBottom: 14,
+  borderRadius: 24,
+  padding: 16,
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+
+dayCircle: {
+  width: 50,
+  height: 50,
+  borderRadius: 25,
+  backgroundColor: '#F1F5F9',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginRight: 14,
+},
+
+dayText: {
+  fontWeight: '700',
+  color: '#475569',
+},
+
+eventTitle: {
+  fontSize: 17,
+  fontWeight: '700',
+},
+
+eventSubtitle: {
+  color: '#64748B',
+},
+
+liveBadge: {
+  backgroundColor: '#DCFCE7',
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 999,
+},
+
+newBadge: {
+  backgroundColor: '#DCFCE7',
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 999,
+},
+
+liveText: {
+  color: '#22C55E',
+  fontWeight: '700',
+},
+
+badgeHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingHorizontal: 20,
+},
+
+viewAll: {
+  color: '#14C8E8',
+  fontWeight: '600',
+},
+
+badgesRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  paddingHorizontal: 20,
+  marginBottom: 24,
+},
+
+badgeCard: {
+  alignItems: 'center',
+},
+
+badgeIcon: {
+  fontSize: 40,
+},
+
+badgeName: {
+  marginTop: 8,
+  fontSize: 12,
+  fontWeight: '600',
+},
+
+rankCard: {
+  marginHorizontal: 20,
+  backgroundColor: '#22C55E',
+  borderRadius: 24,
+  padding: 24,
+},
+
+rankTitle: {
+  color: '#fff',
+  fontSize: 16,
+},
+
+rankText: {
+  color: '#fff',
+  fontWeight: '700',
+  fontSize: 24,
+  marginTop: 8,
+},
   
 });
