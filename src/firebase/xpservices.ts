@@ -4,7 +4,7 @@ import { db } from './config';
 const calculateLevel = (xp: number) => {
   if (xp >= 1000) return 'Elite Athlete';
   if (xp >= 300) return 'Champion';
-  if (xp >= 20) return 'Competitor';
+  if (xp >= 100) return 'Competitor';
   return 'Rookie';
 };
 
