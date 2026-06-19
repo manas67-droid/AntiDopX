@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
   ScrollView,
@@ -8,7 +8,10 @@ import {
   View,
 } from 'react-native';
 
+import { useFocusEffect } from 'expo-router';
+import { auth } from '../src/firebase/config';
 import {
+  claimDailySpinXP,
   getRandomSupplement,
   getSupplementCategories,
   type SupplementCategory,
@@ -19,9 +22,30 @@ export default function SupplementRouletteScreen() {
   const [categories, setCategories] = useState<SupplementCategory[]>([]);
   const [result, setResult] = useState<SupplementResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [dailyXPMessage, setDailyXPMessage] = useState('');
+
+  useFocusEffect(
+    useCallback(() => {
+      setDailyXPMessage('');
+    }, [])
+  );
 
   const spin = async (category?: SupplementCategory) => {
     setIsLoading(true);
+
+    // Claim daily XP on spin
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      const xpResult = await claimDailySpinXP(currentUser.uid);
+      if (xpResult.success) {
+        if (xpResult.data.alreadyClaimed) {
+          setDailyXPMessage('');
+        } else {
+          setDailyXPMessage(`+${xpResult.data.xpAwarded} XP for daily spin!`);
+        }
+      }
+    }
+
     const supplementResult = await getRandomSupplement(category);
     setIsLoading(false);
 
@@ -59,13 +83,19 @@ export default function SupplementRouletteScreen() {
         Supplement Roulette
       </Text>
 
+      {dailyXPMessage ? (
+        <View style={styles.xpBanner}>
+          <Text style={styles.xpBannerText}>{dailyXPMessage}</Text>
+        </View>
+      ) : null}
+
       <TouchableOpacity
         style={styles.primaryButton}
         onPress={() => spin()}
         disabled={isLoading}
       >
         <Text style={styles.buttonText}>
-          {isLoading ? 'Checking...' : 'Random Spin'}
+          {isLoading ? 'Spinning...' : '🎲 Random Spin'}
         </Text>
       </TouchableOpacity>
 
@@ -121,6 +151,19 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginTop: 40,
+  },
+
+  xpBanner: {
+    backgroundColor: '#166534',
+    borderRadius: 12,
+    padding: 14,
+  },
+
+  xpBannerText: {
+    color: '#BBF7D0',
+    fontSize: 15,
+    fontWeight: '700',
+    textAlign: 'center',
   },
 
   primaryButton: {

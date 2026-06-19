@@ -1,154 +1,178 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useState } from 'react';
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
-const badges = [
+import { useFocusEffect } from 'expo-router';
+import {
+  getAchievements,
+  type AchievementKey,
+  type Achievements,
+} from '../src/firebase/achievementService';
+import { auth } from '../src/firebase/config';
+import { getUserProfile } from '../src/firebase/userService';
+
+const achievementMeta: {
+  key: AchievementKey;
+  emoji: string;
+  title: string;
+  description: string;
+}[] = [
   {
+    key: 'firstModule',
     emoji: '🏅',
-    title: 'First Lesson',
-    description: 'Complete your first lesson',
-    earned: true,
+    title: 'First Module',
+    description: 'Complete your first module',
   },
   {
+    key: 'threeModules',
     emoji: '🛡️',
-    title: 'Clean Athlete',
-    description: 'Pass the basics module',
-    earned: true,
+    title: '3 Modules Completed',
+    description: 'Complete 3 learning modules',
   },
   {
+    key: 'fiveModules',
+    emoji: '🏆',
+    title: '5 Modules Completed',
+    description: 'Complete all 5 learning modules',
+  },
+  {
+    key: 'xp100',
+    emoji: '⚡',
+    title: '100 XP Earned',
+    description: 'Earn 100 total XP',
+  },
+  {
+    key: 'streak7',
     emoji: '🔥',
     title: '7 Day Streak',
-    description: 'Practice 7 days in a row',
-    earned: true,
-  },
-  {
-    emoji: '💊',
-    title: 'Supplement Expert',
-    description: 'Master supplement risks',
-    earned: true,
-  },
-  {
-    emoji: '🧠',
-    title: 'Knowledge Streak',
-    description: '5 quiz answers in a row',
-    earned: true,
-  },
-  {
-    emoji: '🎯',
-    title: 'Sharp Shooter',
-    description: '100% on a quiz',
-    earned: true,
-  },
-  {
-    emoji: '🏆',
-    title: 'Anti-Doping Master',
-    description: 'Finish all 6 modules',
-    earned: false,
-  },
-  {
-    emoji: '🌍',
-    title: 'Global Top 100',
-    description: 'Reach top 100 worldwide',
-    earned: false,
-  },
-  {
-    emoji: '⚡',
-    title: 'Speed Demon',
-    description: '10 quiz questions under 60s',
-    earned: false,
-  },
-  {
-    emoji: '🥇',
-    title: 'Tournament Win',
-    description: 'Win a live tournament',
-    earned: false,
-  },
-  {
-    emoji: '📚',
-    title: 'Scholar',
-    description: 'Read all references',
-    earned: false,
-  },
-  {
-    emoji: '💯',
-    title: 'Centurion',
-    description: '100 quizzes completed',
-    earned: false,
+    description: 'Maintain a 7-day streak',
   },
 ];
 
 export default function AchievementsScreen() {
-  const earnedCount = badges.filter(
-    (badge) => badge.earned
-  ).length;
+  const [achievements, setAchievements] = useState<Achievements | null>(null);
+  const [completedModules, setCompletedModules] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const progress =
-    (earnedCount / badges.length) * 100;
+  useFocusEffect(
+    useCallback(() => {
+      const loadData = async () => {
+        setIsLoading(true);
+
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          setIsLoading(false);
+          return;
+        }
+
+        const achievementResult = await getAchievements(currentUser.uid);
+        if (achievementResult.success) {
+          setAchievements(achievementResult.data);
+        }
+
+        const profileResult = await getUserProfile(currentUser.uid);
+        if (profileResult.success && profileResult.data) {
+          const progress = profileResult.data.progress || {};
+          const completed = Object.values(progress).filter(Boolean).length;
+          setCompletedModules(completed);
+        }
+
+        setIsLoading(false);
+      };
+
+      loadData();
+    }, [])
+  );
+
+  const earnedCount = achievements
+    ? Object.values(achievements).filter(Boolean).length
+    : 0;
+
+  const progress = achievements
+    ? (earnedCount / achievementMeta.length) * 100
+    : 0;
 
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
-
       <View style={styles.header}>
         <Text style={styles.title}>
           Achievements
         </Text>
 
-        <Text style={styles.subtitle}>
-          {earnedCount} of {badges.length} unlocked
-        </Text>
+        {achievements ? (
+          <>
+            <Text style={styles.subtitle}>
+              {earnedCount} of {achievementMeta.length} unlocked
+            </Text>
 
-        <View style={styles.progressBar}>
-          <View
-            style={[
-              styles.progressFill,
-              { width: `${progress}%` },
-            ]}
-          />
-        </View>
-      </View>
+            <Text style={styles.completedText}>
+              {completedModules}/5 modules completed
+            </Text>
 
-      {/* Badge Grid */}
-
-      <View style={styles.grid}>
-        {badges.map((badge, index) => (
-          <View
-            key={index}
-            style={[
-              styles.badgeCard,
-              !badge.earned &&
-                styles.lockedBadge,
-            ]}
-          >
-            <View
-              style={[
-                styles.iconContainer,
-                !badge.earned &&
-                  styles.lockedIcon,
-              ]}
-            >
-              <Text style={styles.emoji}>
-                {badge.earned
-                  ? badge.emoji
-                  : '🔒'}
-              </Text>
+            <View style={styles.progressBar}>
+              <View
+                style={[
+                  styles.progressFill,
+                  { width: `${progress}%` },
+                ]}
+              />
             </View>
-
-            <Text
-              style={[
-                styles.badgeTitle,
-                !badge.earned && {
-                  color: '#94A3B8',
-                },
-              ]}
-            >
-              {badge.title}
-            </Text>
-
-            <Text style={styles.badgeDescription}>
-              {badge.description}
-            </Text>
-          </View>
-        ))}
+          </>
+        ) : null}
       </View>
+
+      {isLoading ? (
+        <ActivityIndicator
+          color="#60A5FA"
+          style={{ marginTop: 40 }}
+        />
+      ) : (
+        <View style={styles.grid}>
+          {achievementMeta.map((meta) => {
+            const isEarned = achievements?.[meta.key] === true;
+
+            return (
+              <View
+                key={meta.key}
+                style={[
+                  styles.badgeCard,
+                  !isEarned && styles.lockedBadge,
+                ]}
+              >
+                <View
+                  style={[
+                    styles.iconContainer,
+                    !isEarned && styles.lockedIcon,
+                  ]}
+                >
+                  <Text style={styles.emoji}>
+                    {isEarned ? meta.emoji : '🔒'}
+                  </Text>
+                </View>
+
+                <Text
+                  style={[
+                    styles.badgeTitle,
+                    !isEarned && { color: '#94A3B8' },
+                  ]}
+                >
+                  {meta.title}
+                </Text>
+
+                <Text style={styles.badgeDescription}>
+                  {meta.description}
+                </Text>
+              </View>
+            );
+          })}
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -177,6 +201,12 @@ const styles = StyleSheet.create({
   subtitle: {
     color: '#DBEAFE',
     marginTop: 6,
+  },
+
+  completedText: {
+    color: '#BFDBFE',
+    marginTop: 4,
+    fontSize: 13,
   },
 
   progressBar: {

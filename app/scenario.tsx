@@ -1,201 +1,255 @@
+import { useCallback, useEffect, useState } from 'react';
 import {
-    FontAwesome5,
-    MaterialIcons,
-} from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useState } from 'react';
-import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
-const choices = [
-  {
-    id: 'a',
-    label: 'Take it — coach knows best',
-    outcome: 'bad',
-    text:
-      'Risky. Even trusted coaches can suggest substances containing banned ingredients. Strict liability means YOU are responsible.',
-  },
-  {
-    id: 'b',
-    label: 'Verify on Global DRO first',
-    outcome: 'good',
-    text:
-      "Smart move! Global DRO and WADA's Prohibited List tell you exactly what's allowed.",
-  },
-  {
-    id: 'c',
-    label: 'Ask medical / NADA support',
-    outcome: 'best',
-    text:
-      'Best answer. Your team doctor or NADA can verify ingredients and ensure compliance.',
-  },
-];
+import { useFocusEffect, useRouter } from 'expo-router';
+import { auth } from '../src/firebase/config';
+import {
+  checkScenarioCompleted,
+  getScenarios,
+  recordScenarioResult,
+  type Scenario,
+  type ScenarioChoice,
+} from '../src/firebase/scenarioService';
 
 export default function ScenarioScreen() {
-  const [selected, setSelected] =
-    useState<string | null>(null);
+  const router = useRouter();
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+  const [xpEarnedMessage, setXpEarnedMessage] = useState('');
 
-  const result = choices.find(
-    (choice) => choice.id === selected
+  const loadData = useCallback(async () => {
+    const result = getScenarios();
+    if (!result.success) return;
+
+    const allScenarios = result.data;
+    setScenarios(allScenarios);
+
+    // Check which scenarios are completed
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      const completed = new Set<string>();
+      for (const scenario of allScenarios) {
+        const checkResult = await checkScenarioCompleted(
+          currentUser.uid,
+          scenario.id
+        );
+        if (checkResult.success && checkResult.data) {
+          completed.add(scenario.id);
+        }
+      }
+      setCompletedIds(completed);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData])
   );
+
+  // Reset selection when scenario changes
+  useEffect(() => {
+    setSelected(null);
+    setXpEarnedMessage('');
+  }, [currentIndex]);
+
+  const current =
+    scenarios.length > 0 && currentIndex < scenarios.length
+      ? scenarios[currentIndex]
+      : null;
+
+  const result = current
+    ? current.choices.find((c) => c.id === selected)
+    : null;
+
+  const isCompleted = current ? completedIds.has(current.id) : false;
+
+  const handleSelect = async (choice: ScenarioChoice) => {
+    if (isCompleted) return;
+
+    setSelected(choice.id);
+
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
+
+    const result = await recordScenarioResult(currentUser.uid, current!.id);
+    if (result.success) {
+      if (result.data.xpEarned > 0) {
+        setXpEarnedMessage(`+${result.data.xpEarned} XP earned!`);
+        setCompletedIds((prev) => new Set(prev).add(current!.id));
+      } else {
+        setXpEarnedMessage('Already completed - no XP awarded');
+      }
+    } else {
+      Alert.alert('Error', result.error);
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
-      {/* Header */}
-
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-        >
-          <MaterialIcons
-            name="arrow-back"
-            size={28}
-            color="white"
-          />
+        <TouchableOpacity onPress={() => router.back()}>
+          <Text style={styles.backButton}>← Back</Text>
         </TouchableOpacity>
 
-        <Text style={styles.xpText}>
-          ⚡ +80 XP
-        </Text>
+        {current ? (
+          <Text style={styles.xpReward}>
+            ⚡ +{current.xpReward} XP
+          </Text>
+        ) : null}
       </View>
 
-      {/* Title */}
-
-      <Text style={styles.scenarioLabel}>
-        Scenario 04 · Pre-Competition
-      </Text>
-
-      <Text style={styles.title}>
-        What Would You Do?
-      </Text>
-
-      {/* Scenario Card */}
-
-      <View style={styles.scenarioCard}>
-        <View style={styles.warningIcon}>
-          <FontAwesome5
-            name="exclamation-triangle"
-            size={24}
-            color="white"
-          />
-        </View>
-
-        <View style={{ flex: 1 }}>
-          <Text style={styles.cardTitle}>
-            Day before the meet
-          </Text>
-
-          <Text style={styles.cardText}>
-            Your coach hands you a new recovery
-            supplement and insists it will
-            improve your performance.
-          </Text>
-        </View>
-      </View>
-
-      {/* Choices */}
-
-      {choices.map((choice) => {
-        const isSelected =
-          selected === choice.id;
-
-        const showResult =
-          selected !== null;
-
-        return (
-          <TouchableOpacity
-            key={choice.id}
-            disabled={selected !== null}
-            onPress={() =>
-              setSelected(choice.id)
-            }
-            style={[
-              styles.choiceCard,
-
-              showResult &&
-                isSelected &&
-                choice.outcome === 'bad' &&
-                styles.badChoice,
-
-              showResult &&
-                isSelected &&
-                choice.outcome === 'good' &&
-                styles.goodChoice,
-
-              showResult &&
-                isSelected &&
-                choice.outcome === 'best' &&
-                styles.bestChoice,
-            ]}
-          >
-            <Text style={styles.choiceLetter}>
-              {choice.id.toUpperCase()}
-            </Text>
-
-            <Text style={styles.choiceText}>
-              {choice.label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-
-      {/* Result */}
-
-      {result && (
+      {xpEarnedMessage ? (
         <View
           style={[
-            styles.resultCard,
-
-            result.outcome === 'bad'
-              ? styles.badResult
-              : styles.goodResult,
+            styles.xpBanner,
+            xpEarnedMessage.includes('Already') && styles.xpBannerDim,
           ]}
         >
-          <Text style={styles.resultTitle}>
-            {result.outcome === 'best'
-              ? '🏆 Pro Move!'
-              : result.outcome === 'good'
-              ? '✅ Smart Choice'
-              : '⚠️ Be Careful'}
-          </Text>
-
-          <Text style={styles.resultText}>
-            {result.text}
-          </Text>
-
-          <View style={styles.resultButtons}>
-            <TouchableOpacity
-              style={styles.exitButton}
-              onPress={() =>
-                router.push('/challenges' as any)
-              }
-            >
-              <Text style={styles.exitText}>
-                Exit
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.nextButton}
-              onPress={() =>
-                setSelected(null)
-              }
-            >
-              <Text style={styles.nextText}>
-                Next Scenario →
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <Text style={styles.xpBannerText}>{xpEarnedMessage}</Text>
         </View>
+      ) : null}
+
+      {current ? (
+        <>
+          <Text style={styles.scenarioLabel}>
+            {current.subtitle}
+            {isCompleted ? ' ✅ Completed' : ''}
+          </Text>
+
+          <Text style={styles.title}>
+            {current.title}
+          </Text>
+
+          {/* Situation Card */}
+          <View style={styles.situationCard}>
+            <View style={styles.warningIcon}>
+              <Text style={styles.warningIconText}>!</Text>
+            </View>
+
+            <View style={{ flex: 1 }}>
+              <Text style={styles.cardTitle}>
+                {current.situationTitle}
+              </Text>
+              <Text style={styles.cardText}>
+                {current.situationText}
+              </Text>
+            </View>
+          </View>
+
+          {/* Choices */}
+          {current.choices.map((choice) => {
+            const isSelected = selected === choice.id;
+            const showResult = selected !== null;
+
+            return (
+              <TouchableOpacity
+                key={choice.id}
+                disabled={showResult || isCompleted}
+                onPress={() => handleSelect(choice)}
+                style={[
+                  styles.choiceCard,
+                  showResult &&
+                    isSelected &&
+                    choice.outcome === 'bad' &&
+                    styles.badChoice,
+                  showResult &&
+                    isSelected &&
+                    choice.outcome === 'good' &&
+                    styles.goodChoice,
+                  showResult &&
+                    isSelected &&
+                    choice.outcome === 'best' &&
+                    styles.bestChoice,
+                  isCompleted && styles.completedChoice,
+                ]}
+              >
+                <Text style={styles.choiceLetter}>
+                  {choice.id.toUpperCase()}
+                </Text>
+                <Text style={styles.choiceText}>
+                  {choice.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+
+          {/* Result */}
+          {result && (
+            <View
+              style={[
+                styles.resultCard,
+                result.outcome === 'bad'
+                  ? styles.badResult
+                  : styles.goodResult,
+              ]}
+            >
+              <Text style={styles.resultTitle}>
+                {result.outcome === 'best'
+                  ? '🏆 Pro Move!'
+                  : result.outcome === 'good'
+                  ? '✅ Smart Choice'
+                  : '⚠️ Be Careful'}
+              </Text>
+
+              <Text style={styles.resultText}>
+                {result.text}
+              </Text>
+
+              <View style={styles.resultButtons}>
+                {currentIndex > 0 && (
+                  <TouchableOpacity
+                    style={styles.navButton}
+                    onPress={() => setCurrentIndex((i) => i - 1)}
+                  >
+                    <Text style={styles.navButtonText}>
+                      ← Previous
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                {currentIndex < scenarios.length - 1 && (
+                  <TouchableOpacity
+                    style={styles.navButtonPrimary}
+                    onPress={() => setCurrentIndex((i) => i + 1)}
+                  >
+                    <Text style={styles.navButtonPrimaryText}>
+                      Next Scenario →
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                {currentIndex === scenarios.length - 1 && (
+                  <TouchableOpacity
+                    style={styles.exitButton}
+                    onPress={() => router.back()}
+                  >
+                    <Text style={styles.exitText}>Exit</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          )}
+        </>
+      ) : (
+        <Text style={styles.emptyText}>
+          No scenarios available.
+        </Text>
       )}
     </ScrollView>
   );
-}const styles = StyleSheet.create({
+}
+
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F172A',
@@ -205,14 +259,39 @@ export default function ScenarioScreen() {
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginTop: 20,
     marginBottom: 20,
   },
 
-  xpText: {
+  backButton: {
+    color: '#60A5FA',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  xpReward: {
     color: '#22C55E',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+
+  xpBanner: {
+    backgroundColor: '#166534',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 16,
+  },
+
+  xpBannerDim: {
+    backgroundColor: '#334155',
+  },
+
+  xpBannerText: {
+    color: '#BBF7D0',
+    fontSize: 15,
+    fontWeight: '700',
+    textAlign: 'center',
   },
 
   scenarioLabel: {
@@ -229,7 +308,7 @@ export default function ScenarioScreen() {
     marginBottom: 24,
   },
 
-  scenarioCard: {
+  situationCard: {
     flexDirection: 'row',
     backgroundColor: '#1E293B',
     padding: 20,
@@ -245,6 +324,12 @@ export default function ScenarioScreen() {
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
+  },
+
+  warningIconText: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
   },
 
   cardTitle: {
@@ -265,6 +350,10 @@ export default function ScenarioScreen() {
     marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+
+  completedChoice: {
+    opacity: 0.6,
   },
 
   choiceLetter: {
@@ -326,6 +415,32 @@ export default function ScenarioScreen() {
     gap: 12,
   },
 
+  navButton: {
+    flex: 1,
+    backgroundColor: '#1E293B',
+    padding: 14,
+    borderRadius: 12,
+  },
+
+  navButtonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+
+  navButtonPrimary: {
+    flex: 1,
+    backgroundColor: '#2563EB',
+    padding: 14,
+    borderRadius: 12,
+  },
+
+  navButtonPrimaryText: {
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+
   exitButton: {
     flex: 1,
     backgroundColor: '#1E293B',
@@ -339,16 +454,10 @@ export default function ScenarioScreen() {
     fontWeight: '600',
   },
 
-  nextButton: {
-    flex: 1,
-    backgroundColor: '#2563EB',
-    padding: 14,
-    borderRadius: 12,
-  },
-
-  nextText: {
-    color: 'white',
+  emptyText: {
+    color: '#94A3B8',
+    fontSize: 16,
+    marginTop: 40,
     textAlign: 'center',
-    fontWeight: 'bold',
   },
 });

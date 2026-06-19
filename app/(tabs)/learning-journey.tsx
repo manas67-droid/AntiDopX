@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,7 +6,7 @@ import {
   View,
 } from 'react-native';
 
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { auth } from '../../src/firebase/config';
 import { getUserProfile } from '../../src/firebase/userService';
 
@@ -22,53 +22,55 @@ export default function LearningJourneyScreen() {
   const [completionPercent, setCompletionPercent] =
     useState(0);
 
-  useEffect(() => {
-    const loadProgress = async () => {
-      const currentUser = auth.currentUser;
+  useFocusEffect(
+    useCallback(() => {
+      const loadProgress = async () => {
+        const currentUser = auth.currentUser;
 
-      if (!currentUser) return;
+        if (!currentUser) return;
 
-      const result = await getUserProfile(
-        currentUser.uid
-      );
+        const result = await getUserProfile(
+          currentUser.uid
+        );
 
-      if (!result.success || !result.data) return;
+        if (!result.success || !result.data) return;
 
-      const userProgress =
-        result.data.progress || {};
+        const userProgress =
+          result.data.progress || {};
 
-      setProgress({
-        antiDopingBasics:
-          userProgress.antiDopingBasics || false,
+        setProgress({
+          antiDopingBasics:
+            userProgress.antiDopingBasics || false,
 
-        wadaRules:
-          userProgress.wadaRules || false,
+          wadaRules:
+            userProgress.wadaRules || false,
 
-        testingProcedures:
-          userProgress.testingProcedures || false,
+          testingProcedures:
+            userProgress.testingProcedures || false,
 
-        tue:
-          userProgress.tue || false,
+          tue:
+            userProgress.tue || false,
 
-        supplements:
-          userProgress.supplements || false,
-      });
+          supplements:
+            userProgress.supplements || false,
+        });
 
-      const completedModules =
-        Object.values(userProgress)
-          .filter(Boolean).length;
+        const completedModules =
+          Object.values(userProgress)
+            .filter(Boolean).length;
 
-      const totalModules = 5;
+        const totalModules = 5;
 
-      const percent = Math.round(
-        (completedModules / totalModules) * 100
-      );
+        const percent = Math.round(
+          (completedModules / totalModules) * 100
+        );
 
-      setCompletionPercent(percent);
-    };
+        setCompletionPercent(percent);
+      };
 
-    loadProgress();
-  }, []);
+      loadProgress();
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
@@ -81,39 +83,62 @@ export default function LearningJourneyScreen() {
       </Text>
 
       <TouchableOpacity
+        style={styles.module}
         onPress={() =>
           router.push('./modules/anti-doping-basics')
         }
       >
-        <Text style={styles.module}>
+        <Text style={styles.moduleText}>
           {progress.antiDopingBasics ? '✅' : '⬜'} Anti-Doping
           Basics
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
+        style={styles.module}
         onPress={() =>
           router.push('./modules/wada-rules')
         }
       >
-        <Text style={styles.module}>
+        <Text style={styles.moduleText}>
           {progress.wadaRules ? '✅' : '⬜'} WADA Rules
         </Text>
       </TouchableOpacity>
 
-      <Text style={styles.module}>
-        {progress.testingProcedures ? '✅' : '⬜'} Testing
-        Procedures
-      </Text>
+      <TouchableOpacity
+        style={styles.module}
+        onPress={() =>
+          router.push('./modules/testing-procedures')
+        }
+      >
+        <Text style={styles.moduleText}>
+          {progress.testingProcedures ? '✅' : '⬜'} Testing
+          Procedures
+        </Text>
+      </TouchableOpacity>
 
-      <Text style={styles.module}>
-        {progress.tue ? '✅' : '⬜'} TUE
-      </Text>
+      <TouchableOpacity
+        style={styles.module}
+        onPress={() =>
+          router.push('./modules/tue')
+        }
+      >
+        <Text style={styles.moduleText}>
+          {progress.tue ? '✅' : '⬜'} TUE
+        </Text>
+      </TouchableOpacity>
 
-      <Text style={styles.module}>
-        {progress.supplements ? '✅' : '⬜'} Supplements &
-        Risks
-      </Text>
+      <TouchableOpacity
+        style={styles.module}
+        onPress={() =>
+          router.push('./modules/supplements')
+        }
+      >
+        <Text style={styles.moduleText}>
+          {progress.supplements ? '✅' : '⬜'} Supplements &
+          Risks
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -122,12 +147,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F172A',
-  },
-
-  contentContainer: {
-    gap: 14,
     padding: 20,
-    paddingBottom: 48,
   },
 
   title: {
@@ -135,32 +155,25 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginTop: 60,
-    marginBottom: 30,
+    marginBottom: 8,
   },
 
   progressText: {
-    color: 'white',
-    marginTop: 8,
+    color: '#93C5FD',
+    fontSize: 16,
     fontWeight: '600',
     marginBottom: 24,
   },
 
-  moduleTitle: {
-    color: 'white',
-    fontSize: 18,
-    marginBottom: 20,
+  module: {
+    backgroundColor: '#1E293B',
+    borderRadius: 12,
+    marginBottom: 12,
+    padding: 16,
   },
 
-  module: {
+  moduleText: {
     color: 'white',
     fontSize: 16,
-    marginBottom: 12,
-    padding: 12,
-    backgroundColor: '#1E293B',
-    borderRadius: 8,
   },
 });
-
-function useState<T>(initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
-  return React.useState(initialValue);
-}

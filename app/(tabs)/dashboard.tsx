@@ -1,5 +1,5 @@
-import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useFocusEffect, router } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -19,28 +19,30 @@ export default function DashboardScreen() {
   const [xp, setXp] = useState(0);
   const [streak, setStreak] = useState(0);
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      const currentUser = auth.currentUser;
+  const loadProfile = useCallback(async () => {
+    const currentUser = auth.currentUser;
 
-      if (!currentUser) return;
+    if (!currentUser) return;
 
-      const result = await getUserProfile(currentUser.uid);
+    const result = await getUserProfile(currentUser.uid);
 
-      if (!result.success || !result.data) return;
+    if (!result.success || !result.data) return;
 
-      const userData = result.data;
+    const userData = result.data;
 
-      setName(userData.name || '');
-      setSport(userData.sport || '');
-      setAge(String(userData.age || ''));
-      setLevel(userData.level || '1');
-      setXp(userData.xp || 0);
-      setStreak(userData.streak || 0);
-    };
-
-    loadProfile();
+    setName(userData.name || '');
+    setSport(userData.sport || '');
+    setAge(String(userData.age || ''));
+    setLevel(userData.level || '1');
+    setXp(userData.xp || 0);
+    setStreak(userData.streak || 0);
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile();
+    }, [loadProfile])
+  );
 
   return (
   <ScrollView

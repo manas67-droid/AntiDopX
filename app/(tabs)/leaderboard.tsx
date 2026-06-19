@@ -14,6 +14,9 @@ import {
   type LeaderboardEntry,
 } from '../../src/firebase/leaderboardService';
 
+const TOP_3_COLORS = ['#F59E0B', '#94A3B8', '#CD7F32'];
+const TOP_3_EMOJIS = ['🥇', '🥈', '🥉'];
+
 export default function LeaderboardScreen() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,13 +43,15 @@ export default function LeaderboardScreen() {
     loadLeaderboard();
   }, [loadLeaderboard]);
 
+  const top3 = entries.slice(0, 3);
+  const rest = entries.slice(3);
+
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
-      contentInsetAdjustmentBehavior="automatic"
     >
-      <Text style={styles.title} selectable>
+      <Text style={styles.title}>
         Leaderboard
       </Text>
 
@@ -65,41 +70,84 @@ export default function LeaderboardScreen() {
       ) : null}
 
       {error ? (
-        <Text style={styles.errorText} selectable>
+        <Text style={styles.errorText}>
           {error}
         </Text>
       ) : null}
 
       {!isLoading && entries.length === 0 && !error ? (
-        <Text style={styles.emptyText} selectable>
+        <Text style={styles.emptyText}>
           No leaderboard entries yet.
         </Text>
       ) : null}
 
-      {entries.map((entry, index) => (
+      {/* TOP 3 PODIUM */}
+      {top3.length > 0 ? (
+        <View style={styles.podium}>
+          {top3.map((entry, index) => (
+            <View
+              key={`top-${index}`}
+              style={[
+                styles.podiumCard,
+                index === 0 && styles.podiumFirst,
+              ]}
+            >
+              <Text style={styles.podiumEmoji}>
+                {TOP_3_EMOJIS[index]}
+              </Text>
+              <Text
+                style={[
+                  styles.podiumRank,
+                  { color: TOP_3_COLORS[index] },
+                ]}
+              >
+                #{index + 1}
+              </Text>
+              <Text style={styles.podiumName}>
+                {entry.name}
+              </Text>
+              <Text style={styles.podiumSport}>
+                {entry.sport}
+              </Text>
+              <Text style={styles.podiumXP}>
+                {entry.xp} XP
+              </Text>
+              <Text style={styles.podiumDetail}>
+                {entry.level} · 🔥{entry.streak}
+              </Text>
+            </View>
+          ))}
+        </View>
+      ) : null}
+
+      {/* REST OF LEADERBOARD */}
+      {rest.map((entry, index) => (
         <View
           key={`${entry.name}-${entry.sport}-${index}`}
           style={styles.entryCard}
         >
-          <Text style={styles.rank} selectable>
-            #{index + 1}
+          <Text style={styles.rank}>
+            #{index + 4}
           </Text>
 
           <View style={styles.entryDetails}>
-            <Text style={styles.entryName} selectable>
+            <Text style={styles.entryName}>
               {entry.name}
             </Text>
-            <Text style={styles.entrySport} selectable>
+            <Text style={styles.entrySport}>
               {entry.sport}
             </Text>
           </View>
 
           <View style={styles.scoreGroup}>
-            <Text style={styles.xp} selectable>
+            <Text style={styles.xp}>
               {entry.xp} XP
             </Text>
-            <Text style={styles.level} selectable>
+            <Text style={styles.level}>
               {entry.level}
+            </Text>
+            <Text style={styles.streak}>
+              🔥{entry.streak}
             </Text>
           </View>
         </View>
@@ -111,7 +159,7 @@ export default function LeaderboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#0F172A',
   },
 
   contentContainer: {
@@ -129,7 +177,7 @@ const styles = StyleSheet.create({
 
   refreshButton: {
     alignSelf: 'flex-start',
-    backgroundColor: '#14C8E8',
+    backgroundColor: '#2563EB',
     borderRadius: 12,
     paddingHorizontal: 18,
     paddingVertical: 12,
@@ -138,6 +186,66 @@ const styles = StyleSheet.create({
   refreshButtonText: {
     color: 'white',
     fontWeight: '700',
+  },
+
+  podium: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+    marginVertical: 20,
+  },
+
+  podiumCard: {
+    flex: 1,
+    backgroundColor: '#1E293B',
+    borderRadius: 20,
+    padding: 14,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#334155',
+  },
+
+  podiumFirst: {
+    borderColor: '#F59E0B',
+    backgroundColor: '#1E293B',
+    transform: [{ scale: 1.05 }],
+  },
+
+  podiumEmoji: {
+    fontSize: 28,
+    marginBottom: 6,
+  },
+
+  podiumRank: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+
+  podiumName: {
+    color: 'white',
+    fontSize: 15,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+
+  podiumSport: {
+    color: '#94A3B8',
+    fontSize: 12,
+    textAlign: 'center',
+  },
+
+  podiumXP: {
+    color: '#22C55E',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 6,
+  },
+
+  podiumDetail: {
+    color: '#94A3B8',
+    fontSize: 11,
+    marginTop: 4,
   },
 
   entryCard: {
@@ -190,6 +298,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     textAlign: 'right',
+  },
+
+  streak: {
+    color: '#F97316',
+    fontSize: 12,
+    fontWeight: '700',
   },
 
   errorText: {
