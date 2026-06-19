@@ -386,21 +386,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
   },
-
-  errorText: {
-  t: {
-    color: '#FCA5A5',
-    fontSize: 15,
-    lineHeight: 22,
-  },
-
   emptyText: {
     color: '#CBD5E1',
     fontSize: 16,
   },
+
   errorText: {
-  color: '#EF4444',
-  fontSize: 15,
-  marginTop: 10,
+    color: '#EF4444',
+    fontSize: 15,
+    marginTop: 10,
   },
 });
