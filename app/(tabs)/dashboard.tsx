@@ -46,6 +46,7 @@ export default function DashboardScreen() {
   <ScrollView
     style={styles.container}
     showsVerticalScrollIndicator={false}
+>
   >
     {/* HERO */}
 
@@ -153,21 +154,21 @@ export default function DashboardScreen() {
   >
     <Text style={styles.gridIcon}>📚</Text>
     <Text style={styles.gridTitle}>Learn</Text>
-    <Text style={styles.gridSubtitle}>6 Modules</Text>
+    <Text style={styles.gridSubtitle}>5 Modules</Text>
   </TouchableOpacity>
 
   <TouchableOpacity
     style={styles.gridCard}
     onPress={() => router.push('/supplement-roulette')}
   >
-    <Text style={styles.gridIcon}>🧪</Text>
+    <Text style={styles.gridIcon}>🎲</Text>
     <Text style={styles.gridTitle}>Supplement Spin</Text>
     <Text style={styles.gridSubtitle}>Risk Roulette</Text>
   </TouchableOpacity>
 
   <TouchableOpacity
     style={styles.gridCard}
-    onPress={() => router.push('/medicine-scanner')}
+    onPress={() => router.push('/scanner')}
   >
     <Text style={styles.gridIcon}>📷</Text>
     <Text style={styles.gridTitle}>Med Scanner</Text>
@@ -585,5 +586,4 @@ rankText: {
   fontSize: 24,
   marginTop: 8,
 },
-  
 });
