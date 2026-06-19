@@ -64,7 +64,7 @@ export default function ProfileScreen() {
           <Ionicons
             name="settings-outline"
             size={22}
-            color="white"
+            color="black"
           />
         </TouchableOpacity>
       </View>
@@ -72,7 +72,7 @@ export default function ProfileScreen() {
       {/* Profile Card */}
 
       <LinearGradient
-        colors={["#2563EB", "#1D4ED8"]}
+        colors={["#1c6f90", "#14C8E8"]}
         style={styles.profileCard}
       >
         <View style={styles.profileRow}>
@@ -221,9 +221,6 @@ export default function ProfileScreen() {
   );
 }
 
-/* -------------------------------- */
-/* COMPONENTS */
-/* -------------------------------- */
 
 function StatCard({
   icon,
@@ -301,7 +298,7 @@ function MenuRow({
         <FontAwesome5
           name={icon}
           size={18}
-          color="#94A3B8"
+          color="#14C8E8"
           style={{ marginRight: 12 }}
         />
       )}
@@ -319,7 +316,7 @@ function MenuRow({
       <MaterialIcons
         name="chevron-right"
         size={22}
-        color="#94A3B8"
+        color="#14c8E8"
       />
     </TouchableOpacity>
   );
@@ -328,7 +325,7 @@ function MenuRow({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#fff',
     paddingHorizontal: 20,
   },
 
@@ -341,13 +338,13 @@ const styles = StyleSheet.create({
   },
 
   headerTitle: {
-    color: '#FFFFFF',
+    color: '#000000',
     fontSize: 30,
     fontWeight: '700',
   },
 
   settingsBtn: {
-    backgroundColor: '#1E293B',
+    backgroundColor: '#fff',
     width: 44,
     height: 44,
     borderRadius: 14,
@@ -381,13 +378,10 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     backgroundColor: 'rgba(255,255,255,0.25)',
-
     justifyContent: 'center',
     alignItems: 'center',
-
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.3)',
-
     marginRight: 16,
   },
 
@@ -439,14 +433,10 @@ const styles = StyleSheet.create({
 
   statCard: {
     flex: 1,
-
-    backgroundColor: 'rgba(255,255,255,0.15)',
-
+    backgroundColor: 'rgba(255,255,255,0.18)',
     borderRadius: 18,
     paddingVertical: 16,
-
     alignItems: 'center',
-
     marginHorizontal: 4,
   },
 
@@ -470,7 +460,7 @@ const styles = StyleSheet.create({
 
   quickCard: {
     width: '48%',
-    backgroundColor: '#1E293B',
+    backgroundColor: '#fff',
     padding: 18,
     borderRadius: 22,
 
@@ -485,20 +475,20 @@ const styles = StyleSheet.create({
   },
 
   quickTitle: {
-    color: '#FFFFFF',
+    color: '#000',
     fontWeight: '700',
     fontSize: 15,
     marginTop: 10,
   },
 
   quickSubtitle: {
-    color: '#94A3B8',
+    color: '#000',
     marginTop: 4,
     fontSize: 12,
   },
 
   sectionTitle: {
-    color: '#FFFFFF',
+    color: '#000',
     fontSize: 22,
     fontWeight: '700',
     marginTop: 30,
@@ -506,7 +496,7 @@ const styles = StyleSheet.create({
   },
 
   featureCard: {
-    backgroundColor: '#1E293B',
+    backgroundColor: '#14C8E8',
     padding: 18,
     borderRadius: 18,
     marginBottom: 12,
@@ -530,9 +520,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-
-    backgroundColor: '#1E293B',
-
+    backgroundColor: '#fff',
     padding: 18,
     borderRadius: 18,
     marginBottom: 10,
@@ -540,27 +528,23 @@ const styles = StyleSheet.create({
 
   rowTitle: {
     flex: 1,
-    color: '#FFFFFF',
+    color: '#000',
     fontSize: 15,
     fontWeight: '500',
   },
 
   rowValue: {
-    color: '#94A3B8',
+    color: '#2a3038',
     marginRight: 8,
   },
 
   logoutButton: {
     backgroundColor: '#EF4444',
-
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-
     paddingVertical: 18,
-
     borderRadius: 18,
-
     marginTop: 30,
     marginBottom: 40,
   },
