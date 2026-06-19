@@ -1,6 +1,6 @@
 import {
-    FontAwesome5,
-    MaterialCommunityIcons
+  FontAwesome5,
+  MaterialCommunityIcons
 } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -37,7 +37,7 @@ export default function ChallengesScreen() {
         <Text style={styles.xpText}>
           ⚡ +80 XP per scenario
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> 
 
       {/* Games Grid */}
 
