@@ -1,15 +1,15 @@
 import {
-    FontAwesome5,
-    MaterialIcons,
+  FontAwesome5,
+  MaterialIcons,
 } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 const choices = [
@@ -198,126 +198,156 @@ export default function ScenarioScreen() {
 }const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#F1F5F9',
     padding: 20,
   },
 
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
+    alignItems: 'center',
+    marginTop: 50,
     marginBottom: 20,
   },
 
   xpText: {
     color: '#22C55E',
-    fontWeight: 'bold',
+    fontWeight: '700',
     fontSize: 16,
   },
 
   scenarioLabel: {
-    color: '#2563EB',
-    fontSize: 12,
+    color: '#06B6D4',
+    fontSize: 13,
     fontWeight: '700',
+    letterSpacing: 1,
   },
 
   title: {
-    color: 'white',
-    fontSize: 32,
-    fontWeight: 'bold',
+    color: '#0F172A',
+    fontSize: 34,
+    fontWeight: '800',
     marginTop: 8,
     marginBottom: 24,
   },
 
   scenarioCard: {
     flexDirection: 'row',
-    backgroundColor: '#1E293B',
+    backgroundColor: '#FFFFFF',
     padding: 20,
-    borderRadius: 20,
+    borderRadius: 24,
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
 
   warningIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 14,
-    backgroundColor: '#F59E0B',
+    width: 58,
+    height: 58,
+    borderRadius: 18,
+    backgroundColor: '#FB923C',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 14,
   },
 
   cardTitle: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: '#0F172A',
+    fontWeight: '700',
+    fontSize: 18,
     marginBottom: 8,
   },
 
   cardText: {
-    color: '#CBD5E1',
+    color: '#64748B',
     lineHeight: 22,
+    fontSize: 15,
   },
 
   choiceCard: {
-    backgroundColor: '#1E293B',
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
+    backgroundColor: '#FFFFFF',
+    padding: 18,
+    borderRadius: 22,
+    marginBottom: 14,
     flexDirection: 'row',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
 
   choiceLetter: {
-    color: '#2563EB',
-    fontWeight: 'bold',
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#E0F2FE',
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    color: '#06B6D4',
+    fontWeight: '800',
     fontSize: 18,
     marginRight: 14,
+    overflow: 'hidden',
   },
 
   choiceText: {
-    color: 'white',
+    color: '#0F172A',
     flex: 1,
+    fontSize: 15,
+    fontWeight: '600',
   },
 
   badChoice: {
     borderWidth: 2,
     borderColor: '#EF4444',
+    backgroundColor: '#FEF2F2',
   },
 
   goodChoice: {
     borderWidth: 2,
-    borderColor: '#2563EB',
+    borderColor: '#06B6D4',
+    backgroundColor: '#F0FDFF',
   },
 
   bestChoice: {
     borderWidth: 2,
     borderColor: '#22C55E',
+    backgroundColor: '#F0FDF4',
   },
 
   resultCard: {
     marginTop: 20,
-    padding: 20,
-    borderRadius: 18,
+    padding: 22,
+    borderRadius: 24,
+    marginBottom: 30,
   },
 
   badResult: {
-    backgroundColor: '#7F1D1D',
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
   },
 
   goodResult: {
-    backgroundColor: '#14532D',
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#86EFAC',
   },
 
   resultTitle: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
+    color: '#0F172A',
+    fontSize: 22,
+    fontWeight: '800',
     marginBottom: 10,
   },
 
   resultText: {
-    color: 'white',
-    lineHeight: 22,
+    color: '#475569',
+    lineHeight: 24,
+    fontSize: 15,
   },
 
   resultButtons: {
@@ -328,27 +358,27 @@ export default function ScenarioScreen() {
 
   exitButton: {
     flex: 1,
-    backgroundColor: '#1E293B',
-    padding: 14,
-    borderRadius: 12,
+    backgroundColor: '#E2E8F0',
+    padding: 16,
+    borderRadius: 16,
   },
 
   exitText: {
-    color: 'white',
+    color: '#0F172A',
     textAlign: 'center',
-    fontWeight: '600',
+    fontWeight: '700',
   },
 
   nextButton: {
     flex: 1,
-    backgroundColor: '#2563EB',
-    padding: 14,
-    borderRadius: 12,
+    backgroundColor: '#06B6D4',
+    padding: 16,
+    borderRadius: 16,
   },
 
   nextText: {
     color: 'white',
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontWeight: '800',
   },
 });
