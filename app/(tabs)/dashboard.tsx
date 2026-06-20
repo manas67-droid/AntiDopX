@@ -47,7 +47,7 @@ export default function DashboardScreen() {
     style={styles.container}
     showsVerticalScrollIndicator={false}
 >
-  >
+  
     {/* HERO */}
 
     <View style={styles.hero}>
