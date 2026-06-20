@@ -1,15 +1,15 @@
 import {
-    Feather,
-    MaterialCommunityIcons,
+  Feather,
+  MaterialCommunityIcons,
 } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 const questions = [
@@ -202,13 +202,13 @@ export default function QuizScreen() {
       </Text>
 
       {question.opts.map((option, i) => {
-        let backgroundColor = '#1E293B';
+        let backgroundColor = '#FFFFFF';
 
         if (picked !== null) {
           if (i === question.a) {
-            backgroundColor = '#16A34A';
+           backgroundColor = '#DCFCE7';
           } else if (picked === i) {
-            backgroundColor = '#DC2626';
+            backgroundColor = '#FEE2E2';
           }
         }
 
@@ -235,107 +235,133 @@ export default function QuizScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#F1F5F9',
     padding: 20,
   },
 
   topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
+    alignItems: 'center',
+    marginTop: 50,
+    marginBottom: 20,
   },
 
   timer: {
-    color: '#FACC15',
-    fontWeight: 'bold',
+    color: '#06B6D4',
+    fontWeight: '800',
     fontSize: 16,
+    backgroundColor: '#E0F7FA',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
   },
 
   progress: {
-    color: '#94A3B8',
-    marginTop: 30,
+    color: '#64748B',
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 10,
   },
 
   question: {
-    color: 'white',
-    fontSize: 26,
-    fontWeight: 'bold',
-    marginTop: 10,
+    color: '#0F172A',
+    fontSize: 30,
+    fontWeight: '800',
+    lineHeight: 40,
     marginBottom: 30,
   },
 
   optionButton: {
+    backgroundColor: '#FFFFFF',
     padding: 18,
-    borderRadius: 16,
+    borderRadius: 22,
     marginBottom: 14,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
 
   optionText: {
-    color: 'white',
+    color: '#0F172A',
     fontSize: 16,
     fontWeight: '600',
   },
 
   resultContainer: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#F1F5F9',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 24,
   },
 
   resultTitle: {
-    color: 'white',
-    fontSize: 32,
-    fontWeight: 'bold',
+    color: '#0F172A',
+    fontSize: 34,
+    fontWeight: '800',
     marginTop: 20,
   },
 
   resultSubtitle: {
-    color: '#CBD5E1',
+    color: '#64748B',
+    fontSize: 16,
     marginTop: 8,
     marginBottom: 30,
   },
 
   statsRow: {
     flexDirection: 'row',
-    gap: 10,
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 20,
+    marginBottom: 30,
   },
 
   statCard: {
-    backgroundColor: '#1E293B',
-    padding: 16,
-    borderRadius: 16,
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    padding: 18,
+    borderRadius: 20,
     alignItems: 'center',
+    marginHorizontal: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
 
   statValue: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
+    color: '#0F172A',
+    fontSize: 22,
+    fontWeight: '800',
   },
 
   statLabel: {
-    color: '#94A3B8',
-    marginTop: 4,
+    color: '#64748B',
+    marginTop: 6,
+    fontSize: 13,
   },
 
   button: {
-    backgroundColor: '#2563EB',
-    paddingHorizontal: 30,
-    paddingVertical: 14,
-    borderRadius: 14,
-    marginTop: 30,
+    backgroundColor: '#06B6D4',
+    width: '100%',
+    paddingVertical: 16,
+    borderRadius: 18,
+    alignItems: 'center',
   },
 
   buttonText: {
     color: 'white',
-    fontWeight: 'bold',
+    fontWeight: '800',
+    fontSize: 16,
   },
 
   playAgain: {
-    color: '#60A5FA',
+    color: '#06B6D4',
     marginTop: 20,
-    fontWeight: '600',
+    fontWeight: '700',
+    fontSize: 16,
   },
 });
