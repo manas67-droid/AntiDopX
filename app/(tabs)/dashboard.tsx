@@ -159,7 +159,7 @@ export default function DashboardScreen() {
 
   <TouchableOpacity
     style={styles.gridCard}
-    onPress={() => router.push('/supplement-roulette')}
+    onPress={() => router.push('/roulette')}
   >
     <Text style={styles.gridIcon}>🎲</Text>
     <Text style={styles.gridTitle}>Supplement Spin</Text>
