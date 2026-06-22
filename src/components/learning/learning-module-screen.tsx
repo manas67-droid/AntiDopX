@@ -1,5 +1,5 @@
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
   Alert,
   ScrollView,
@@ -12,6 +12,7 @@ import {
 import { evaluateAchievements } from '../../firebase/achievementService';
 import { auth } from '../../firebase/config';
 import { completeModule } from '../../firebase/progressService';
+import { getUserProfile } from '../../firebase/userService';
 import { addXP } from '../../firebase/xpservices';
 import type { LearningModule } from '../../learning/modules';
 import { gradeQuiz, type QuizAnswers, type QuizResult } from '../../learning/quiz';
@@ -25,6 +26,23 @@ export function LearningModuleScreen({ module }: LearningModuleScreenProps) {
   const [answers, setAnswers] = useState<QuizAnswers>({});
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [isCompleting, setIsCompleting] = useState(false);
+  const [alreadyCompleted, setAlreadyCompleted] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      const checkProgress = async () => {
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+
+        const result = await getUserProfile(currentUser.uid);
+        if (result.success && result.data) {
+          const progress = result.data.progress || {};
+          setAlreadyCompleted(Boolean(progress[module.moduleKey]));
+        }
+      };
+      checkProgress();
+    }, [module.moduleKey])
+  );
 
   const questions = module.quiz.questions;
   const answeredCount = questions.filter(
@@ -79,6 +97,20 @@ export function LearningModuleScreen({ module }: LearningModuleScreenProps) {
     setIsCompleting(true);
 
     try {
+      // Check if already completed before proceeding (defense in depth)
+      const profileResult = await getUserProfile(currentUser.uid);
+      if (profileResult.success && profileResult.data) {
+        const existingProgress = profileResult.data.progress || {};
+        if (existingProgress[module.moduleKey]) {
+          setAlreadyCompleted(true);
+          Alert.alert(
+            'Module already completed',
+            'You have already completed this module and cannot earn XP again.'
+          );
+          return;
+        }
+      }
+
       const progressResult = await completeModule(
         currentUser.uid,
         module.moduleKey
@@ -134,6 +166,14 @@ export function LearningModuleScreen({ module }: LearningModuleScreenProps) {
       <Text style={styles.title} selectable>
         {module.title}
       </Text>
+
+      {alreadyCompleted && (
+        <View style={styles.alreadyCompletedBanner}>
+          <Text style={styles.alreadyCompletedText}>
+            ✓ Module already completed. You earned XP previously.
+          </Text>
+        </View>
+      )}
 
       {module.sections.map((section) => (
         <View key={section.title} style={styles.section}>
@@ -216,18 +256,26 @@ export function LearningModuleScreen({ module }: LearningModuleScreenProps) {
         </Text>
       ) : null}
 
-      <TouchableOpacity
-        style={[
-          styles.completeButton,
-          !canComplete && styles.disabledButton,
-        ]}
-        onPress={handleCompleteModule}
-        disabled={!canComplete}
-      >
-        <Text style={styles.buttonText}>
-          {isCompleting ? 'Completing...' : `Complete Module +${module.xpReward} XP`}
-        </Text>
-      </TouchableOpacity>
+      {alreadyCompleted ? (
+        <View style={styles.completedNotice}>
+          <Text style={styles.completedNoticeText}>
+            ✓ Completed
+          </Text>
+        </View>
+      ) : (
+        <TouchableOpacity
+          style={[
+            styles.completeButton,
+            !canComplete && styles.disabledButton,
+          ]}
+          onPress={handleCompleteModule}
+          disabled={!canComplete}
+        >
+          <Text style={styles.buttonText}>
+            {isCompleting ? 'Completing...' : `Complete Module +${module.xpReward} XP`}
+          </Text>
+        </TouchableOpacity>
+      )}
     </ScrollView>
   );
 }
@@ -249,6 +297,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 40,
     marginBottom: 20,
+  },
+
+  alreadyCompletedBanner: {
+    backgroundColor: '#166534',
+    borderRadius: 12,
+    marginBottom: 18,
+    padding: 14,
+  },
+
+  alreadyCompletedText: {
+    color: '#BBF7D0',
+    fontSize: 15,
+    fontWeight: '700',
+    textAlign: 'center',
   },
 
   section: {
@@ -367,6 +429,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     marginTop: 12,
+    textAlign: 'center',
+  },
+
+  completedNotice: {
+    backgroundColor: '#1E293B',
+    borderRadius: 12,
+    marginTop: 12,
+    padding: 16,
+  },
+
+  completedNoticeText: {
+    color: '#22C55E',
+    fontSize: 16,
+    fontWeight: '700',
     textAlign: 'center',
   },
 });

@@ -9,6 +9,8 @@ import {
   View,
 } from 'react-native';
 
+import { registerUser } from '../src/firebase/authService';
+import { loginUser } from '../src/firebase/loginService';
 
 export default function AthleteRegisterScreen() {
   const router = useRouter();
@@ -18,7 +20,7 @@ export default function AthleteRegisterScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!email.trim()) {
       alert('Enter Email');
       return;
@@ -30,10 +32,29 @@ export default function AthleteRegisterScreen() {
     }
 
     if (isLogin) {
-      // Existing user
-      router.replace('/(tabs)/dashboard');
+      const result = await loginUser(
+        email.trim(),
+        password
+      );
+
+      if (!result.success) {
+        console.log('LOGIN ERROR:', result.error);
+        alert(result.error);
+        return;
+      }
+
+      router.replace('/dashboard');
     } else {
-      // New user
+      const result = await registerUser(
+        email.trim(),
+        password
+      );
+
+      if (!result.success) {
+        alert(result.error);
+        return;
+      }
+
       router.push('/onboarding');
     }
   };
@@ -62,8 +83,6 @@ export default function AthleteRegisterScreen() {
       </View>
 
       <View style={styles.card}>
-        {/* Toggle */}
-
         <View style={styles.toggleContainer}>
           <TouchableOpacity
             style={[
@@ -100,17 +119,14 @@ export default function AthleteRegisterScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Email */}
-
         <TextInput
           placeholder="athlete@email.com"
           placeholderTextColor="#94A3B8"
           style={styles.input}
           value={email}
           onChangeText={setEmail}
+          autoCapitalize="none"
         />
-
-        {/* Password */}
 
         <TextInput
           placeholder="Password"
@@ -129,8 +145,6 @@ export default function AthleteRegisterScreen() {
           </TouchableOpacity>
         )}
 
-        {/* Main Button */}
-
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={handleContinue}
@@ -143,8 +157,6 @@ export default function AthleteRegisterScreen() {
         </TouchableOpacity>
 
         <Text style={styles.or}>OR</Text>
-
-        {/* Google */}
 
         <TouchableOpacity style={styles.googleButton}>
           <Text style={styles.googleText}>
@@ -283,4 +295,3 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
 });
- 

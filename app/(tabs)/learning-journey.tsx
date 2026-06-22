@@ -22,15 +22,16 @@ export default function LearningJourneyScreen() {
 
   const [completionPercent, setCompletionPercent] = useState(0);
 
-  useEffect(() => {
-    const loadProgress = async () => {
-      const currentUser = auth.currentUser;
+  useFocusEffect(
+    useCallback(() => {
+      const loadProgress = async () => {
+        const currentUser = auth.currentUser;
 
-      if (!currentUser) return;
+        if (!currentUser) return;
 
       const result = await getUserProfile(currentUser.uid);
 
-      if (!result.success || !result.data) return;
+        if (!result.success || !result.data) return;
 
       const userProgress = result.data.progress || {};
 
@@ -49,15 +50,18 @@ export default function LearningJourneyScreen() {
       const completedModules =
         Object.values(userProgress).filter(Boolean).length;
 
-      const totalModules = 5;
+        const totalModules = 5;
 
-      const percent = Math.round((completedModules / totalModules) * 100);
+        const percent = Math.round(
+          (completedModules / totalModules) * 100
+        );
 
-      setCompletionPercent(percent);
-    };
+        setCompletionPercent(percent);
+      };
 
-    loadProgress();
-  }, []);
+      loadProgress();
+    }, [])
+  );
 
   return (
     <ScrollView
@@ -263,3 +267,14 @@ function useState<T>(
 ): [T, React.Dispatch<React.SetStateAction<T>>] {
   return React.useState(initialValue);
 }
+function useFocusEffect(effect: () => void | (() => void)) {
+  useEffect(() => {
+    const unsubscribe = effect();
+    return typeof unsubscribe === "function" ? unsubscribe : undefined;
+  }, [effect]);
+}
+
+function useCallback(callback: () => void, deps: never[]): () => void | (() => void) {
+  return React.useCallback(callback, deps);
+}
+

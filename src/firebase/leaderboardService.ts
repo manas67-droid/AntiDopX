@@ -17,6 +17,7 @@ export type LeaderboardEntry = {
   sport: string;
   xp: number;
   level: string;
+  streak: number;
 };
 
 export const getLeaderboard = async (
@@ -38,6 +39,7 @@ export const getLeaderboard = async (
         sport: String(data.sport || 'Unknown sport'),
         xp: Number(data.xp || 0),
         level: String(data.level || 'Rookie'),
+        streak: Number(data.streak || 0),
       };
     });
 

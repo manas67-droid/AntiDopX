@@ -1,7 +1,10 @@
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+
 import {
   getErrorMessage,
   type ServiceResponse,
 } from '../types/serviceResponse';
+import { db } from './config';
 
 export type SupplementCategory = 'Safe' | 'Risky' | 'Prohibited';
 
@@ -108,6 +111,57 @@ export const getRandomSupplement = async (
     return {
       success: true,
       data: getRandomItem(matches),
+    };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      error: getErrorMessage(error),
+    };
+  }
+};
+
+const DAILY_SPIN_XP = 10;
+
+export const claimDailySpinXP = async (
+  uid: string
+): Promise<ServiceResponse<{ xpAwarded: number; alreadyClaimed: boolean }>> => {
+  try {
+    const userRef = doc(db, 'users', uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      return { success: false, error: 'User not found' };
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const lastSpinDate = userSnap.data().lastSpinDate
+      ? userSnap.data().lastSpinDate.split('T')[0]
+      : null;
+
+    if (lastSpinDate === today) {
+      return {
+        success: true,
+        data: { xpAwarded: 0, alreadyClaimed: true },
+      };
+    }
+
+    const currentXP = Number(userSnap.data().xp || 0);
+    const newXP = currentXP + DAILY_SPIN_XP;
+
+    let newLevel = userSnap.data().level || 'Rookie';
+    if (newXP >= 1000) newLevel = 'Elite Athlete';
+    else if (newXP >= 300) newLevel = 'Champion';
+    else if (newXP >= 100) newLevel = 'Competitor';
+
+    await updateDoc(userRef, {
+      lastSpinDate: new Date().toISOString(),
+      xp: newXP,
+      level: newLevel,
+    });
+
+    return {
+      success: true,
+      data: { xpAwarded: DAILY_SPIN_XP, alreadyClaimed: false },
     };
   } catch (error: unknown) {
     return {

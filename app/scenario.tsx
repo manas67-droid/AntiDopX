@@ -31,14 +31,49 @@ const choices = [
 ];
 
 export default function ScenarioScreen() {
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [selected, setSelected] = useState<string | null>(null);
 
-  const result = choices.find((choice) => choice.id === selected);
+  // Reset selection when scenario changes
+  useEffect(() => {
+    setSelected(null);
+    setXpEarnedMessage('');
+  }, [currentIndex]);
+
+  const current =
+    scenarios.length > 0 && currentIndex < scenarios.length
+      ? scenarios[currentIndex]
+      : null;
+
+  const result = current
+    ? current.choices.find((c) => c.id === selected)
+    : null;
+
+  const isCompleted = current ? completedIds.has(current.id) : false;
+
+  const handleSelect = async (choice: ScenarioChoice) => {
+    if (isCompleted) return;
+
+    setSelected(choice.id);
+
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
+
+    const result = await recordScenarioResult(currentUser.uid, current!.id);
+    if (result.success) {
+      if (result.data.xpEarned > 0) {
+        setXpEarnedMessage(`+${result.data.xpEarned} XP earned!`);
+        setCompletedIds((prev) => new Set(prev).add(current!.id));
+      } else {
+        setXpEarnedMessage('Already completed - no XP awarded');
+      }
+    } else {
+      Alert.alert('Error', result.error);
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
-      {/* Header */}
-
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <MaterialIcons name="arrow-back" size={28} color="white" />
@@ -144,6 +179,133 @@ export default function ScenarioScreen() {
             </TouchableOpacity>
           </View>
         </View>
+      ) : null}
+
+      {current ? (
+        <>
+          <Text style={styles.scenarioLabel}>
+            {current.subtitle}
+            {isCompleted ? ' ✅ Completed' : ''}
+          </Text>
+
+          <Text style={styles.title}>
+            {current.title}
+          </Text>
+
+          {/* Situation Card */}
+          <View style={styles.situationCard}>
+            <View style={styles.warningIcon}>
+              <Text style={styles.warningIconText}>!</Text>
+            </View>
+
+            <View style={{ flex: 1 }}>
+              <Text style={styles.cardTitle}>
+                {current.situationTitle}
+              </Text>
+              <Text style={styles.cardText}>
+                {current.situationText}
+              </Text>
+            </View>
+          </View>
+
+          {/* Choices */}
+          {current.choices.map((choice) => {
+            const isSelected = selected === choice.id;
+            const showResult = selected !== null;
+
+            return (
+              <TouchableOpacity
+                key={choice.id}
+                disabled={showResult || isCompleted}
+                onPress={() => handleSelect(choice)}
+                style={[
+                  styles.choiceCard,
+                  showResult &&
+                    isSelected &&
+                    choice.outcome === 'bad' &&
+                    styles.badChoice,
+                  showResult &&
+                    isSelected &&
+                    choice.outcome === 'good' &&
+                    styles.goodChoice,
+                  showResult &&
+                    isSelected &&
+                    choice.outcome === 'best' &&
+                    styles.bestChoice,
+                  isCompleted && styles.completedChoice,
+                ]}
+              >
+                <Text style={styles.choiceLetter}>
+                  {choice.id.toUpperCase()}
+                </Text>
+                <Text style={styles.choiceText}>
+                  {choice.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+
+          {/* Result */}
+          {result && (
+            <View
+              style={[
+                styles.resultCard,
+                result.outcome === 'bad'
+                  ? styles.badResult
+                  : styles.goodResult,
+              ]}
+            >
+              <Text style={styles.resultTitle}>
+                {result.outcome === 'best'
+                  ? '🏆 Pro Move!'
+                  : result.outcome === 'good'
+                  ? '✅ Smart Choice'
+                  : '⚠️ Be Careful'}
+              </Text>
+
+              <Text style={styles.resultText}>
+                {result.text}
+              </Text>
+
+              <View style={styles.resultButtons}>
+                {currentIndex > 0 && (
+                  <TouchableOpacity
+                    style={styles.navButton}
+                    onPress={() => setCurrentIndex((i) => i - 1)}
+                  >
+                    <Text style={styles.navButtonText}>
+                      ← Previous
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                {currentIndex < scenarios.length - 1 && (
+                  <TouchableOpacity
+                    style={styles.navButtonPrimary}
+                    onPress={() => setCurrentIndex((i) => i + 1)}
+                  >
+                    <Text style={styles.navButtonPrimaryText}>
+                      Next Scenario →
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                {currentIndex === scenarios.length - 1 && (
+                  <TouchableOpacity
+                    style={styles.exitButton}
+                    onPress={() => router.back()}
+                  >
+                    <Text style={styles.exitText}>Exit</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          )}
+        </>
+      ) : (
+        <Text style={styles.emptyText}>
+          No scenarios available.
+        </Text>
       )}
     </ScrollView>
   );
@@ -167,6 +329,24 @@ const styles = StyleSheet.create({
     color: "#22C55E",
     fontWeight: "700",
     fontSize: 16,
+  },
+
+  xpBanner: {
+    backgroundColor: '#166534',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 16,
+  },
+
+  xpBannerDim: {
+    backgroundColor: '#334155',
+  },
+
+  xpBannerText: {
+    color: '#BBF7D0',
+    fontSize: 15,
+    fontWeight: '700',
+    textAlign: 'center',
   },
 
   scenarioLabel: {
@@ -206,6 +386,12 @@ const styles = StyleSheet.create({
     marginRight: 14,
   },
 
+  warningIconText: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+
   cardTitle: {
     color: "#0F172A",
     fontWeight: "700",
@@ -230,6 +416,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
+  },
+
+  completedChoice: {
+    opacity: 0.6,
   },
 
   choiceLetter: {
@@ -309,6 +499,32 @@ const styles = StyleSheet.create({
     gap: 12,
   },
 
+  navButton: {
+    flex: 1,
+    backgroundColor: '#1E293B',
+    padding: 14,
+    borderRadius: 12,
+  },
+
+  navButtonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+
+  navButtonPrimary: {
+    flex: 1,
+    backgroundColor: '#2563EB',
+    padding: 14,
+    borderRadius: 12,
+  },
+
+  navButtonPrimaryText: {
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+
   exitButton: {
     flex: 1,
     backgroundColor: "#E2E8F0",
@@ -335,3 +551,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
 });
+
+// State for XP earned message is managed via useState in ScenarioScreen component
+// This is not needed as a standalone function since it's already integrated as state
+
