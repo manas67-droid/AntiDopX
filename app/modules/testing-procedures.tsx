@@ -3,9 +3,7 @@ import { LearningModuleScreen } from '../../src/components/learning/learning-mod
 import { getLearningModuleBySlug } from '../../src/learning/modules';
 
 export default function TestingProceduresScreen() {
-  const module = getLearningModuleBySlug(
-    'testing-procedures'
-  );
+  const module = getLearningModuleBySlug('testing-procedures');
 
   if (!module) {
     return null;

@@ -225,7 +225,7 @@ export default function ScannerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#020617',
+    backgroundColor: '#f8',
     padding: 20,
   },
 
@@ -253,14 +253,14 @@ const styles = StyleSheet.create({
     width: 260,
     height: 260,
     borderWidth: 2,
-    borderColor: '#38BDF8',
+    borderColor: '#14C8E8',
     borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   scanningText: {
-    color: '#38BDF8',
+    color: '#14C8E8',
     marginTop: 12,
     fontWeight: 'bold',
   },
@@ -268,13 +268,13 @@ const styles = StyleSheet.create({
   instructions: {
     color: '#94A3B8',
     textAlign: 'center',
+    fontSize: 14,
     marginBottom: 20,
   },
 
   buttonRow: {
     flexDirection: 'row',
-    justifyContent:
-      'space-between',
+    justifyContent: 'space-between',
     marginBottom: 20,
   },
 
@@ -288,14 +288,16 @@ const styles = StyleSheet.create({
 
   smallButtonText: {
     color: 'white',
-    marginTop: 4,
-    fontSize: 12,
+    marginTop: 2,
+    fontSize: 10,
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 
   scanButton: {
-    backgroundColor: '#2563EB',
-    width: '38%',
-    padding: 14,
+    backgroundColor: '#14C8E8',
+    width: '40%',
+    padding: 18,
     borderRadius: 14,
     alignItems: 'center',
   },
@@ -303,11 +305,13 @@ const styles = StyleSheet.create({
   scanButtonText: {
     color: 'white',
     fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
   },
 
   resultCard: {
     backgroundColor: '#1E293B',
-    borderWidth: 2,
+    borderWidth: 3,
     borderRadius: 20,
     padding: 20,
   },
@@ -355,7 +359,7 @@ const styles = StyleSheet.create({
   },
 
   saveButton: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#14C8E8',
     width: '48%',
     padding: 14,
     borderRadius: 12,
