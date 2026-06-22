@@ -588,9 +588,4 @@ rankText: {
   fontSize: 24,
   marginTop: 8,
 },
-<<<<<<< HEAD
-  
 });
-=======
-});
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7

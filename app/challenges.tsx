@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 import {
-<<<<<<< HEAD
   ActivityIndicator,
   Alert,
   ScrollView,
@@ -17,13 +16,6 @@ import {
   type Challenge,
 } from '../src/firebase/challengesService';
 import { auth } from '../src/firebase/config';
-=======
-  FontAwesome5,
-  MaterialCommunityIcons
-} from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
 
 export default function ChallengesScreen() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -81,44 +73,10 @@ export default function ChallengesScreen() {
         {completedCount}/{challenges.length} completed this week
       </Text>
 
-<<<<<<< HEAD
       {isLoading ? (
         <ActivityIndicator
           color="#60A5FA"
           style={{ marginTop: 40 }}
-=======
-      {/* Featured Card */}
-      <TouchableOpacity
-        style={styles.featuredCard}
-        onPress={() => router.push('/scenario'as any)}
-      >
-        <Text style={styles.badge}>
-          FEATURED
-        </Text>
-
-        <Text style={styles.featuredTitle}>
-          What Would You Do?
-        </Text>
-
-        <Text style={styles.featuredDescription}>
-          Make split-second decisions in real
-          anti-doping scenarios.
-        </Text>
-
-        <Text style={styles.xpText}>
-          ⚡ +80 XP per scenario
-        </Text>
-      </TouchableOpacity> 
-
-      {/* Games Grid */}
-
-      <View style={styles.grid}>
-        <GameCard
-          title="Supplement Roulette"
-          subtitle="Spin to learn risks"
-          icon="dice"
-          route="/roulette"
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
         />
       ) : (
         <>

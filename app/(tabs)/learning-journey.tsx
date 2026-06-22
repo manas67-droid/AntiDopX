@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import React, { useCallback, useState } from 'react';
-=======
 import React, { useEffect } from "react";
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
 import {
   ScrollView,
   StyleSheet,
@@ -11,15 +7,9 @@ import {
   View,
 } from "react-native";
 
-<<<<<<< HEAD
-import { router, useFocusEffect } from 'expo-router';
-import { auth } from '../../src/firebase/config';
-import { getUserProfile } from '../../src/firebase/userService';
-=======
 import { router } from "expo-router";
 import { auth } from "../../src/firebase/config";
 import { getUserProfile } from "../../src/firebase/userService";
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
 
 export default function LearningJourneyScreen() {
   const [progress, setProgress] = useState({
@@ -39,41 +29,10 @@ export default function LearningJourneyScreen() {
 
         if (!currentUser) return;
 
-<<<<<<< HEAD
-        const result = await getUserProfile(
-          currentUser.uid
-        );
-=======
       const result = await getUserProfile(currentUser.uid);
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
 
         if (!result.success || !result.data) return;
 
-<<<<<<< HEAD
-        const userProgress =
-          result.data.progress || {};
-
-        setProgress({
-          antiDopingBasics:
-            userProgress.antiDopingBasics || false,
-
-          wadaRules:
-            userProgress.wadaRules || false,
-
-          testingProcedures:
-            userProgress.testingProcedures || false,
-
-          tue:
-            userProgress.tue || false,
-
-          supplements:
-            userProgress.supplements || false,
-        });
-
-        const completedModules =
-          Object.values(userProgress)
-            .filter(Boolean).length;
-=======
       const userProgress = result.data.progress || {};
 
       setProgress({
@@ -90,17 +49,12 @@ export default function LearningJourneyScreen() {
 
       const completedModules =
         Object.values(userProgress).filter(Boolean).length;
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
 
         const totalModules = 5;
 
-<<<<<<< HEAD
         const percent = Math.round(
           (completedModules / totalModules) * 100
         );
-=======
-      const percent = Math.round((completedModules / totalModules) * 100);
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
 
         setCompletionPercent(percent);
       };
@@ -123,66 +77,6 @@ export default function LearningJourneyScreen() {
 
       {/* Progress Card */}
 
-<<<<<<< HEAD
-      <TouchableOpacity
-        style={styles.module}
-        onPress={() =>
-          router.push('./modules/anti-doping-basics')
-        }
-      >
-        <Text style={styles.moduleText}>
-          {progress.antiDopingBasics ? '✅' : '⬜'} Anti-Doping
-          Basics
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.module}
-        onPress={() =>
-          router.push('./modules/wada-rules')
-        }
-      >
-        <Text style={styles.moduleText}>
-          {progress.wadaRules ? '✅' : '⬜'} WADA Rules
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.module}
-        onPress={() =>
-          router.push('./modules/testing-procedures')
-        }
-      >
-        <Text style={styles.moduleText}>
-          {progress.testingProcedures ? '✅' : '⬜'} Testing
-          Procedures
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.module}
-        onPress={() =>
-          router.push('./modules/tue')
-        }
-      >
-        <Text style={styles.moduleText}>
-          {progress.tue ? '✅' : '⬜'} TUE
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.module}
-        onPress={() =>
-          router.push('./modules/supplements')
-        }
-      >
-        <Text style={styles.moduleText}>
-          {progress.supplements ? '✅' : '⬜'} Supplements &
-          Risks
-        </Text>
-      </TouchableOpacity>
-    </View>
-=======
       <View style={styles.progressCard}>
         <Text style={styles.currentLabel}>CURRENT PROGRESS</Text>
 
@@ -262,46 +156,12 @@ export default function LearningJourneyScreen() {
         </View>
       </View>
     </ScrollView>
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-<<<<<<< HEAD
-    backgroundColor: '#0F172A',
-    padding: 20,
-  },
-
-  title: {
-    color: 'white',
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginTop: 60,
-    marginBottom: 8,
-  },
-
-  progressText: {
-    color: '#93C5FD',
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 24,
-  },
-
-  module: {
-    backgroundColor: '#1E293B',
-    borderRadius: 12,
-    marginBottom: 12,
-    padding: 16,
-  },
-
-  moduleText: {
-    color: 'white',
-    fontSize: 16,
-  },
-});
-=======
     backgroundColor: "#F5F8FA",
     paddingHorizontal: 20,
     paddingTop: 60,
@@ -407,4 +267,14 @@ function useState<T>(
 ): [T, React.Dispatch<React.SetStateAction<T>>] {
   return React.useState(initialValue);
 }
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
+function useFocusEffect(effect: () => void | (() => void)) {
+  useEffect(() => {
+    const unsubscribe = effect();
+    return typeof unsubscribe === "function" ? unsubscribe : undefined;
+  }, [effect]);
+}
+
+function useCallback(callback: () => void, deps: never[]): () => void | (() => void) {
+  return React.useCallback(callback, deps);
+}
+

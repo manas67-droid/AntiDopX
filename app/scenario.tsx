@@ -1,69 +1,12 @@
-<<<<<<< HEAD
-import { useCallback, useEffect, useState } from 'react';
-import {
-  Alert,
-=======
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-<<<<<<< HEAD
-} from 'react-native';
-
-import { useFocusEffect, useRouter } from 'expo-router';
-import { auth } from '../src/firebase/config';
-import {
-  checkScenarioCompleted,
-  getScenarios,
-  recordScenarioResult,
-  type Scenario,
-  type ScenarioChoice,
-} from '../src/firebase/scenarioService';
-
-export default function ScenarioScreen() {
-  const router = useRouter();
-  const [scenarios, setScenarios] = useState<Scenario[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
-  const [xpEarnedMessage, setXpEarnedMessage] = useState('');
-
-  const loadData = useCallback(async () => {
-    const result = getScenarios();
-    if (!result.success) return;
-
-    const allScenarios = result.data;
-    setScenarios(allScenarios);
-
-    // Check which scenarios are completed
-    const currentUser = auth.currentUser;
-    if (currentUser) {
-      const completed = new Set<string>();
-      for (const scenario of allScenarios) {
-        const checkResult = await checkScenarioCompleted(
-          currentUser.uid,
-          scenario.id
-        );
-        if (checkResult.success && checkResult.data) {
-          completed.add(scenario.id);
-        }
-      }
-      setCompletedIds(completed);
-    }
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      loadData();
-    }, [loadData])
-  );
-=======
 } from "react-native";
 
 const choices = [
@@ -88,10 +31,8 @@ const choices = [
 ];
 
 export default function ScenarioScreen() {
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [selected, setSelected] = useState<string | null>(null);
-
-  const result = choices.find((choice) => choice.id === selected);
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
 
   // Reset selection when scenario changes
   useEffect(() => {
@@ -135,26 +76,6 @@ export default function ScenarioScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-<<<<<<< HEAD
-          <Text style={styles.backButton}>← Back</Text>
-        </TouchableOpacity>
-
-        {current ? (
-          <Text style={styles.xpReward}>
-            ⚡ +{current.xpReward} XP
-          </Text>
-        ) : null}
-      </View>
-
-      {xpEarnedMessage ? (
-        <View
-          style={[
-            styles.xpBanner,
-            xpEarnedMessage.includes('Already') && styles.xpBannerDim,
-          ]}
-        >
-          <Text style={styles.xpBannerText}>{xpEarnedMessage}</Text>
-=======
           <MaterialIcons name="arrow-back" size={28} color="white" />
         </TouchableOpacity>
 
@@ -257,7 +178,6 @@ export default function ScenarioScreen() {
               <Text style={styles.nextText}>Next Scenario →</Text>
             </TouchableOpacity>
           </View>
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
         </View>
       ) : null}
 
@@ -390,10 +310,6 @@ export default function ScenarioScreen() {
     </ScrollView>
   );
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -402,24 +318,6 @@ const styles = StyleSheet.create({
   },
 
   header: {
-<<<<<<< HEAD
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 20,
-  },
-
-  backButton: {
-    color: '#60A5FA',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-
-  xpReward: {
-    color: '#22C55E',
-    fontWeight: 'bold',
-=======
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -430,7 +328,6 @@ const styles = StyleSheet.create({
   xpText: {
     color: "#22C55E",
     fontWeight: "700",
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
     fontSize: 16,
   },
 
@@ -467,15 +364,9 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
 
-<<<<<<< HEAD
-  situationCard: {
-    flexDirection: 'row',
-    backgroundColor: '#1E293B',
-=======
   scenarioCard: {
     flexDirection: "row",
     backgroundColor: "#FFFFFF",
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
     padding: 20,
     borderRadius: 24,
     marginBottom: 20,
@@ -647,13 +538,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-<<<<<<< HEAD
-  emptyText: {
-    color: '#94A3B8',
-    fontSize: 16,
-    marginTop: 40,
-    textAlign: 'center',
-=======
   nextButton: {
     flex: 1,
     backgroundColor: "#06B6D4",
@@ -665,6 +549,9 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     fontWeight: "800",
->>>>>>> 1f47e78c42b666455a065f02e9c037fa6ccae9a7
   },
 });
+
+// State for XP earned message is managed via useState in ScenarioScreen component
+// This is not needed as a standalone function since it's already integrated as state
+
