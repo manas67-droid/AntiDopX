@@ -61,7 +61,12 @@ export default function SportSelectionScreen() {
     useState<string>("");
 
  const handleContinue = () => {
-  router.push("/(tabs)/dashboard",);
+  router.push({
+    pathname: '/athlete-details',
+    params: {
+      sport: selectedSport,
+    },
+  });
 };
 
   return (
