@@ -1,7 +1,6 @@
-import { useCallback, useState } from 'react';
+import { router } from 'expo-router';
+import React from 'react';
 import {
-  ActivityIndicator,
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,231 +8,331 @@ import {
   View,
 } from 'react-native';
 
-import { useFocusEffect } from 'expo-router';
-import {
-  claimChallengeReward,
-  getWeeklyChallenges,
-  type Challenge,
-} from '../src/firebase/challengesService';
-import { auth } from '../src/firebase/config';
-
 export default function ChallengesScreen() {
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [claimingId, setClaimingId] = useState<string | null>(null);
-
-  const loadChallenges = useCallback(async () => {
-    const currentUser = auth.currentUser;
-    if (!currentUser) return;
-
-    setIsLoading(true);
-    const result = await getWeeklyChallenges(currentUser.uid);
-    if (result.success) {
-      setChallenges(result.data);
-    } else {
-      Alert.alert('Error', result.error);
-    }
-    setIsLoading(false);
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      loadChallenges();
-    }, [loadChallenges])
-  );
-
-  const handleClaim = async (challenge: Challenge) => {
-    const currentUser = auth.currentUser;
-    if (!currentUser) return;
-
-    setClaimingId(challenge.id);
-    const result = await claimChallengeReward(currentUser.uid, challenge.id);
-    setClaimingId(null);
-
-    if (result.success) {
-      Alert.alert(
-        'Reward claimed!',
-        `+${result.data} XP awarded for completing "${challenge.title}"`
-      );
-      loadChallenges();
-    } else {
-      Alert.alert('Error', result.error);
-    }
-  };
-
-  const completedCount = challenges.filter((c) => c.completed).length;
-
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.header}>
-        🎯 Weekly Challenges
+  <ScrollView
+    style={styles.container}
+    showsVerticalScrollIndicator={false}
+  >
+    <Text style={styles.title}>
+      Challenges
+    </Text>
+
+    <Text style={styles.subtitle}>
+      Compete, learn and earn rewards
+    </Text>
+
+    {/* Quiz */}
+
+    <TouchableOpacity
+      style={styles.gameCard}
+      onPress={() => router.push('/quiz')}
+    >
+      <Text style={styles.gameTitle}>
+        🧠 Quiz Arena
       </Text>
 
-      <Text style={styles.subHeader}>
-        {completedCount}/{challenges.length} completed this week
+      <Text style={styles.gameSubtitle}>
+        Beat the clock and test your knowledge
+      </Text>
+    </TouchableOpacity>
+
+    {/* Scenario */}
+
+    <TouchableOpacity
+      style={styles.gameCard}
+      onPress={() => router.push('/scenario')}
+    >
+      <Text style={styles.gameTitle}>
+        🎯 Decision Scenarios
       </Text>
 
-      {isLoading ? (
-        <ActivityIndicator
-          color="#60A5FA"
-          style={{ marginTop: 40 }}
-        />
-      ) : (
-        <>
-          {challenges.map((challenge) => {
-            const progressPct = Math.min(
-              (challenge.progress / challenge.target) * 100,
-              100
-            );
-            const isComplete = challenge.completed;
+      <Text style={styles.gameSubtitle}>
+        Choose wisely and earn XP
+      </Text>
+    </TouchableOpacity>
 
-            return (
-              <View
-                key={challenge.id}
-                style={[
-                  styles.challengeCard,
-                  isComplete && styles.completedCard,
-                ]}
-              >
-                <View style={styles.challengeHeader}>
-                  <Text style={styles.challengeTitle}>
-                    {isComplete ? '✅ ' : '⏳ '}
-                    {challenge.title}
-                  </Text>
-                  <Text style={styles.xpBadge}>
-                    +{challenge.xpReward} XP
-                  </Text>
-                </View>
+    {/* Scanner */}
 
-                <Text style={styles.challengeDescription}>
-                  {challenge.description}
-                </Text>
+    <TouchableOpacity
+      style={styles.gameCard}
+      onPress={() => router.push('/scanner')}
+    >
+      <Text style={styles.gameTitle}>
+        📷 Medicine Scanner
+      </Text>
 
-                <View style={styles.progressBg}>
-                  <View
-                    style={[
-                      styles.progressFill,
-                      { width: `${progressPct}%` },
-                    ]}
-                  />
-                </View>
+      <Text style={styles.gameSubtitle}>
+        Check medicine compliance instantly
+      </Text>
+    </TouchableOpacity>
 
-                <Text style={styles.progressText}>
-                  {challenge.progress >= challenge.target
-                    ? 'Completed!'
-                    : `${challenge.progress} / ${challenge.target}`}
-                </Text>
+    {/* Roulette */}
 
-                {isComplete && (
-                  <TouchableOpacity
-                    style={styles.claimButton}
-                    onPress={() => handleClaim(challenge)}
-                    disabled={claimingId === challenge.id}
-                  >
-                    <Text style={styles.claimButtonText}>
-                      {claimingId === challenge.id
-                        ? 'Claiming...'
-                        : 'Claim Reward'}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            );
-          })}
-        </>
-      )}
-    </ScrollView>
+    <TouchableOpacity
+      style={styles.gameCard}
+      onPress={() => router.push('/roulette')}
+    >
+      <Text style={styles.gameTitle}>
+        🧪 Supplement Roulette
+      </Text>
+
+      <Text style={styles.gameSubtitle}>
+        Learn supplement risks through gameplay
+      </Text>
+    </TouchableOpacity>
+
+    {/* Tournament Section */}
+
+    <Text style={styles.sectionTitle}>
+      🏆 Live Tournaments
+    </Text>
+
+    <View style={styles.tournamentCard}>
+      <View style={styles.dayCircle}>
+        <Text style={styles.dayText}>THU</Text>
+      </View>
+
+      <View style={{ flex: 1 }}>
+        <Text style={styles.eventTitle}>
+          Clean Sport Cup
+        </Text>
+
+        <Text style={styles.eventSubtitle}>
+          1,240 Players
+        </Text>
+      </View>
+
+      <View style={styles.liveBadge}>
+        <Text style={styles.liveText}>
+          LIVE
+        </Text>
+      </View>
+    </View>
+
+    <View style={styles.tournamentCard}>
+      <View style={styles.dayCircle}>
+        <Text style={styles.dayText}>FRI</Text>
+      </View>
+
+      <View style={{ flex: 1 }}>
+        <Text style={styles.eventTitle}>
+          Supplement Awareness Week
+        </Text>
+
+        <Text style={styles.eventSubtitle}>
+          Solo Event
+        </Text>
+      </View>
+
+      <View style={styles.liveBadge}>
+        <Text style={styles.liveText}>
+          DAY 2
+        </Text>
+      </View>
+    </View>
+
+    <View style={styles.tournamentCard}>
+      <View style={styles.dayCircle}>
+        <Text style={styles.dayText}>SAT</Text>
+      </View>
+
+      <View style={{ flex: 1 }}>
+        <Text style={styles.eventTitle}>
+          TUE Mastery Bracket
+        </Text>
+
+        <Text style={styles.eventSubtitle}>
+          Team Battle
+        </Text>
+      </View>
+
+      <View style={styles.liveBadge}>
+        <Text style={styles.liveText}>
+          SATURDAY
+        </Text>
+      </View>
+    </View>
+
+    <View style={{ height: 50 }} />
+  </ScrollView>
+  );
+}
+
+function TournamentCard({
+  title,
+  players,
+  status,
+}: {
+  title: string;
+  players: string;
+  status: string;
+}) {
+  return (
+    <View style={styles.tournamentCard}>
+      <View style={styles.circle}>
+        <Text style={styles.circleText}>
+          {status === 'LIVE'
+            ? 'THU'
+            : status === 'DAY 2'
+            ? 'FRI'
+            : 'SAT'}
+        </Text>
+      </View>
+
+      <View style={{ flex: 1 }}>
+        <Text style={styles.tournamentTitle}>
+          {title}
+        </Text>
+
+        <Text style={styles.tournamentPlayers}>
+          {players}
+        </Text>
+      </View>
+
+      <View style={styles.badge}>
+        <Text style={styles.badgeText}>
+          {status}
+        </Text>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#F8FAFC',
     padding: 20,
   },
 
-  header: {
-    color: 'white',
-    fontSize: 30,
-    fontWeight: 'bold',
-    marginTop: 20,
+  title: {
+    fontSize: 34,
+    fontWeight: '800',
+    color: '#0F172A',
+    marginTop: 50,
   },
 
-  subHeader: {
-    color: '#94A3B8',
-    marginBottom: 24,
+  subtitle: {
+    fontSize: 16,
+    color: '#64748B',
+    marginTop: 6,
+    marginBottom: 30,
+  },
+
+  gameCard: {
+    backgroundColor: '#FFFFFF',
+    padding: 22,
+    borderRadius: 24,
+    marginBottom: 16,
+    elevation: 3,
+  },
+
+  gameTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+
+  gameSubtitle: {
+    color: '#64748B',
     marginTop: 6,
   },
 
-  challengeCard: {
-    backgroundColor: '#1E293B',
-    borderRadius: 20,
-    padding: 18,
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#0F172A',
+    marginTop: 20,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#334155',
   },
 
-  completedCard: {
-    borderColor: '#22C55E',
-  },
-
-  challengeHeader: {
+  tournamentCard: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    borderRadius: 24,
+    marginBottom: 14,
+    elevation: 2,
   },
 
-  challengeTitle: {
-    color: 'white',
-    fontSize: 18,
+dayCircle: {
+  width: 52,
+  height: 52,
+  borderRadius: 26,
+  backgroundColor: '#E2E8F0',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginRight: 12,
+},
+
+dayText: {
+  fontWeight: '700',
+  color: '#475569',
+},
+
+eventTitle: {
+  fontSize: 16,
+  fontWeight: '700',
+  color: '#0F172A',
+},
+
+eventSubtitle: {
+  color: '#64748B',
+  marginTop: 4,
+},
+
+liveBadge: {
+  backgroundColor: '#DCFCE7',
+  paddingHorizontal: 10,
+  paddingVertical: 6,
+  borderRadius: 20,
+},
+
+liveText: {
+  color: '#16A34A',
+  fontWeight: '700',
+  fontSize: 12,
+},
+
+  circle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#E2E8F0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+
+  circleText: {
+    color: '#475569',
     fontWeight: '700',
-    flex: 1,
+    fontSize: 12,
   },
 
-  xpBadge: {
+  tournamentTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+
+  tournamentPlayers: {
+    color: '#64748B',
+    marginTop: 4,
+  },
+
+  badge: {
+    backgroundColor: '#DCFCE7',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+
+  badgeText: {
     color: '#22C55E',
     fontWeight: '700',
-    fontSize: 14,
-  },
-
-  challengeDescription: {
-    color: '#94A3B8',
-    marginBottom: 14,
-  },
-
-  progressBg: {
-    height: 8,
-    backgroundColor: '#334155',
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#2563EB',
-    borderRadius: 10,
-  },
-
-  progressText: {
-    color: '#CBD5E1',
-    fontSize: 13,
-    marginTop: 8,
-    fontWeight: '600',
-  },
-
-  claimButton: {
-    backgroundColor: '#22C55E',
-    borderRadius: 12,
-    padding: 14,
-    marginTop: 14,
-  },
-
-  claimButtonText: {
-    color: 'white',
-    fontWeight: '700',
-    textAlign: 'center',
+    fontSize: 12,
   },
 });
