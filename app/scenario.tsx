@@ -1,7 +1,8 @@
-import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,35 +10,33 @@ import {
   View,
 } from "react-native";
 
-const choices = [
-  {
-    id: "a",
-    label: "Take it — coach knows best",
-    outcome: "bad",
-    text: "Risky. Even trusted coaches can suggest substances containing banned ingredients. Strict liability means YOU are responsible.",
-  },
-  {
-    id: "b",
-    label: "Verify on Global DRO first",
-    outcome: "good",
-    text: "Smart move! Global DRO and WADA's Prohibited List tell you exactly what's allowed.",
-  },
-  {
-    id: "c",
-    label: "Ask medical / NADA support",
-    outcome: "best",
-    text: "Best answer. Your team doctor or NADA can verify ingredients and ensure compliance.",
-  },
-];
+import { auth } from "../src/firebase/config";
+import {
+  getScenarios,
+  recordScenarioResult,
+  type Scenario,
+  type ScenarioChoice,
+} from "../src/firebase/scenarioService";
 
 export default function ScenarioScreen() {
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [selected, setSelected] = useState<string | null>(null);
+  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+  const [xpEarnedMessage, setXpEarnedMessage] = useState<string>("");
+
+  // Load scenarios on mount
+  useEffect(() => {
+    const result = getScenarios();
+    if (result.success && result.data) {
+      setScenarios(result.data);
+    }
+  }, []);
 
   // Reset selection when scenario changes
   useEffect(() => {
     setSelected(null);
-    setXpEarnedMessage('');
+    setXpEarnedMessage("");
   }, [currentIndex]);
 
   const current =
@@ -46,7 +45,7 @@ export default function ScenarioScreen() {
       : null;
 
   const result = current
-    ? current.choices.find((c) => c.id === selected)
+    ? current.choices.find((c: ScenarioChoice) => c.id === selected)
     : null;
 
   const isCompleted = current ? completedIds.has(current.id) : false;
@@ -59,138 +58,37 @@ export default function ScenarioScreen() {
     const currentUser = auth.currentUser;
     if (!currentUser) return;
 
-    const result = await recordScenarioResult(currentUser.uid, current!.id);
-    if (result.success) {
-      if (result.data.xpEarned > 0) {
-        setXpEarnedMessage(`+${result.data.xpEarned} XP earned!`);
+    const recordResult = await recordScenarioResult(currentUser.uid, current!.id);
+    if (recordResult.success) {
+      if (recordResult.data.xpEarned > 0) {
+        setXpEarnedMessage(`+${recordResult.data.xpEarned} XP earned!`);
         setCompletedIds((prev) => new Set(prev).add(current!.id));
       } else {
-        setXpEarnedMessage('Already completed - no XP awarded');
+        setXpEarnedMessage("Already completed - no XP awarded");
       }
     } else {
-      Alert.alert('Error', result.error);
+      Alert.alert("Error", recordResult.error);
     }
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <MaterialIcons name="arrow-back" size={28} color="white" />
+          <MaterialIcons name="arrow-back" size={28} color="#1E293B" />
         </TouchableOpacity>
 
-        <Text style={styles.xpText}>⚡ +80 XP</Text>
+        <Text style={styles.xpText}>⚡ +{current?.xpReward || 0} XP</Text>
       </View>
-
-      {/* Title */}
-
-      <Text style={styles.scenarioLabel}>Scenario 04 · Pre-Competition</Text>
-
-      <Text style={styles.title}>What Would You Do?</Text>
-
-      {/* Scenario Card */}
-
-      <View style={styles.scenarioCard}>
-        <View style={styles.warningIcon}>
-          <FontAwesome5 name="exclamation-triangle" size={24} color="white" />
-        </View>
-
-        <View style={{ flex: 1 }}>
-          <Text style={styles.cardTitle}>Day before the meet</Text>
-
-          <Text style={styles.cardText}>
-            Your coach hands you a new recovery supplement and insists it will
-            improve your performance.
-          </Text>
-        </View>
-      </View>
-
-      {/* Choices */}
-
-      {choices.map((choice) => {
-        const isSelected = selected === choice.id;
-
-        const showResult = selected !== null;
-
-        return (
-          <TouchableOpacity
-            key={choice.id}
-            disabled={selected !== null}
-            onPress={() => setSelected(choice.id)}
-            style={[
-              styles.choiceCard,
-
-              showResult &&
-                isSelected &&
-                choice.outcome === "bad" &&
-                styles.badChoice,
-
-              showResult &&
-                isSelected &&
-                choice.outcome === "good" &&
-                styles.goodChoice,
-
-              showResult &&
-                isSelected &&
-                choice.outcome === "best" &&
-                styles.bestChoice,
-            ]}
-          >
-            <Text style={styles.choiceLetter}>{choice.id.toUpperCase()}</Text>
-
-            <Text style={styles.choiceText}>{choice.label}</Text>
-          </TouchableOpacity>
-        );
-      })}
-
-      {/* Result */}
-
-      {result && (
-        <View
-          style={[
-            styles.resultCard,
-
-            result.outcome === "bad" ? styles.badResult : styles.goodResult,
-          ]}
-        >
-          <Text style={styles.resultTitle}>
-            {result.outcome === "best"
-              ? "🏆 Pro Move!"
-              : result.outcome === "good"
-                ? "✅ Smart Choice"
-                : "⚠️ Be Careful"}
-          </Text>
-
-          <Text style={styles.resultText}>{result.text}</Text>
-
-          <View style={styles.resultButtons}>
-            <TouchableOpacity
-              style={styles.exitButton}
-              onPress={() => router.push("/challenges" as any)}
-            >
-              <Text style={styles.exitText}>Exit</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.nextButton}
-              onPress={() => setSelected(null)}
-            >
-              <Text style={styles.nextText}>Next Scenario →</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      ) : null}
 
       {current ? (
         <>
           <Text style={styles.scenarioLabel}>
             {current.subtitle}
-            {isCompleted ? ' ✅ Completed' : ''}
+            {isCompleted ? " ✅" : ""}
           </Text>
 
-          <Text style={styles.title}>
-            {current.title}
-          </Text>
+          <Text style={styles.title}>{current.title}</Text>
 
           {/* Situation Card */}
           <View style={styles.situationCard}>
@@ -199,12 +97,8 @@ export default function ScenarioScreen() {
             </View>
 
             <View style={{ flex: 1 }}>
-              <Text style={styles.cardTitle}>
-                {current.situationTitle}
-              </Text>
-              <Text style={styles.cardText}>
-                {current.situationText}
-              </Text>
+              <Text style={styles.cardTitle}>{current.situationTitle}</Text>
+              <Text style={styles.cardText}>{current.situationText}</Text>
             </View>
           </View>
 
@@ -222,15 +116,15 @@ export default function ScenarioScreen() {
                   styles.choiceCard,
                   showResult &&
                     isSelected &&
-                    choice.outcome === 'bad' &&
+                    choice.outcome === "bad" &&
                     styles.badChoice,
                   showResult &&
                     isSelected &&
-                    choice.outcome === 'good' &&
+                    choice.outcome === "good" &&
                     styles.goodChoice,
                   showResult &&
                     isSelected &&
-                    choice.outcome === 'best' &&
+                    choice.outcome === "best" &&
                     styles.bestChoice,
                   isCompleted && styles.completedChoice,
                 ]}
@@ -238,34 +132,37 @@ export default function ScenarioScreen() {
                 <Text style={styles.choiceLetter}>
                   {choice.id.toUpperCase()}
                 </Text>
-                <Text style={styles.choiceText}>
-                  {choice.label}
-                </Text>
+                <Text style={styles.choiceText}>{choice.label}</Text>
               </TouchableOpacity>
             );
           })}
+
+          {/* XP Message */}
+          {xpEarnedMessage && (
+            <View style={styles.xpBanner}>
+              <Text style={styles.xpBannerText}>{xpEarnedMessage}</Text>
+            </View>
+          )}
 
           {/* Result */}
           {result && (
             <View
               style={[
                 styles.resultCard,
-                result.outcome === 'bad'
+                result.outcome === "bad"
                   ? styles.badResult
                   : styles.goodResult,
               ]}
             >
               <Text style={styles.resultTitle}>
-                {result.outcome === 'best'
-                  ? '🏆 Pro Move!'
-                  : result.outcome === 'good'
-                  ? '✅ Smart Choice'
-                  : '⚠️ Be Careful'}
+                {result.outcome === "best"
+                  ? "🏆 Pro Move!"
+                  : result.outcome === "good"
+                  ? "✅ Smart Choice"
+                  : "⚠️ Be Careful"}
               </Text>
 
-              <Text style={styles.resultText}>
-                {result.text}
-              </Text>
+              <Text style={styles.resultText}>{result.text}</Text>
 
               <View style={styles.resultButtons}>
                 {currentIndex > 0 && (
@@ -273,9 +170,7 @@ export default function ScenarioScreen() {
                     style={styles.navButton}
                     onPress={() => setCurrentIndex((i) => i - 1)}
                   >
-                    <Text style={styles.navButtonText}>
-                      ← Previous
-                    </Text>
+                    <Text style={styles.navButtonText}>← Previous</Text>
                   </TouchableOpacity>
                 )}
 
@@ -303,9 +198,7 @@ export default function ScenarioScreen() {
           )}
         </>
       ) : (
-        <Text style={styles.emptyText}>
-          No scenarios available.
-        </Text>
+        <Text style={styles.emptyText}>Loading scenarios...</Text>
       )}
     </ScrollView>
   );
@@ -332,21 +225,18 @@ const styles = StyleSheet.create({
   },
 
   xpBanner: {
-    backgroundColor: '#166534',
+    backgroundColor: "#166534",
     borderRadius: 12,
     padding: 14,
     marginBottom: 16,
-  },
-
-  xpBannerDim: {
-    backgroundColor: '#334155',
+    marginTop: 16,
   },
 
   xpBannerText: {
-    color: '#BBF7D0',
+    color: "#BBF7D0",
     fontSize: 15,
-    fontWeight: '700',
-    textAlign: 'center',
+    fontWeight: "700",
+    textAlign: "center",
   },
 
   scenarioLabel: {
@@ -364,7 +254,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
 
-  scenarioCard: {
+  situationCard: {
     flexDirection: "row",
     backgroundColor: "#FFFFFF",
     padding: 20,
@@ -387,9 +277,9 @@ const styles = StyleSheet.create({
   },
 
   warningIconText: {
-    color: 'white',
+    color: "white",
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 
   cardTitle: {
@@ -501,28 +391,28 @@ const styles = StyleSheet.create({
 
   navButton: {
     flex: 1,
-    backgroundColor: '#1E293B',
+    backgroundColor: "#1E293B",
     padding: 14,
     borderRadius: 12,
   },
 
   navButtonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontWeight: '600',
+    color: "white",
+    textAlign: "center",
+    fontWeight: "600",
   },
 
   navButtonPrimary: {
     flex: 1,
-    backgroundColor: '#2563EB',
+    backgroundColor: "#2563EB",
     padding: 14,
     borderRadius: 12,
   },
 
   navButtonPrimaryText: {
-    color: 'white',
-    textAlign: 'center',
-    fontWeight: 'bold',
+    color: "white",
+    textAlign: "center",
+    fontWeight: "bold",
   },
 
   exitButton: {
@@ -538,20 +428,11 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  nextButton: {
-    flex: 1,
-    backgroundColor: "#06B6D4",
-    padding: 16,
-    borderRadius: 16,
-  },
-
-  nextText: {
-    color: "white",
+  emptyText: {
+    color: "#64748B",
+    fontSize: 16,
     textAlign: "center",
-    fontWeight: "800",
+    marginTop: 40,
   },
 });
-
-// State for XP earned message is managed via useState in ScenarioScreen component
-// This is not needed as a standalone function since it's already integrated as state
 
