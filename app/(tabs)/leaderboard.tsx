@@ -51,9 +51,6 @@ export default function LeaderboardScreen() {
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
     >
-      <Text style={styles.title}>
-        Leaderboard
-      </Text>
      <View style={styles.header}>
   <Text style={styles.headerTitle}>
     Leaderboard
@@ -91,76 +88,78 @@ export default function LeaderboardScreen() {
       ) : null}
 
       {/* TOP 3 PODIUM */}
-      {top3.length > 0 ? (
-        <View style={styles.podium}>
-          {top3.map((entry, index) => (
-            <View
-              key={`top-${index}`}
-              style={[
-                styles.podiumCard,
-                index === 0 && styles.podiumFirst,
-              ]}
-            >
-              <Text style={styles.podiumEmoji}>
-                {TOP_3_EMOJIS[index]}
-              </Text>
-              <Text
-                style={[
-                  styles.podiumRank,
-                  { color: TOP_3_COLORS[index] },
-                ]}
-              >
-                #{index + 1}
-              </Text>
-              <Text style={styles.podiumName}>
-                {entry.name}
-              </Text>
-              <Text style={styles.podiumSport}>
-                {entry.sport}
-              </Text>
-              <Text style={styles.podiumXP}>
-                {entry.xp} XP
-              </Text>
-              <Text style={styles.podiumDetail}>
-                {entry.level} · 🔥{entry.streak}
-              </Text>
-            </View>
-          ))}
-        </View>
-      ) : null}
+     {top3.length === 3 && (
+  <View style={styles.podiumContainer}>
+
+    {/* SECOND */}
+    <View style={styles.sidePodium}>
+      <View style={styles.avatarSilver}>
+        <Text style={styles.avatarLabel}>
+          {top3[1]?.name?.charAt(0)}
+        </Text>
+      </View>
+
+      <Text style={styles.podiumName}>
+        {top3[1]?.name}
+      </Text>
+
+      <Text style={styles.podiumXP}>
+        {top3[1]?.xp.toLocaleString()} XP
+      </Text>
+
+      <View style={[styles.podiumBlock, { height: 70 }]}>
+        <Text style={styles.blockNumber}>2</Text>
+      </View>
+    </View>
+
+    {/* FIRST */}
+    <View style={styles.centerPodium}>
+      <Text style={styles.crown}>👑</Text>
+
+      <View style={styles.avatarGold}>
+        <Text style={styles.avatarLabel}>
+          {top3[0]?.name?.charAt(0)}
+        </Text>
+      </View>
+
+      <Text style={styles.podiumName}>
+        {top3[0]?.name}
+      </Text>
+
+      <Text style={styles.podiumXP}>
+        {top3[0]?.xp.toLocaleString()} XP
+      </Text>
+
+      <View style={[styles.podiumBlock, { height: 110 }]}>
+        <Text style={styles.blockNumber}>1</Text>
+      </View>
+    </View>
+
+    {/* THIRD */}
+    <View style={styles.sidePodium}>
+      <View style={styles.avatarBronze}>
+        <Text style={styles.avatarLabel}>
+          {top3[2]?.name?.charAt(0)}
+        </Text>
+      </View>
+
+      <Text style={styles.podiumName}>
+        {top3[2]?.name}
+      </Text>
+
+      <Text style={styles.podiumXP}>
+        {top3[2]?.xp.toLocaleString()} XP
+      </Text>
+
+      <View style={[styles.podiumBlock, { height: 55 }]}>
+        <Text style={styles.blockNumber}>3</Text>
+      </View>
+    </View>
+
+  </View>
+)}
 
       {/* REST OF LEADERBOARD */}
-      {rest.map((entry, index) => (
-        <View
-          key={`${entry.name}-${entry.sport}-${index}`}
-          style={styles.entryCard}
-        >
-          <Text style={styles.rank}>
-            #{index + 4}
-          </Text>
-
-          <View style={styles.entryDetails}>
-            <Text style={styles.entryName}>
-              {entry.name}
-            </Text>
-            <Text style={styles.entrySport}>
-              {entry.sport}
-            </Text>
-          </View>
-
-          <View style={styles.scoreGroup}>
-            <Text style={styles.xp}>
-              {entry.xp} XP
-            </Text>
-            <Text style={styles.level}>
-              {entry.level}
-            </Text>
-            <Text style={styles.streak}>
-              🔥{entry.streak}
-            </Text>
-          </View>
-        </View>
-      ))}
       {entries.map((entry, index) => (
   <View
     key={`${entry.name}-${entry.sport}-${index}`}
@@ -209,26 +208,24 @@ export default function LeaderboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+   backgroundColor: '#F8FAFC',
   },
+contentContainer: {
+  paddingHorizontal: 20,
+  paddingTop: 20,
+  paddingBottom: 48,
+},
 
-  contentContainer: {
-    gap: 14,
-    padding: 20,
-    paddingBottom: 48,
-  },
+header: {
+  marginTop: 25,
+  marginBottom: 20,
+},
 
-
-   header: {
-  marginTop: 40,
-  marginBottom: 10,
-  },
-
-  headerTitle: {
+ headerTitle: {
   color: '#0F172A',
-  fontSize: 34,
-  fontWeight: '800',
-  },
+  fontSize: 30,
+  fontWeight: '700',
+},
 
   headerSubtitle: {
   color: '#64748B',
@@ -236,20 +233,14 @@ const styles = StyleSheet.create({
   marginTop: 4,
   },
 
-  title: {
-    color: 'white',
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginTop: 40,
-  },
-
   refreshButton: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#2563EB',
-    borderRadius: 12,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-  },
+  alignSelf: 'flex-start',
+  backgroundColor: '#06B6D4',
+  borderRadius: 12,
+  paddingHorizontal: 18,
+  paddingVertical: 12,
+  marginBottom: 20,
+},
 
   refreshButtonText: {
     color: 'white',
@@ -290,24 +281,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
 
-  podiumName: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-
   podiumSport: {
     color: '#94A3B8',
     fontSize: 12,
     textAlign: 'center',
-  },
-
-  podiumXP: {
-    color: '#22C55E',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 6,
   },
 
   podiumDetail: {
@@ -316,23 +293,23 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  entryCard: {
+ entryCard: {
   flexDirection: 'row',
   alignItems: 'center',
   backgroundColor: '#FFFFFF',
-  borderRadius: 30,
-  paddingVertical: 16,
-  paddingHorizontal: 18,
+  borderRadius: 24,
+  padding: 16,
+  marginBottom: 12,
   borderWidth: 1,
   borderColor: '#E2E8F0',
-  },
+},
 
-  rank: {
-  width: 30,
-  fontSize: 24,
+ rank: {
+  width: 35,
+  fontSize: 22,
   fontWeight: '700',
   color: '#475569',
-  },
+},
   avatarCircle: {
   width: 50,
   height: 50,
@@ -369,11 +346,11 @@ const styles = StyleSheet.create({
     gap: 4,
   },
 
-  xp: {
+ xp: {
   color: '#0F172A',
-  fontSize: 30,
+  fontSize: 22,
   fontWeight: '800',
-  },
+},
 
   level: {
   color: '#64748B',
@@ -396,4 +373,97 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginTop: 10,
   },
+
+podiumContainer: {
+  backgroundColor: '#06B6D4',
+  borderRadius: 32,
+  paddingTop: 18,
+  paddingBottom: 10,
+  paddingHorizontal: 16,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'flex-end',
+  marginBottom: 10,
+},
+
+centerPodium: {
+  alignItems: 'center',
+},
+
+sidePodium: {
+  alignItems: 'center',
+},
+
+crown: {
+  fontSize: 26,
+  marginBottom: 6,
+},
+
+avatarGold: {
+  width: 72,
+  height: 72,
+  borderRadius: 36,
+  backgroundColor: '#EC4899', // Pink
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderWidth: 3,
+  borderColor: '#FBCFE8',
+},
+
+avatarSilver: {
+  width: 64,
+  height: 64,
+  borderRadius: 32,
+  backgroundColor: '#FB923C', // Orange
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderWidth: 2,
+  borderColor: '#FED7AA',
+},
+
+avatarBronze: {
+  width: 64,
+  height: 64,
+  borderRadius: 32,
+  backgroundColor: '#18dcc5', // Grey
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderWidth: 2,
+  borderColor: '#CBD5E1',
+},
+
+avatarLabel: {
+  color: '#fff',
+  fontWeight: '800',
+  fontSize: 22,
+},
+
+podiumBlock: {
+  width: 100,
+  backgroundColor: '#22D3EE',
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 10,
+},
+
+blockNumber: {
+  color: '#fff',
+  fontSize: 28,
+  fontWeight: '800',
+},
+
+podiumName: {
+  color: '#fff',
+  fontWeight: '700',
+  marginTop: 8,
+  textAlign: 'center',
+},
+
+podiumXP: {
+  color: '#E0F2FE',
+  fontSize: 13,
+  marginTop: 2,
+},
 });
