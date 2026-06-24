@@ -205,7 +205,7 @@ export default function ProfileScreen() {
       {/* Logout */}
       <TouchableOpacity
         style={styles.logoutButton}
-        onPress={() => router.push('/athlete-register' as any)}
+        onPress={handleLogout}
         activeOpacity={0.8}
       >
         <MaterialIcons name="logout" size={22} color="white" />
@@ -246,7 +246,7 @@ function QuickCard({
 }) {
   return (
     <TouchableOpacity style={styles.quickCard} onPress={onPress}>
-      <FontAwesome5 name={icon} size={28} color="#14C8E8" solid />
+      <FontAwesome5 name={icon} size={22} color="#2563EB" />
       <Text style={styles.quickTitle}>{title}</Text>
       <Text style={styles.quickSubtitle}>{subtitle}</Text>
     </TouchableOpacity>
@@ -274,7 +274,7 @@ function MenuRow({
       )}
       <Text style={styles.rowTitle}>{title}</Text>
       {value && <Text style={styles.rowValue}>{value}</Text>}
-      <MaterialIcons name="chevron-right" size={22} color="#14C8E8" />
+      <MaterialIcons name="chevron-right" size={22} color="'#06B6D4'" />
     </TouchableOpacity>
   );
 }
