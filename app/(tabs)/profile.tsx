@@ -205,7 +205,7 @@ export default function ProfileScreen() {
       {/* Logout */}
       <TouchableOpacity
         style={styles.logoutButton}
-        onPress={() => router.push('/index' as any)}
+        onPress={() => router.push('/athlete-register' as any)}
         activeOpacity={0.8}
       >
         <MaterialIcons name="logout" size={22} color="white" />
