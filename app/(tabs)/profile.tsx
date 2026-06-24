@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
   },
 
   editBtn: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#06B6D4',
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 14,
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   },
 
   profileCard: {
-    backgroundColor: '#14C8E8',
+    backgroundColor: '#06B6D4',
     borderRadius: 30,
     padding: 24,
     shadowColor: '#000',
