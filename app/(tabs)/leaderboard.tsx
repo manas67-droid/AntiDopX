@@ -403,29 +403,33 @@ avatarGold: {
   width: 72,
   height: 72,
   borderRadius: 36,
-  backgroundColor: '#F59E0B',
+  backgroundColor: '#EC4899', // Pink
   justifyContent: 'center',
   alignItems: 'center',
   borderWidth: 3,
-  borderColor: '#FDE68A',
+  borderColor: '#FBCFE8',
 },
 
 avatarSilver: {
   width: 64,
   height: 64,
   borderRadius: 32,
-  backgroundColor: '#CBD5E1',
+  backgroundColor: '#FB923C', // Orange
   justifyContent: 'center',
   alignItems: 'center',
+  borderWidth: 2,
+  borderColor: '#FED7AA',
 },
 
 avatarBronze: {
   width: 64,
   height: 64,
   borderRadius: 32,
-  backgroundColor: '#FB923C',
+  backgroundColor: '#18dcc5', // Grey
   justifyContent: 'center',
   alignItems: 'center',
+  borderWidth: 2,
+  borderColor: '#CBD5E1',
 },
 
 avatarLabel: {
