@@ -11,6 +11,7 @@ import {
 
 import { registerUser } from '../src/firebase/authService';
 import { loginUser } from '../src/firebase/loginService';
+import { updateDailyStreak } from '../src/firebase/streakService';
 
 export default function AthleteRegisterScreen() {
   const router = useRouter();
@@ -42,6 +43,24 @@ export default function AthleteRegisterScreen() {
         alert(result.error);
         return;
       }
+
+      const streakResult = await updateDailyStreak(
+        result.user!.uid
+      );
+
+      if (!streakResult.success) {
+        console.log(
+          'STREAK ERROR:',
+          streakResult.error
+        );
+        alert(streakResult.error);
+        return;
+      }
+
+      console.log(
+        'UPDATED STREAK:',
+        streakResult.streak
+      );
 
       router.replace('/dashboard');
     } else {

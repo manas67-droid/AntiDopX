@@ -26,6 +26,11 @@ export default function LoginScreen() {
 
     const streakResult = await updateDailyStreak(result.user!.uid);
 
+console.log(
+  'STREAK RESULT:',
+  JSON.stringify(streakResult)
+);
+
     if (!streakResult.success) {
       alert(streakResult.error);
       return;
