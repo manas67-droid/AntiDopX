@@ -32,6 +32,11 @@ export const updateDailyStreak = async (
       userData.lastLoginDate
         ?.split('T')[0];
 
+    console.log('UID:', uid);
+    console.log('USER DATA:', userData);
+    console.log('LAST LOGIN:', lastLogin);
+    console.log('TODAY:', todayString);
+
     let streak = userData.streak || 1;
 
     if (lastLogin === todayString) {
@@ -55,6 +60,8 @@ export const updateDailyStreak = async (
     } else {
       streak = 1;
     }
+
+    console.log('NEW STREAK:', streak);
 
     await updateDoc(userRef, {
       streak,

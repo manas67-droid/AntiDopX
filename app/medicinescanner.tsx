@@ -1,62 +1,113 @@
 import {
-    Feather,
-    MaterialCommunityIcons,
-    MaterialIcons,
+  Feather,
+  MaterialCommunityIcons,
+  MaterialIcons,
 } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import { auth } from '../src/firebase/config';
+import { addXP } from '../src/firebase/xpservices';
 
-const results = [
-  {
-    status: 'safe',
-    title: 'Paracetamol 500mg',
-    note: 'Permitted in and out of competition.',
-    color: '#16A34A',
-    icon: 'check-circle',
-  },
-  {
-    status: 'warning',
-    title: 'Pseudoephedrine',
-    note: 'Permitted out-of-competition. Restricted during competition.',
-    color: '#F59E0B',
-    icon: 'warning',
-  },
-  {
-    status: 'prohibited',
-    title: 'Clenbuterol',
-    note: 'PROHIBITED at all times. Do not consume.',
-    color: '#DC2626',
-    icon: 'cancel',
-  },
-];
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import {
+  scanMedicineText,
+} from '../src/firebase/medicineScannerService';
 
-export default function ScannerScreen() {
-  const [scanning, setScanning] = useState(false);
-  const [result, setResult] = useState<any>(null);
 
-  const scanMedicine = () => {
-    setScanning(true);
-    setResult(null);
+export default function ScannerScreen() 
+{const [scanning, setScanning] = useState(false);
+const [result, setResult] = useState<any>(null);
+const [medicineName, setMedicineName] = useState('');
+const [permission, requestPermission] =
+  useCameraPermissions();
 
-    setTimeout(() => {
-      const randomResult =
-        results[
-          Math.floor(
-            Math.random() * results.length
-          )
-        ];
+const [showCamera, setShowCamera] =
+  useState(false);
+  if (!permission) {
+  return null;
+}
+const rewardMedicineScan = async () => {
+  const currentUser = auth.currentUser;
 
-      setResult(randomResult);
-      setScanning(false);
-    }, 1800);
-  };
+  if (!currentUser) return;
+
+  await addXP(
+    currentUser.uid,
+    10
+  );
+};
+ const scanMedicine = async () => {
+  if (!medicineName.trim()) {
+    alert('Enter a medicine name');
+    return;
+  }
+
+  setScanning(true);
+  setResult(null);
+
+  const scanResult =
+    await scanMedicineText(
+      medicineName
+    );
+
+  if (!scanResult.success) {
+    alert(scanResult.error);
+    setScanning(false);
+    return;
+  }
+
+  const lookup =
+    scanResult.data.lookup;
+
+  let color = '#64748B';
+  let icon: any = 'help-outline';
+
+  if (lookup.status === 'Allowed') {
+    color = '#16A34A';
+    icon = 'check-circle';
+  }
+
+  if (
+    lookup.status ===
+    'Use With Caution'
+  ) {
+    color = '#F59E0B';
+    icon = 'warning';
+  }
+
+  if (
+    lookup.status ===
+    'Prohibited'
+  ) {
+    color = '#DC2626';
+    icon = 'cancel';
+  }
+
+  setResult({
+  status: lookup.status,
+  title: lookup.drugName,
+  note: lookup.guidance,
+  color,
+  icon,
+});
+
+if (lookup.status !== 'Unknown') {
+  console.log(
+  'Medicine found:',
+  lookup.drugName
+);
+}
+
+setScanning(false);
+};
 
   return (
     <SafeAreaView style={styles.container}>
@@ -90,29 +141,72 @@ export default function ScannerScreen() {
 
       <View style={styles.scannerArea}>
         <View style={styles.scannerBox}>
-          <MaterialCommunityIcons
-            name="barcode-scan"
-            size={80}
-            color="#38BDF8"
-          />
+  {showCamera ? (
+    <>
+      <CameraView
+  style={StyleSheet.absoluteFillObject}
+/>
+      {showCamera && (
+        <TouchableOpacity
+          style={{
+            marginTop: 10,
+            backgroundColor: '#EF4444',
+            padding: 12,
+            borderRadius: 10,
+          }}
+          onPress={() => setShowCamera(false)}
+        >
+          <Text
+            style={{
+              color: 'white',
+              fontWeight: 'bold',
+            }}
+          >
+            Close Camera
+          </Text>
+        </TouchableOpacity>
+      )}
+    </>
+  ) : (
+    <MaterialCommunityIcons
+      name="barcode-scan"
+      size={80}
+      color="#38BDF8"
+    />
+  )}
+</View>
 
           {scanning && (
             <Text style={styles.scanningText}>
               Scanning...
             </Text>
           )}
-        </View>
       </View>
 
       <Text style={styles.instructions}>
         Point camera at the medicine label
       </Text>
 
+      <TextInput
+        style={styles.input}
+        placeholder="Enter medicine name"
+        placeholderTextColor="#94A3B8"
+        value={medicineName}
+        onChangeText={setMedicineName}
+      />
+
       {/* Actions */}
 
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={styles.secondaryButton}
+          onPress={async () => {
+            const response = await requestPermission();
+
+            if (response.granted) {
+              setShowCamera(true);
+            }
+          }}
         >
           <MaterialIcons
             name="photo-library"
@@ -132,7 +226,7 @@ export default function ScannerScreen() {
           <Text style={styles.scanButtonText}>
             {scanning
               ? 'Scanning...'
-              : 'SCAN'}
+              : 'Check Medicine'}
           </Text>
         </TouchableOpacity>
 
@@ -225,7 +319,7 @@ export default function ScannerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8',
+    backgroundColor: '#0F172A',
     padding: 20,
   },
 
@@ -250,14 +344,15 @@ const styles = StyleSheet.create({
   },
 
   scannerBox: {
-    width: 260,
-    height: 260,
-    borderWidth: 2,
-    borderColor: '#14C8E8',
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  width: 260,
+  height: 260,
+  borderWidth: 2,
+  borderColor: '#14C8E8',
+  borderRadius: 30,
+  overflow: 'hidden',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
 
   scanningText: {
     color: '#14C8E8',
@@ -269,6 +364,14 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     textAlign: 'center',
     fontSize: 14,
+    marginBottom: 20,
+  },
+
+  input: {
+    backgroundColor: '#1E293B',
+    color: 'white',
+    padding: 16,
+    borderRadius: 12,
     marginBottom: 20,
   },
 

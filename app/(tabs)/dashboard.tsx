@@ -170,7 +170,7 @@ export default function DashboardScreen() {
 
   <TouchableOpacity
     style={styles.gridCard}
-    onPress={() => router.push('/scanner')}
+    onPress={() => router.push('/medicinescanner')}
   >
     <Text style={styles.gridIcon}>📷</Text>
     <Text style={styles.gridTitle}>Med Scanner</Text>
