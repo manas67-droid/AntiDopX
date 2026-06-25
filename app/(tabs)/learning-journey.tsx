@@ -114,7 +114,7 @@ export default function LearningJourneyScreen() {
 
         <TouchableOpacity
           style={styles.moduleCard}
-          onPress={() => router.push("./modules/wada-rules")}
+          onPress={() => router.push("/modules/wada-rules")}
         >
           <Text style={styles.status}>
             {progress.wadaRules ? "COMPLETED" : "IN PROGRESS"}
