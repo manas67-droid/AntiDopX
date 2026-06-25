@@ -43,33 +43,35 @@ export default function ChallengesScreen() {
 
       <View style={styles.grid}>
         <GameCard
-          title="Supplement Roulette"
-          subtitle="Spin to learn risks"
-          icon="dice"
-          route="/roulette"
-        />
+  title="Supplement Roulette"
+  subtitle="Spin to learn risks"
+  icon="dice"
+  iconColor="#FF8A3D"
+  route="/roulette"
+/>
+<GameCard
+  title="Medicine Scanner"
+  subtitle="AI label check"
+  icon="camera"
+  iconColor="#8B5CF6"
+  route="/scanner"
+/>
+<GameCard
+  title="Quiz Arena"
+  subtitle="60s rapid fire"
+  icon="brain"
+  iconColor="#22C55E"
+  route="/quiz"
+/>
 
         <GameCard
-          title="Medicine Scanner"
-          subtitle="AI label check"
-          icon="camera"
-          route="/scanner"
-        />
-
-        <GameCard
-          title="Quiz Arena"
-          subtitle="60s rapid fire"
-          icon="brain"
-          route="/quiz"
-        />
-
-        <GameCard
-          title="Scenarios"
-          subtitle="Branching outcomes"
-          icon="question-circle"
-          route="/scenario"
-        />
-      </View>
+  title="Scenarios"
+  subtitle="Branching outcomes"
+  icon="question-circle"
+  iconColor="#1EC6E8"
+  route="/scenario"
+/>
+</View>
 
       {/* Tournament Section */}
 
@@ -103,11 +105,13 @@ function GameCard({
   subtitle,
   icon,
   route,
+  iconColor,
 }: {
   title: string;
   subtitle: string;
   icon: any;
   route: string;
+  iconColor: string;
 }) {
   return (
     <TouchableOpacity
@@ -115,10 +119,10 @@ function GameCard({
       onPress={() => router.push(route as any)}
     >
       <FontAwesome5
-        name={icon}
-        size={28}
-        color="#2563EB"
-      />
+  name={icon}
+  size={28}
+  color={iconColor}
+/>
 
       <Text style={styles.gameTitle}>
         {title}
@@ -166,54 +170,61 @@ function TournamentCard({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0F172A',
-    padding: 20,
-  },
-
-  header: {
-    color: 'white',
-    fontSize: 30,
-    fontWeight: 'bold',
-    marginTop: 20,
-  },
+ container: {
+  flex: 1,
+  backgroundColor: '#F8FBFE',
+  padding: 20,
+},
+ header: {
+  color: '#0F172A',
+  fontSize: 38,
+  fontWeight: '800',
+  marginTop: 20,
+},
 
   subHeader: {
-    color: '#94A3B8',
-    marginBottom: 24,
-  },
-
+  color: '#64748B',
+  fontSize: 16,
+  marginBottom: 24,
+},
   featuredCard: {
-    backgroundColor: '#2563EB',
-    padding: 20,
-    borderRadius: 20,
-    marginBottom: 24,
-  },
-
+  backgroundColor: '#06B6D4',
+  padding: 22,
+  borderRadius: 28,
+  marginBottom: 24,
+  shadowColor: '#000',
+  shadowOpacity: 0.08,
+  shadowRadius: 12,
+  elevation: 6,
+},
   badge: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-
-  featuredTitle: {
-    color: 'white',
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-
+  alignSelf: 'flex-start',
+  backgroundColor: 'rgba(255,255,255,0.25)',
+  color: 'white',
+  paddingHorizontal: 10,
+  paddingVertical: 4,
+  borderRadius: 20,
+  fontSize: 11,
+  fontWeight: '700',
+},
+featuredTitle: {
+  color: 'white',
+  fontSize: 34,
+  fontWeight: '800',
+  marginTop: 16,
+},
   featuredDescription: {
-    color: 'white',
-    marginTop: 10,
-  },
-
+  color: '#EAF9FF',
+  fontSize: 17,
+  marginTop: 10,
+  lineHeight: 24,
+},
   xpText: {
-    color: 'white',
-    marginTop: 15,
-    fontWeight: 'bold',
-  },
+  color: 'white',
+  marginTop: 20,
+  fontWeight: '700',
+  fontSize: 16,
+},
 
   grid: {
     flexDirection: 'row',
@@ -222,48 +233,61 @@ const styles = StyleSheet.create({
   },
 
   gameCard: {
-    width: '48%',
-    backgroundColor: '#1E293B',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 16,
-  },
+  width: '48%',
+  backgroundColor: '#FFFFFF',
+  borderRadius: 28,
+  padding: 22,
+  marginBottom: 18,
 
-  gameTitle: {
-    color: 'white',
-    fontWeight: 'bold',
-    marginTop: 12,
-  },
+  shadowColor: '#000',
+  shadowOpacity: 0.08,
+  shadowRadius: 10,
+  elevation: 5,
+
+  borderWidth: 1,
+  borderColor: '#EDF2F7',
+},
+gameTitle: {
+  color: '#111827',
+  fontWeight: '700',
+  fontSize: 22,
+  marginTop: 18,
+},
 
   gameSubtitle: {
-    color: '#94A3B8',
-    fontSize: 12,
-    marginTop: 5,
-  },
+  color: '#64748B',
+  fontSize: 15,
+  marginTop: 8,
+},
+sectionTitle: {
+  color: '#111827',
+  fontSize: 28,
+  fontWeight: '800',
+  marginVertical: 24,
+},
 
-  sectionTitle: {
-    color: 'white',
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginVertical: 20,
-  },
-
-  tournamentCard: {
-    backgroundColor: '#1E293B',
+ tournamentCard: {
+  backgroundColor: '#FFFFFF',
     padding: 16,
-    borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 12,
+    borderRadius: 24,
+    borderWidth: 1,
+borderColor: '#E5E7EB',
+shadowColor: '#000',
+shadowOpacity: 0.06,
+shadowRadius: 8,
+elevation: 4,
   },
 
   tournamentTitle: {
-    color: 'white',
+  color: '#111827',
     fontWeight: 'bold',
   },
 
   tournamentPlayers: {
-    color: '#94A3B8',
+    color: '#64748B',
     fontSize: 12,
   },
 
