@@ -125,7 +125,7 @@ export default function DashboardScreen() {
       </Text>
 
       <Text style={styles.missionTime}>
-    • Ends in 6h
+      ⏱ Ends in 6h
       </Text>
     </View>
 
@@ -333,17 +333,17 @@ hero: {
   missionHeading: {
   color: '#14C8E8',
   fontWeight: '700',
-  marginBottom: 10,
+  fontSize: 16,
   },
 
   missionHeader: {
   flexDirection: 'row',
+  justifyContent: 'space-between',
   alignItems: 'center',
-  marginBottom: 12,
+  marginBottom: 16,
   },
 
   missionTime: {
-  marginLeft: 8,
   color: '#64748B',
   fontSize: 15,
   },
