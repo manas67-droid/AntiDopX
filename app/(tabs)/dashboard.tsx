@@ -423,7 +423,7 @@ hero: {
 
   levelValue: {
     color: '#fff',
-    fontSize: 36,
+    fontSize: 28,
     fontWeight: '700',
   },
 
@@ -442,7 +442,7 @@ hero: {
 
   progressFill: {
     height: 10,
-    backgroundColor: '#84CC16',
+  backgroundColor: '#fff',
     borderRadius: 20,
   },
 
