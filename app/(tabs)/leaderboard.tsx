@@ -213,9 +213,8 @@ const styles = StyleSheet.create({
 contentContainer: {
   paddingHorizontal: 20,
   paddingTop: 20,
-  paddingBottom: 48,
+  paddingBottom: 120, // Increased bottom spacing
 },
-
 header: {
   marginTop: 25,
   marginBottom: 20,
