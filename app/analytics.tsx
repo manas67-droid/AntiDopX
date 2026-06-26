@@ -37,7 +37,7 @@ export default function AnalyticsScreen() {
           <Ionicons
             name="arrow-back"
             size={22}
-            color="white"
+            color="#64748B"
           />
         </TouchableOpacity>
 
@@ -249,12 +249,11 @@ function KpiCard({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0F172A',
-    paddingHorizontal: 20,
-  },
-
+ container: {
+  flex: 1,
+  backgroundColor: '#F8FAFC',
+  paddingHorizontal: 18,
+},
   headerRow: {
     marginTop: 50,
     flexDirection: 'row',
@@ -263,96 +262,138 @@ const styles = StyleSheet.create({
   },
 
   backButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    backgroundColor: '#1E293B',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  width: 40,
+  height: 40,
+  borderRadius: 20,
+  backgroundColor: '#FFFFFF',
 
-  filter: {
-    backgroundColor: '#1E293B',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 12,
-  },
+  justifyContent: 'center',
+  alignItems: 'center',
 
-  filterText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
-  },
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
 
-  title: {
-    color: 'white',
-    fontSize: 30,
-    fontWeight: 'bold',
-    marginTop: 24,
-  },
+  elevation: 2,
+},
+ filter: {
+  backgroundColor: '#FFFFFF',
+
+  paddingHorizontal: 16,
+  paddingVertical: 10,
+
+  borderRadius: 20,
+
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+
+  elevation: 2,
+},
+filterText: {
+  color: '#0F172A',
+  fontSize: 12,
+  fontWeight: '600',
+},
+ title: {
+  color: '#0F172A',
+  fontSize: 38,
+  fontWeight: '800',
+  marginTop: 24,
+},
 
   subtitle: {
-    color: '#94A3B8',
-    marginTop: 6,
-    marginBottom: 20,
-  },
+  color: '#64748B',
+  fontSize: 15,
+  marginTop: 4,
+  marginBottom: 18,
+},
 
   kpiGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
+kpiCard: {
+  width: '48%',
 
-  kpiCard: {
-    width: '48%',
-    backgroundColor: '#1E293B',
-    borderRadius: 20,
-    padding: 16,
-    marginBottom: 12,
+  backgroundColor: '#FFFFFF',
+
+  borderRadius: 22,
+
+  padding: 18,
+
+  marginBottom: 16,
+
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+
+  shadowColor: '#000',
+  shadowOpacity: 0.05,
+  shadowRadius: 8,
+  shadowOffset: {
+    width: 0,
+    height: 3,
   },
 
-  kpiIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    backgroundColor: '#2563EB',
-    justifyContent: 'center',
-    alignItems: 'center',
+  elevation: 3,
+},
+
+ kpiIcon: {
+  width: 42,
+  height: 42,
+  borderRadius: 21,
+  backgroundColor: '#1EB9F0',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+kpiValue: {
+  color: '#0F172A',
+  fontSize: 24,
+  fontWeight: 'bold',
+  marginTop: 12,
+},
+
+kpiLabel: {
+  color: '#64748B',
+  marginTop: 4,
+  fontSize: 12,
+},
+
+card: {
+  backgroundColor: '#FFFFFF',
+
+  borderRadius: 24,
+
+  padding: 20,
+
+  marginTop: 18,
+
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+
+  shadowColor: '#000',
+  shadowOpacity: 0.05,
+  shadowRadius: 8,
+  shadowOffset: {
+    width: 0,
+    height: 3,
   },
 
-  kpiValue: {
-    color: 'white',
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: 12,
-  },
-
-  kpiLabel: {
-    color: '#94A3B8',
-    marginTop: 4,
-    fontSize: 12,
-  },
-
-  card: {
-    backgroundColor: '#1E293B',
-    borderRadius: 24,
-    padding: 20,
-    marginTop: 20,
-  },
+  elevation: 3,
+},
 
   chartHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
 
-  chartLabel: {
-    color: '#94A3B8',
+ chartLabel: {
+  color: '#64748B',
     fontSize: 12,
     fontWeight: '700',
   },
-
-  chartXP: {
-    color: 'white',
+chartXP: {
+  color: '#0F172A',
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 4,
@@ -377,7 +418,7 @@ const styles = StyleSheet.create({
 
   bar: {
     width: 20,
-    backgroundColor: '#2563EB',
+    backgroundColor: '#06B6D4',
     borderRadius: 6,
   },
 
@@ -396,18 +437,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
-  moduleName: {
-    color: 'white',
+ moduleName: {
+  color: '#0F172A',
     fontWeight: '600',
   },
 
-  modulePercent: {
-    color: '#94A3B8',
-  },
+ modulePercent: {
+  color: '#64748B',
+},
 
   progressBackground: {
     height: 8,
-    backgroundColor: '#334155',
+    backgroundColor:  '#E5E7EB',
     borderRadius: 10,
     marginTop: 6,
     overflow: 'hidden',
@@ -419,11 +460,16 @@ const styles = StyleSheet.create({
   },
 
   warningCard: {
-    backgroundColor: '#F59E0B',
-    borderRadius: 24,
-    padding: 20,
-    marginTop: 20,
-  },
+  backgroundColor: '#FF824D',
+
+  borderRadius: 24,
+
+  padding: 20,
+
+  marginTop: 20,
+
+  marginBottom: 40,
+},
 
   warningLabel: {
     color: 'white',
@@ -445,13 +491,18 @@ const styles = StyleSheet.create({
   },
 
   studyButton: {
-    backgroundColor: 'white',
-    alignSelf: 'flex-start',
-    marginTop: 16,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
+  backgroundColor: '#FFFFFF',
+
+  paddingHorizontal: 18,
+
+  paddingVertical: 10,
+
+  borderRadius: 24,
+
+  marginTop: 18,
+
+  alignSelf: 'flex-start',
+},
 
   studyButtonText: {
     color: '#F59E0B',
