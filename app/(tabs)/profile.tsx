@@ -266,20 +266,33 @@ function MenuRow({
   return (
     <TouchableOpacity style={styles.row}>
       {icon && (
-        <FontAwesome5
-          name={icon}
-          size={18}
-          color='#06B6D4'
-          style={{ marginRight: 12 }}
-        />
+        <View style={styles.iconCircle}>
+          <FontAwesome5
+            name={icon}
+            size={16}
+            color="#64748B"
+          />
+        </View>
       )}
-      <Text style={styles.rowTitle}>{title}</Text>
-      {value && <Text style={styles.rowValue}>{value}</Text>}
-      <MaterialIcons name="chevron-right" size={22} color='#06B6D4' />
+
+      <Text style={styles.rowTitle}>
+        {title}
+      </Text>
+
+      {value && (
+        <Text style={styles.rowValue}>
+          {value}
+        </Text>
+      )}
+
+      <MaterialIcons
+        name="chevron-right"
+        size={20}
+        color="#64748B"
+      />
     </TouchableOpacity>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -445,35 +458,63 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 
-  sectionTitle: {
-    color: '#000',
-    fontSize: 22,
-    fontWeight: '700',
-    marginTop: 30,
-    marginBottom: 12,
+ sectionTitle: {
+  fontSize: 30,
+  fontWeight: '700',
+  color: '#0F172A',
+
+  marginTop: 28,
+  marginBottom: 18,
+},
+
+ row: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: '#FFFFFF',
+  borderRadius: 22,
+  paddingVertical: 18,
+  paddingHorizontal: 18,
+  marginBottom: 14,
+
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+
+  shadowColor: '#000',
+  shadowOpacity: 0.05,
+  shadowRadius: 10,
+  shadowOffset: {
+    width: 0,
+    height: 3,
   },
 
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 18,
-    borderRadius: 18,
-    marginBottom: 10,
-  },
-
+  elevation: 3,
+},
   rowTitle: {
-    flex: 1,
-    color: '#000',
-    fontSize: 15,
-    fontWeight: '500',
-  },
+  flex: 1,
+  color: '#0F172A',
+  fontSize: 16,
+  fontWeight: '600',
+},
 
-  rowValue: {
-    color: '#2a3038',
-    marginRight: 8,
-  },
+rowValue: {
+  color: '#64748B',
+  fontSize: 14,
+  marginRight: 10,
+},
+iconCircle: {
+  width: 42,
+  height: 42,
+  borderRadius: 21,
+  backgroundColor: '#F8FAFC',
 
+  justifyContent: 'center',
+  alignItems: 'center',
+
+  marginRight: 14,
+
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+},
   logoutButton: {
   backgroundColor: '#EF4444',
   flexDirection: 'row',
