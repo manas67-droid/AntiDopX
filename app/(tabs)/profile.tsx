@@ -98,10 +98,11 @@ export default function ProfileScreen() {
     : 'AT';
 
   return (
-    <ScrollView
-      style={styles.container}
-      showsVerticalScrollIndicator={false}
-    >
+   <ScrollView
+  style={styles.container}
+  contentContainerStyle={{ paddingBottom: 120 }}
+  showsVerticalScrollIndicator={false}
+>
       {/* Header */}
       <View style={styles.headerRow}>
         <Text style={styles.headerTitle}>Profile</Text>
@@ -474,15 +475,15 @@ const styles = StyleSheet.create({
   },
 
   logoutButton: {
-    backgroundColor: '#EF4444',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 18,
-    borderRadius: 18,
-    marginTop: 30,
-    marginBottom: 40,
-  },
+  backgroundColor: '#EF4444',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  paddingVertical: 18,
+  borderRadius: 18,
+  marginTop: 30,
+  marginBottom: 8, // Extra space above bottom tab
+},
 
   logoutText: {
     color: '#FFFFFF',
