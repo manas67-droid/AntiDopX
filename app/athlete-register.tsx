@@ -194,7 +194,7 @@ export default function AthleteRegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#00BCEB',
+    backgroundColor: '#06B6D4',
     paddingTop: 60,
   },
 
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   },
 
   primaryButton: {
-    backgroundColor: '#00BCEB',
+    backgroundColor: '#06B6D4',
     padding: 18,
     borderRadius: 35,
     alignItems: 'center',
