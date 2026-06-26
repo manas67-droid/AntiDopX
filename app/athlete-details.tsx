@@ -114,7 +114,7 @@ export default function AthleteDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#14C8E8',
+    backgroundColor: '#06B6D4',
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: '#14C8E8',
+    color: '#06B6D4',
     textAlign: 'center',
     fontWeight: '700',
     fontSize: 18,
