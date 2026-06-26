@@ -129,7 +129,7 @@ export default function AchievementsScreen() {
 
       {isLoading ? (
         <ActivityIndicator
-          color="#60A5FA"
+          color="#06B6D4"
           style={{ marginTop: 40 }}
         />
       ) : (
@@ -180,11 +180,11 @@ export default function AchievementsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#fff',
   },
 
   header: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#06B6D4',
     paddingTop: 50,
     paddingBottom: 30,
     paddingHorizontal: 20,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
 
   progressBar: {
     height: 10,
-    backgroundColor: '#60A5FA',
+    backgroundColor: '#fff',
     borderRadius: 20,
     marginTop: 16,
     overflow: 'hidden',
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
 
   progressFill: {
     height: '100%',
-    backgroundColor: 'white',
+    backgroundColor: '#06B6D4',
     borderRadius: 20,
   },
 
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 18,
-    backgroundColor: '#2563EB',
+    backgroundColor: '#06B6D4',
     justifyContent: 'center',
     alignItems: 'center',
   },
