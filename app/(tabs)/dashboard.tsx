@@ -119,9 +119,15 @@ export default function DashboardScreen() {
     {/* DAILY MISSION */}
 
     <View style={styles.missionCard}>
+      <View style={styles.missionHeader}>
       <Text style={styles.missionHeading}>
-        DAILY MISSION
+    DAILY MISSION
       </Text>
+
+      <Text style={styles.missionTime}>
+    • Ends in 6h
+      </Text>
+    </View>
 
       <Text style={styles.missionText}>
         Complete 1 Scenario + 5 Quiz Questions
@@ -295,13 +301,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-
-  hero: {
-    backgroundColor: '#14C8E8',
-    padding: 24,
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
-  },
+hero: {
+  backgroundColor: '#14C8E8',
+  paddingTop: 24,
+  paddingHorizontal: 24,
+  paddingBottom: 90, // increase this
+  borderBottomLeftRadius: 40,
+  borderBottomRightRadius: 40,
+},
 
   userRow: {
     flexDirection: 'row',
@@ -327,6 +334,18 @@ const styles = StyleSheet.create({
   color: '#14C8E8',
   fontWeight: '700',
   marginBottom: 10,
+  },
+
+  missionHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 12,
+  },
+
+  missionTime: {
+  marginLeft: 8,
+  color: '#64748B',
+  fontSize: 15,
   },
 
   progressBgLight: {
@@ -427,14 +446,22 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
 
-  missionCard: {
-    backgroundColor: '#fff',
-    margin: 20,
-    borderRadius: 24,
-    padding: 20,
-    elevation: 4,
-  },
+ missionCard: {
+  backgroundColor: '#fff',
+  marginHorizontal: 20,
+  marginTop: -55,        // <-- overlap
+  borderRadius: 28,
+  padding: 22,
+  elevation: 8,
 
+  shadowColor: '#14C8E8',
+  shadowOpacity: 0.12,
+  shadowRadius: 20,
+  shadowOffset: {
+    width: 0,
+    height: 8,
+  },
+},
   missionTitle: {
     color: '#14C8E8',
     fontWeight: '700',
@@ -461,12 +488,13 @@ const styles = StyleSheet.create({
 
   
   sectionTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginHorizontal: 20,
-    marginBottom: 15,
-    color: '#0F172A',
-  },
+  fontSize: 24,
+  fontWeight: '700',
+  marginHorizontal: 20,
+  marginTop: 12,
+  marginBottom: 18,
+  color: '#0F172A',
+},
 
   gridSubtitle: {
   color: '#64748B',
