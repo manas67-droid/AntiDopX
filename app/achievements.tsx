@@ -7,7 +7,9 @@ import {
   View,
 } from 'react-native';
 
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native';
 import {
   getAchievements,
   type AchievementKey,
@@ -101,6 +103,16 @@ export default function AchievementsScreen() {
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Ionicons
+          name="arrow-back"
+          size={24}
+          color="white"
+          />
+        </TouchableOpacity>
         <Text style={styles.title}>
           Achievements
         </Text>
@@ -129,7 +141,7 @@ export default function AchievementsScreen() {
 
       {isLoading ? (
         <ActivityIndicator
-          color="#06B6D4"
+          color="#60A5FA"
           style={{ marginTop: 40 }}
         />
       ) : (
@@ -180,27 +192,38 @@ export default function AchievementsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f6fafd',
   },
 
   header: {
     backgroundColor: '#06B6D4',
-    paddingTop: 50,
-    paddingBottom: 30,
+    paddingTop: 55,
+    paddingBottom: 35,
     paddingHorizontal: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
   },
+
+  backButton: {
+  width: 42,
+  height: 42,
+  borderRadius: 21,
+  backgroundColor: 'rgba(255,255,255,0.18)',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginBottom: 20,
+},
 
   title: {
     color: 'white',
-    fontSize: 30,
-    fontWeight: 'bold',
+    fontSize: 38,
+    fontWeight: '800',
   },
 
   subtitle: {
-    color: '#DBEAFE',
-    marginTop: 6,
+    color: '#EAFBFF',
+    fontSize: 16,
+    marginTop: 4,
   },
 
   completedText: {
@@ -211,46 +234,61 @@ const styles = StyleSheet.create({
 
   progressBar: {
     height: 10,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    marginTop: 16,
+    backgroundColor: '#16c6e8',
+    borderRadius: 99,
+    marginTop: 18,
     overflow: 'hidden',
   },
 
   progressFill: {
     height: '100%',
-    backgroundColor: '#06B6D4',
-    borderRadius: 20,
+    backgroundColor: 'white',
+    borderRadius: 99,
   },
 
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    padding: 16,
+    paddingHorizontal: 18,
+    paddingTop: 22,
   },
 
-  badgeCard: {
-    width: '31%',
-    backgroundColor: '#1E293B',
-    borderRadius: 20,
-    padding: 10,
-    marginBottom: 14,
-    alignItems: 'center',
+  badgeCard:{
+width:'31%',
+backgroundColor:'#06B6D4',
+borderRadius:22,
+paddingVertical:18,
+paddingHorizontal:10,
+marginBottom:14,
+
+alignItems:'center',
+
+shadowColor:'#14C8E8',
+shadowOpacity:0.12,
+shadowRadius:12,
+shadowOffset:{
+width:0,
+height:5
+},
+
+elevation:5,
+},
+
+  lockedBadge:{
+    backgroundColor:'#FAFCFE',
+    borderWidth:1,
+    borderStyle:'dashed',
+    borderColor:'#DCE6EF',
   },
 
-  lockedBadge: {
-    opacity: 0.6,
-  },
-
-  iconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 18,
-    backgroundColor: '#06B6D4',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  iconContainer:{
+width:62,
+height:62,
+borderRadius:31,
+justifyContent:'center',
+alignItems:'center',
+},
 
   lockedIcon: {
     backgroundColor: '#334155',
@@ -260,18 +298,18 @@ const styles = StyleSheet.create({
     fontSize: 28,
   },
 
-  badgeTitle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    fontSize: 12,
-    marginTop: 8,
+  badgeTitle:{
+    fontSize:13,
+    fontWeight:'700',
+    color:'#16202C',
+    textAlign:'center',
+    marginTop:10,
   },
 
-  badgeDescription: {
-    color: '#94A3B8',
-    textAlign: 'center',
-    fontSize: 10,
-    marginTop: 4,
+  badgeDescription:{
+    fontSize:11,
+    color:'#64748B',
+    textAlign:'center',
+    marginTop:4,
   },
 });
