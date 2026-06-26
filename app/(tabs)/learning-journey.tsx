@@ -101,7 +101,7 @@ export default function LearningJourneyScreen() {
       <View style={styles.timeline}>
         <TouchableOpacity
           style={styles.moduleCard}
-          onPress={() => router.push("./modules/anti-doping-basics")}
+          onPress={() => router.push("/modules/anti-doping-basics")}
         >
           <Text style={styles.status}>
             {progress.antiDopingBasics ? "COMPLETED" : "AVAILABLE"}
