@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
 hero: {
-  backgroundColor: '#14C8E8',
+  backgroundColor: '#06B6D4',
   paddingTop: 24,
   paddingHorizontal: 24,
   paddingBottom: 90, // increase this
@@ -331,7 +331,7 @@ hero: {
     fontSize: 20,
   },
   missionHeading: {
-  color: '#14C8E8',
+  color: '#06B6D4',
   fontWeight: '700',
   fontSize: 16,
   },
@@ -454,7 +454,7 @@ hero: {
   padding: 22,
   elevation: 8,
 
-  shadowColor: '#14C8E8',
+  shadowColor: '#06B6D4',
   shadowOpacity: 0.12,
   shadowRadius: 20,
   shadowOffset: {
@@ -463,7 +463,7 @@ hero: {
   },
 },
   missionTitle: {
-    color: '#14C8E8',
+    color: '#06B6D4',
     fontWeight: '700',
     marginBottom: 8,
   },
@@ -573,7 +573,7 @@ badgeHeader: {
 },
 
 viewAll: {
-  color: '#14C8E8',
+  color: '#06B6D4',
   fontWeight: '600',
 },
 
