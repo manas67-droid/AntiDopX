@@ -279,17 +279,16 @@ function MenuRow({
         <FontAwesome5
           name={icon}
           size={18}
-          color="#06B6D4"
+          color='#06B6D4'
           style={{ marginRight: 12 }}
         />
       )}
       <Text style={styles.rowTitle}>{title}</Text>
       {value && <Text style={styles.rowValue}>{value}</Text>}
-      <MaterialIcons name="chevron-right" size={22} color="#06B6D4" />
+      <MaterialIcons name="chevron-right" size={22} color='#06B6D4' />
     </TouchableOpacity>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -457,17 +456,17 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
-    color: "#000",
+    color: '#000',
     fontSize: 22,
-    fontWeight: "700",
+    fontWeight: '700',
     marginTop: 30,
     marginBottom: 12,
   },
 
   row: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
     padding: 18,
     borderRadius: 18,
     marginBottom: 10,
@@ -475,13 +474,13 @@ const styles = StyleSheet.create({
 
   rowTitle: {
     flex: 1,
-    color: "#000",
+    color: '#000',
     fontSize: 15,
-    fontWeight: "500",
+    fontWeight: '500',
   },
 
   rowValue: {
-    color: "#2a3038",
+    color: '#2a3038',
     marginRight: 8,
   },
 

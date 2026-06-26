@@ -163,9 +163,15 @@ export function LearningModuleScreen({ module }: LearningModuleScreenProps) {
       contentContainerStyle={styles.contentContainer}
       contentInsetAdjustmentBehavior="automatic"
     >
-      <Text style={styles.title} selectable>
-        {module.title}
-      </Text>
+     <View style={styles.header}>
+  <Text style={styles.pageTitle}>
+    {module.title}
+  </Text>
+
+  <Text style={styles.pageSubtitle}>
+    Learn • Practice • Master
+  </Text>
+</View>
 
       {alreadyCompleted && (
         <View style={styles.alreadyCompletedBanner}>
@@ -281,118 +287,157 @@ export function LearningModuleScreen({ module }: LearningModuleScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0F172A',
-  },
-
+ container: {
+  flex: 1,
+  backgroundColor: '#F8FAFC',
+},
   contentContainer: {
-    padding: 20,
-    paddingBottom: 48,
-  },
+  paddingHorizontal: 20,
+  paddingTop: 20,
+  paddingBottom: 120,
+},
+ header: {
+  marginTop: 35,
+  marginBottom: 24,
+},
 
-  title: {
-    color: 'white',
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginTop: 40,
-    marginBottom: 20,
-  },
+pageTitle: {
+  fontSize: 34,
+  fontWeight: '800',
+  color: '#0F172A',
+},
 
-  alreadyCompletedBanner: {
-    backgroundColor: '#166534',
-    borderRadius: 12,
-    marginBottom: 18,
-    padding: 14,
-  },
+pageSubtitle: {
+  color: '#64748B',
+  fontSize: 16,
+  marginTop: 6,
+},
+alreadyCompletedBanner: {
+  backgroundColor: '#ECFDF5',
 
-  alreadyCompletedText: {
-    color: '#BBF7D0',
-    fontSize: 15,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
+  borderRadius: 18,
 
-  section: {
-    gap: 10,
-    marginBottom: 18,
-  },
+  padding: 16,
 
+  marginBottom: 20,
+
+  borderWidth: 1,
+  borderColor: '#BBF7D0',
+},
+
+ alreadyCompletedText: {
+  color: '#15803D',
+  fontSize: 16,
+  fontWeight: '700',
+  textAlign: 'center',
+},
+
+ section: {
+  backgroundColor: '#FFFFFF',
+  borderRadius: 24,
+  padding: 20,
+  marginBottom: 20,
+
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+
+  shadowColor: '#000',
+  shadowOpacity: 0.05,
+  shadowRadius: 8,
+  shadowOffset: {
+    width: 0,
+    height: 3,
+  },
+  elevation: 3,
+},
   sectionTitle: {
-    color: '#60A5FA',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
+  color: '#0F172A',
+  fontSize: 22,
+  fontWeight: '700',
+  marginBottom: 10,
+},
 
-  content: {
-    color: 'white',
-    fontSize: 16,
-    lineHeight: 24,
-  },
+ content: {
+  color: '#475569',
+  fontSize: 16,
+  lineHeight: 28,
+},
 
   quizHeader: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 12,
-    marginBottom: 12,
-  },
+  marginTop: 24,
+  marginBottom: 18,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+},
 
   quizTitle: {
-    color: 'white',
-    fontSize: 22,
-    fontWeight: 'bold',
+  color: '#0F172A',
+  fontSize: 28,
+  fontWeight: '800',
+},
+ quizProgress: {
+  color: '#06B6D4',
+  fontSize: 15,
+  fontWeight: '700',
+},
+
+ questionCard: {
+  backgroundColor: '#FFFFFF',
+  borderRadius: 22,
+  padding: 20,
+  marginBottom: 20,
+
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+
+  shadowColor: '#000',
+  shadowOpacity: 0.05,
+  shadowRadius: 8,
+  shadowOffset: {
+    width: 0,
+    height: 3,
   },
 
-  quizProgress: {
-    color: '#93C5FD',
-    fontSize: 16,
-    fontVariant: ['tabular-nums'],
-    fontWeight: '700',
-  },
-
-  questionCard: {
-    backgroundColor: '#1E293B',
-    borderRadius: 12,
-    gap: 10,
-    marginBottom: 16,
-    padding: 16,
-  },
-
+  elevation: 3,
+},
   question: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '700',
-    lineHeight: 24,
-  },
-
+  color: '#0F172A',
+  fontSize: 18,
+  fontWeight: '700',
+  marginBottom: 14,
+  lineHeight: 28,
+},
   optionButton: {
-    backgroundColor: '#334155',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#475569',
-    padding: 12,
-  },
+  backgroundColor: '#F8FAFC',
+  borderRadius: 16,
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+  paddingVertical: 16,
+  paddingHorizontal: 16,
+  marginTop: 10,
+},
 
-  optionSelected: {
-    borderColor: '#60A5FA',
-  },
+ optionSelected: {
+  borderColor: '#06B6D4',
+  borderWidth: 2,
+},
 
-  optionCorrect: {
-    backgroundColor: '#166534',
-    borderColor: '#22C55E',
-  },
+ optionCorrect: {
+  backgroundColor: '#DCFCE7',
+  borderColor: '#22C55E',
+},
 
-  optionWrong: {
-    backgroundColor: '#7F1D1D',
-    borderColor: '#EF4444',
-  },
+ optionWrong: {
+  backgroundColor: '#FEE2E2',
+  borderColor: '#EF4444',
+},
 
-  optionText: {
-    color: 'white',
-    fontSize: 15,
-    lineHeight: 22,
-  },
+ optionText: {
+  color: '#0F172A',
+  fontSize: 16,
+  fontWeight: '600',
+},
 
   explanation: {
     color: '#CBD5E1',
@@ -401,48 +446,83 @@ const styles = StyleSheet.create({
   },
 
   secondaryButton: {
-    backgroundColor: '#334155',
-    borderRadius: 12,
-    padding: 16,
+  backgroundColor: '#FFFFFF',
+
+  borderRadius: 18,
+
+  paddingVertical: 16,
+
+  marginTop: 10,
+
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+
+  shadowColor: '#000',
+  shadowOpacity: 0.05,
+  shadowRadius: 8,
+  shadowOffset: {
+    width: 0,
+    height: 3,
   },
 
-  completeButton: {
-    backgroundColor: '#2563EB',
-    borderRadius: 12,
-    marginTop: 12,
-    padding: 16,
+  elevation: 3,
+},
+
+ completeButton: {
+  backgroundColor: '#06B6D4',
+
+  borderRadius: 20,
+
+  paddingVertical: 18,
+
+  marginTop: 18,
+
+  shadowColor: '#06B6D4',
+  shadowOpacity: 0.25,
+  shadowRadius: 10,
+  shadowOffset: {
+    width: 0,
+    height: 4,
   },
 
-  disabledButton: {
-    opacity: 0.45,
-  },
-
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
+  elevation: 4,
+},
+disabledButton: {
+  backgroundColor: '#CBD5E1',
+  opacity: 1,
+},
+ buttonText: {
+  color: '#0F172A',
+  fontSize: 17,
+  fontWeight: '700',
+  textAlign: 'center',
+},
 
   scoreText: {
-    color: '#CBD5E1',
-    fontSize: 16,
-    fontWeight: '700',
-    marginTop: 12,
-    textAlign: 'center',
-  },
+  color: '#0F172A',
+  fontSize: 18,
+  fontWeight: '700',
+  marginTop: 18,
+  textAlign: 'center',
+},
 
-  completedNotice: {
-    backgroundColor: '#1E293B',
-    borderRadius: 12,
-    marginTop: 12,
-    padding: 16,
-  },
+ completedNotice: {
+  backgroundColor: '#ECFDF5',
 
-  completedNoticeText: {
-    color: '#22C55E',
-    fontSize: 16,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
+  borderRadius: 20,
+
+  padding: 18,
+
+  marginTop: 18,
+
+  borderWidth: 1,
+  borderColor: '#BBF7D0',
+},
+
+ completedNoticeText: {
+  color: '#15803D',
+  fontSize: 17,
+  fontWeight: '700',
+  textAlign: 'center',
+},
 });

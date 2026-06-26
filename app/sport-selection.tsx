@@ -130,7 +130,7 @@ export default function SportSelectionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#14C8E8',
+    backgroundColor: '#06B6D4',
     paddingHorizontal: 24,
     paddingTop: 40,
   },
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
 
   activeCard: {
     borderWidth: 3,
-    borderColor: '#0EA5E9',
+    borderColor: '#06B6D4',
     transform: [{ scale: 1.02 }],
   },
 
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: '#14C8E8',
+    color: '#06B6D4',
     textAlign: 'center',
     fontWeight: '700',
     fontSize: 18,

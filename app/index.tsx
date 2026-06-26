@@ -12,7 +12,7 @@ import {
 export default function WelcomeScreen() {
   return (
     <LinearGradient
-      colors={['#26D0CE', '#1AB6D9']}
+      colors={['#26D0CE', '#06B6D4']}
       style={styles.container}
     >
       <SafeAreaView style={styles.content}>
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: '#1AB6D9',
+    color: '#06B6D4',
     fontWeight: '700',
     fontSize: 18,
   },
