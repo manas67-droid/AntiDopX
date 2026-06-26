@@ -101,7 +101,7 @@ export default function LearningJourneyScreen() {
       <View style={styles.timeline}>
         <TouchableOpacity
           style={styles.moduleCard}
-          onPress={() => router.push("./modules/anti-doping-basics")}
+          onPress={() => router.push("/modules/anti-doping-basics")}
         >
           <Text style={styles.status}>
             {progress.antiDopingBasics ? "COMPLETED" : "AVAILABLE"}
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   },
 
   progressCard: {
-    backgroundColor: "#16C6E8",
+    backgroundColor: "#06B6D4",
     borderRadius: 30,
     padding: 24,
     marginBottom: 30,
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
   },
 
   status: {
-    color: "#0EA5E9",
+    color: "#06B6D4",
     fontSize: 12,
     fontWeight: "700",
     marginBottom: 6,
