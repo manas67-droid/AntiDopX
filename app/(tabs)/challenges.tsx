@@ -54,7 +54,7 @@ export default function ChallengesScreen() {
   subtitle="AI label check"
   icon="camera"
   iconColor="#8B5CF6"
-  route="/scanner"
+  route="/medicinescanner"
 />
 <GameCard
   title="Quiz Arena"
