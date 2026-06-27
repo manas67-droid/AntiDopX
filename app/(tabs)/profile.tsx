@@ -1,7 +1,7 @@
-import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
-import { router, useFocusEffect } from "expo-router";
-import { doc, updateDoc } from "firebase/firestore";
-import { useCallback, useState } from "react";
+import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
+import { router, useFocusEffect } from 'expo-router';
+import { doc, updateDoc } from 'firebase/firestore';
+import { useCallback, useState } from 'react';
 import {
   Alert,
   ScrollView,
@@ -10,22 +10,22 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
-import { auth, db } from "../../src/firebase/config";
-import { getUserProfile } from "../../src/firebase/userService";
+import { auth, db } from '../../src/firebase/config';
+import { getUserProfile } from '../../src/firebase/userService';
 
 export default function ProfileScreen() {
-  const [name, setName] = useState("");
-  const [sport, setSport] = useState("");
-  const [age, setAge] = useState("");
+  const [name, setName] = useState('');
+  const [sport, setSport] = useState('');
+  const [age, setAge] = useState('');
   const [xp, setXp] = useState(0);
-  const [level, setLevel] = useState("");
+  const [level, setLevel] = useState('');
   const [streak, setStreak] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
-  const [editName, setEditName] = useState("");
-  const [editSport, setEditSport] = useState("");
-  const [editAge, setEditAge] = useState("");
+  const [editName, setEditName] = useState('');
+  const [editSport, setEditSport] = useState('');
+  const [editAge, setEditAge] = useState('');
 
   const loadProfile = useCallback(async () => {
     const currentUser = auth.currentUser;
@@ -35,18 +35,18 @@ export default function ProfileScreen() {
     if (!result.success || !result.data) return;
 
     const user = result.data;
-    setName(user.name || "");
-    setSport(user.sport || "");
-    setAge(String(user.age || ""));
+    setName(user.name || '');
+    setSport(user.sport || '');
+    setAge(String(user.age || ''));
     setXp(user.xp || 0);
-    setLevel(user.level || "Rookie");
+    setLevel(user.level || 'Rookie');
     setStreak(user.streak || 0);
   }, []);
 
   useFocusEffect(
     useCallback(() => {
       loadProfile();
-    }, [loadProfile]),
+    }, [loadProfile])
   );
 
   const handleStartEdit = () => {
@@ -61,12 +61,12 @@ export default function ProfileScreen() {
     if (!currentUser) return;
 
     if (!editName.trim()) {
-      Alert.alert("Error", "Name is required");
+      Alert.alert('Error', 'Name is required');
       return;
     }
 
     try {
-      const userRef = doc(db, "users", currentUser.uid);
+      const userRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userRef, {
         name: editName.trim(),
         sport: editSport.trim(),
@@ -77,37 +77,32 @@ export default function ProfileScreen() {
       setSport(editSport.trim());
       setAge(String(Number(editAge) || 0));
       setIsEditing(false);
-      Alert.alert("Success", "Profile updated");
+      Alert.alert('Success', 'Profile updated');
     } catch (error: any) {
-      Alert.alert("Error", error.message);
+      Alert.alert('Error', error.message);
     }
   };
 
   const handleLogout = async () => {
-    const { logoutUser } = await import("../../src/firebase/logoutservices");
+    const { logoutUser } = await import('../../src/firebase/logoutservices');
     const result = await logoutUser();
     if (result.success) {
-      router.replace("/login");
+      router.replace('/login');
     } else {
-      Alert.alert("Error", result.error);
+      Alert.alert('Error', result.error);
     }
   };
 
   const initials = name
-    ? name
-        .split(" ")
-        .map((w: string) => w[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
-    : "AT";
+    ? name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()
+    : 'AT';
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingBottom: 120 }}
-      showsVerticalScrollIndicator={false}
-    >
+   <ScrollView
+  style={styles.container}
+  contentContainerStyle={{ paddingBottom: 120 }}
+  showsVerticalScrollIndicator={false}
+>
       {/* Header */}
       <View style={styles.headerRow}>
         <Text style={styles.headerTitle}>Profile</Text>
@@ -116,12 +111,14 @@ export default function ProfileScreen() {
           style={styles.editBtn}
           onPress={isEditing ? handleSaveEdit : handleStartEdit}
         >
-          <Text style={styles.editBtnText}>{isEditing ? "Save" : "Edit"}</Text>
+          <Text style={styles.editBtnText}>
+            {isEditing ? 'Save' : 'Edit'}
+          </Text>
         </TouchableOpacity>
       </View>
 
       {/* Profile Card */}
-      <View style={[styles.profileCard, { backgroundColor: "#06B6D4" }]}>
+      <View style={[styles.profileCard, { backgroundColor: '#06B6D4' }]}>
         <View style={styles.profileRow}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{initials}</Text>
@@ -155,9 +152,9 @@ export default function ProfileScreen() {
               </>
             ) : (
               <>
-                <Text style={styles.userName}>{name || "Athlete"}</Text>
-                <Text style={styles.userInfo}>{sport || "Athlete"}</Text>
-                <Text style={styles.userInfo}>Age: {age || "N/A"}</Text>
+                <Text style={styles.userName}>{name || 'Athlete'}</Text>
+                <Text style={styles.userInfo}>{sport || 'Athlete'}</Text>
+                <Text style={styles.userInfo}>Age: {age || 'N/A'}</Text>
 
                 <View style={styles.badge}>
                   <FontAwesome5 name="shield-alt" size={12} color="#fff" />
@@ -182,13 +179,13 @@ export default function ProfileScreen() {
           title="Achievements"
           subtitle="View Badges"
           icon="trophy"
-          onPress={() => router.push("/achievements" as any)}
+          onPress={() => router.push('/achievements' as any)}
         />
         <QuickCard
           title="Analytics"
           subtitle="Knowledge Growth"
           icon="chart-bar"
-          onPress={() => router.push("/analytics" as any)}
+          onPress={() => router.push('/analytics' as any)}
         />
       </View>
 
@@ -209,7 +206,7 @@ export default function ProfileScreen() {
       {/* Logout */}
       <TouchableOpacity
         style={styles.logoutButton}
-        onPress={() => router.push("/athlete-register" as any)}
+        onPress={() => router.push('/athlete-register' as any)}
         activeOpacity={0.8}
       >
         <MaterialIcons name="logout" size={22} color="white" />
@@ -231,14 +228,7 @@ function StatCard({
   return (
     <View style={styles.statCard}>
       <FontAwesome5 name={icon} size={14} color="white" />
-      <Text
-        style={styles.statValue}
-        numberOfLines={1}
-        adjustsFontSizeToFit
-        minimumFontScale={0.6}
-      >
-        {value}
-      </Text>
+      <Text style={styles.statValue}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>
   );
@@ -257,7 +247,7 @@ function QuickCard({
 }) {
   return (
     <TouchableOpacity style={styles.quickCard} onPress={onPress}>
-      <FontAwesome5 name={icon} size={22} color="#06B6D4" />
+      <FontAwesome5 name={icon} size={22} color='#06B6D4' />
       <Text style={styles.quickTitle}>{title}</Text>
       <Text style={styles.quickSubtitle}>{subtitle}</Text>
     </TouchableOpacity>
@@ -276,57 +266,71 @@ function MenuRow({
   return (
     <TouchableOpacity style={styles.row}>
       {icon && (
-        <FontAwesome5
-          name={icon}
-          size={18}
-          color='#06B6D4'
-          style={{ marginRight: 12 }}
-        />
+        <View style={styles.iconCircle}>
+          <FontAwesome5
+            name={icon}
+            size={16}
+            color="#64748B"
+          />
+        </View>
       )}
-      <Text style={styles.rowTitle}>{title}</Text>
-      {value && <Text style={styles.rowValue}>{value}</Text>}
-      <MaterialIcons name="chevron-right" size={22} color='#06B6D4' />
+
+      <Text style={styles.rowTitle}>
+        {title}
+      </Text>
+
+      {value && (
+        <Text style={styles.rowValue}>
+          {value}
+        </Text>
+      )}
+
+      <MaterialIcons
+        name="chevron-right"
+        size={20}
+        color="#64748B"
+      />
     </TouchableOpacity>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     paddingHorizontal: 20,
   },
 
   headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginTop: 50,
     marginBottom: 20,
   },
 
   headerTitle: {
-    color: "#000000",
+    color: '#000000',
     fontSize: 30,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   editBtn: {
-    backgroundColor: "#06B6D4",
+    backgroundColor: '#06B6D4',
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 14,
   },
 
   editBtnText: {
-    color: "white",
-    fontWeight: "700",
+    color: 'white',
+    fontWeight: '700',
   },
 
   profileCard: {
-    backgroundColor: "#06B6D4",
+    backgroundColor: '#06B6D4',
     borderRadius: 30,
     padding: 24,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12,
     shadowRadius: 20,
@@ -334,8 +338,8 @@ const styles = StyleSheet.create({
   },
 
   profileRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 20,
   },
 
@@ -343,46 +347,46 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "rgba(255,255,255,0.25)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.3)",
+    borderColor: 'rgba(255,255,255,0.3)',
     marginRight: 16,
   },
 
   avatarText: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     fontSize: 28,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   userName: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     fontSize: 24,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   userInfo: {
-    color: "#EAFBFF",
-    fontSize: 15,
+    color: '#EAFBFF',
+    fontSize: 14,
     marginTop: 4,
   },
 
   editInput: {
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: 'rgba(255,255,255,0.2)',
     borderRadius: 10,
-    color: "white",
+    color: 'white',
     fontSize: 16,
     marginBottom: 8,
     padding: 10,
   },
 
   badge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.18)",
-    alignSelf: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    alignSelf: 'flex-start',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 999,
@@ -390,52 +394,51 @@ const styles = StyleSheet.create({
   },
 
   badgeText: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     fontSize: 13,
-    fontWeight: "600",
+    fontWeight: '600',
     marginLeft: 6,
   },
 
   statsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 12,
   },
 
   statCard: {
     flex: 1,
-    backgroundColor: "rgba(255,255,255,0.18)",
+    backgroundColor: 'rgba(255,255,255,0.18)',
     borderRadius: 18,
     paddingVertical: 16,
-    alignItems: "center",
+    alignItems: 'center',
     marginHorizontal: 4,
   },
 
   statValue: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     fontSize: 22,
-    fontWeight: "700",
-    textAlign: "center",
+    fontWeight: '700',
   },
 
   statLabel: {
-    color: "#EAFBFF",
+    color: '#EAFBFF',
     fontSize: 12,
     marginTop: 4,
   },
 
   quickRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 20,
   },
 
   quickCard: {
-    width: "48%",
-    backgroundColor: "#fff",
+    width: '48%',
+    backgroundColor: '#fff',
     padding: 18,
     borderRadius: 22,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 10,
@@ -443,62 +446,90 @@ const styles = StyleSheet.create({
   },
 
   quickTitle: {
-    color: "#000",
-    fontWeight: "700",
+    color: '#000',
+    fontWeight: '700',
     fontSize: 15,
     marginTop: 10,
   },
 
   quickSubtitle: {
-    color: "#000",
+    color: '#000',
     marginTop: 4,
     fontSize: 12,
   },
 
-  sectionTitle: {
-    color: '#000',
-    fontSize: 22,
-    fontWeight: '700',
-    marginTop: 30,
-    marginBottom: 12,
+ sectionTitle: {
+  fontSize: 30,
+  fontWeight: '700',
+  color: '#0F172A',
+
+  marginTop: 28,
+  marginBottom: 18,
+},
+
+ row: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: '#FFFFFF',
+  borderRadius: 22,
+  paddingVertical: 18,
+  paddingHorizontal: 18,
+  marginBottom: 14,
+
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+
+  shadowColor: '#000',
+  shadowOpacity: 0.05,
+  shadowRadius: 10,
+  shadowOffset: {
+    width: 0,
+    height: 3,
   },
 
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 18,
-    borderRadius: 18,
-    marginBottom: 10,
-  },
-
+  elevation: 3,
+},
   rowTitle: {
-    flex: 1,
-    color: '#000',
-    fontSize: 15,
-    fontWeight: '500',
-  },
+  flex: 1,
+  color: '#0F172A',
+  fontSize: 16,
+  fontWeight: '600',
+},
 
-  rowValue: {
-    color: '#2a3038',
-    marginRight: 8,
-  },
+rowValue: {
+  color: '#64748B',
+  fontSize: 14,
+  marginRight: 10,
+},
+iconCircle: {
+  width: 42,
+  height: 42,
+  borderRadius: 21,
+  backgroundColor: '#F8FAFC',
 
+  justifyContent: 'center',
+  alignItems: 'center',
+
+  marginRight: 14,
+
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+},
   logoutButton: {
-    backgroundColor: "#EF4444",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 18,
-    borderRadius: 18,
-    marginTop: 30,
-    marginBottom: 8, // Extra space above bottom tab
-  },
+  backgroundColor: '#EF4444',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  paddingVertical: 18,
+  borderRadius: 18,
+  marginTop: 30,
+  marginBottom: 8, // Extra space above bottom tab
+},
 
   logoutText: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
     marginLeft: 8,
   },
 });
