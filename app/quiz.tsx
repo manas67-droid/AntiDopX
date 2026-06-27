@@ -184,7 +184,7 @@ export default function QuizScreen() {
           <Feather
             name="arrow-left"
             size={24}
-            color="white"
+            color="#000"
           />
         </TouchableOpacity>
 
