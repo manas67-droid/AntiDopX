@@ -13,7 +13,8 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import Svg, { G, Path, Text as SvgText
+import Svg, {
+  G, Path
 } from "react-native-svg";
 
 const items = [
@@ -279,18 +280,18 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 
-  pointer: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 15,
-    borderRightWidth: 15,
-    borderBottomWidth: 25,
-    borderLeftColor: "transparent",
-    borderRightColor: "transparent",
-    borderBottomColor: "#14C8E8",
-    marginBottom: -5,
-    zIndex: 10,
-  },
+ pointer: {
+  width: 0,
+  height: 0,
+  borderLeftWidth: 15,
+  borderRightWidth: 15,
+  borderTopWidth: 25,
+  borderLeftColor: "transparent",
+  borderRightColor: "transparent",
+  borderTopColor: "#06B6D4",
+  marginBottom: -18, // pushes the arrow slightly inside the wheel
+  zIndex: 100,
+},
 
   centerCircle: {
     position: "absolute",
