@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 
 import {
   getLeaderboard,
@@ -39,9 +40,11 @@ export default function LeaderboardScreen() {
     setIsLoading(false);
   }, []);
 
-  useEffect(() => {
-    loadLeaderboard();
-  }, [loadLeaderboard]);
+  useFocusEffect(
+    useCallback(() => {
+      loadLeaderboard();
+    }, [loadLeaderboard])
+  );
 
   const top3 = entries.slice(0, 3);
   const rest = entries.slice(3);
@@ -162,7 +165,7 @@ export default function LeaderboardScreen() {
       {/* REST OF LEADERBOARD */}
       {entries.map((entry, index) => (
   <View
-    key={`${entry.name}-${entry.sport}-${index}`}
+        key={entry.uid}
     style={styles.entryCard}
   >
     <Text style={styles.rank}>

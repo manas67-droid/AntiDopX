@@ -42,7 +42,8 @@
         {
           "cameraPermission": "Allow Athlete Training Academy to access your camera"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

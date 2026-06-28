@@ -30,7 +30,7 @@ export const defaultAchievements: Achievements = {
   streak7: false,
 };
 
-const achievementLabels: Record<AchievementKey, string> = {
+export const achievementLabels: Record<AchievementKey, string> = {
   firstModule: 'First Module',
   threeModules: '3 Modules Completed',
   fiveModules: '5 Modules Completed',

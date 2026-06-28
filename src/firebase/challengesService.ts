@@ -11,6 +11,7 @@ import {
   type ServiceResponse,
 } from '../types/serviceResponse';
 import { db } from './config';
+import { calculateLevel } from './xpUtils';
 
 export type ChallengeType = 'complete_modules' | 'earn_xp' | 'maintain_streak';
 
@@ -201,11 +202,7 @@ export const claimChallengeReward = async (
     if (userSnap.exists()) {
       const currentXP = Number(userSnap.data().xp || 0);
       const newXP = currentXP + challenge.xpReward;
-
-      let newLevel = userSnap.data().level || 'Rookie';
-      if (newXP >= 1000) newLevel = 'Elite Athlete';
-      else if (newXP >= 300) newLevel = 'Champion';
-      else if (newXP >= 100) newLevel = 'Competitor';
+      const newLevel = calculateLevel(newXP);
 
       await updateDoc(userRef, { xp: newXP, level: newLevel });
     }

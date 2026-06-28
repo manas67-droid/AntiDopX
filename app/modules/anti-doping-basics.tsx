@@ -3,17 +3,11 @@ import { LearningModuleScreen } from '../../src/components/learning/learning-mod
 import { getLearningModuleBySlug } from '../../src/learning/modules';
 
 export default function AntiDopingBasicsScreen() {
-  const module = getLearningModuleBySlug(
-    'anti-doping-basics'
-  );
+  const module = getLearningModuleBySlug('anti-doping-basics');
 
   if (!module) {
     return null;
   }
 
-  return (
-    <LearningModuleScreen
-      module={module}
-    />
-  );
+  return <LearningModuleScreen module={module} />;
 }

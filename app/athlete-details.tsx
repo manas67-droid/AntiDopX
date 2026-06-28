@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
@@ -8,8 +9,8 @@ import {
   View,
 } from 'react-native';
 
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../src/firebase/config';
+import { auth } from '../src/firebase/config';
+import { createUserProfile } from '../src/firebase/firestoreService';
 
 export default function AthleteDetailsScreen() {
   const { sport } = useLocalSearchParams<{
@@ -18,69 +19,50 @@ export default function AthleteDetailsScreen() {
 
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleContinue = async () => {
     if (!name.trim()) {
-      alert('Please enter your name');
+      Alert.alert('Error', 'Please enter your name');
       return;
     }
 
     if (!age.trim()) {
-      alert('Please enter your age');
+      Alert.alert('Error', 'Please enter your age');
       return;
     }
 
     const currentUser = auth.currentUser;
 
     if (!currentUser) {
-      alert('No authenticated user found');
+      Alert.alert('Error', 'No authenticated user found');
       return;
     }
 
-    try {
-      await setDoc(
-        doc(db, 'users', currentUser.uid),
-        {
-          uid: currentUser.uid,
-          email: currentUser.email,
+    setIsSaving(true);
 
-          name: name.trim(),
-          age: Number(age),
-          sport: sport || 'Unknown',
+    const result = await createUserProfile(
+      currentUser.uid,
+      name.trim(),
+      currentUser.email || '',
+      age.trim(),
+      sport || 'Unknown'
+    );
 
-          xp: 0,
-          level: 'Rookie',
-          streak: 0,
+    setIsSaving(false);
 
-          progress: {
-            antiDopingBasics: false,
-            wadaRules: false,
-            testingProcedures: false,
-            tue: false,
-            supplements: false,
-          },
-
-          achievements: [],
-
-          createdAt: new Date().toISOString(),
-        }
-      );
-
-      router.replace('/dashboard');
-    } catch (error: any) {
-      alert(error.message);
+    if (!result.success) {
+      Alert.alert('Error', result.error);
+      return;
     }
+
+    router.replace('/dashboard');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        Athlete Details
-      </Text>
-
-      <Text style={styles.subtitle}>
-        Complete your profile
-      </Text>
+      <Text style={styles.title}>Athlete Details</Text>
+      <Text style={styles.subtitle}>Complete your profile</Text>
 
       <TextInput
         style={styles.input}
@@ -102,9 +84,10 @@ export default function AthleteDetailsScreen() {
       <TouchableOpacity
         style={styles.button}
         onPress={handleContinue}
+        disabled={isSaving}
       >
         <Text style={styles.buttonText}>
-          Continue
+          {isSaving ? 'Saving...' : 'Continue'}
         </Text>
       </TouchableOpacity>
     </View>
@@ -118,7 +101,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
-
   title: {
     color: '#FFFFFF',
     fontSize: 34,
@@ -126,14 +108,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 10,
   },
-
   subtitle: {
     color: '#EAFBFF',
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 40,
   },
-
   input: {
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
@@ -141,14 +121,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 16,
   },
-
   button: {
     backgroundColor: '#FFFFFF',
     paddingVertical: 18,
     borderRadius: 999,
     marginTop: 20,
   },
-
   buttonText: {
     color: '#14C8E8',
     textAlign: 'center',

@@ -112,9 +112,10 @@ export function LearningModuleScreen({ module }: LearningModuleScreenProps) {
       }
 
       const progressResult = await completeModule(
-        currentUser.uid,
-        module.moduleKey
-      );
+  currentUser.uid,
+  module.moduleKey,
+  quizResult.score
+);
 
       if (!progressResult.success) {
         Alert.alert('Error', progressResult.error);

@@ -1,20 +1,32 @@
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from './config';
 
-const calculateLevel = (xp: number) => {
-  if (xp >= 1000) return 'Elite Athlete';
-  if (xp >= 300) return 'Champion';
-  if (xp >= 100) return 'Competitor';
-  return 'Rookie';
-};
+import {
+  getErrorMessage,
+  type ServiceResponse,
+} from '../types/serviceResponse';
+import {
+  createEmptyMonthlyXP,
+  defaultModuleProgress,
+} from '../types/userProfile';
+import { db } from './config';
+import {
+  calculateLevel,
+  getCurrentWeek,
+  normalizeMonthlyXP,
+} from './xpUtils';
 
 export const addXP = async (
   uid: string,
   amount: number
-) => {
+): Promise<
+  ServiceResponse<{
+    xp: number;
+    level: string;
+    monthlyXP: ReturnType<typeof createEmptyMonthlyXP>;
+  }>
+> => {
   try {
     const userRef = doc(db, 'users', uid);
-
     const userSnap = await getDoc(userRef);
 
     if (!userSnap.exists()) {
@@ -25,27 +37,32 @@ export const addXP = async (
     }
 
     const userData = userSnap.data();
-
-    const currentXP = userData.xp || 0;
-
+    const currentXP = Number(userData.xp || 0);
     const newXP = currentXP + amount;
-
     const newLevel = calculateLevel(newXP);
+    const monthlyXP = normalizeMonthlyXP(userData.monthlyXP);
+    const currentWeek = getCurrentWeek();
+
+    monthlyXP[currentWeek] = (monthlyXP[currentWeek] || 0) + amount;
 
     await updateDoc(userRef, {
       xp: newXP,
       level: newLevel,
+      monthlyXP,
     });
 
     return {
       success: true,
-      xp: newXP,
-      level: newLevel,
+      data: {
+        xp: newXP,
+        level: newLevel,
+        monthlyXP,
+      },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      error: error.message,
+      error: getErrorMessage(error),
     };
   }
 };

@@ -5,6 +5,7 @@ import {
   type ServiceResponse,
 } from '../types/serviceResponse';
 import { db } from './config';
+import { calculateLevel } from './xpUtils';
 
 export type SupplementCategory = 'Safe' | 'Risky' | 'Prohibited';
 
@@ -147,11 +148,7 @@ export const claimDailySpinXP = async (
 
     const currentXP = Number(userSnap.data().xp || 0);
     const newXP = currentXP + DAILY_SPIN_XP;
-
-    let newLevel = userSnap.data().level || 'Rookie';
-    if (newXP >= 1000) newLevel = 'Elite Athlete';
-    else if (newXP >= 300) newLevel = 'Champion';
-    else if (newXP >= 100) newLevel = 'Competitor';
+    const newLevel = calculateLevel(newXP);
 
     await updateDoc(userRef, {
       lastSpinDate: new Date().toISOString(),
