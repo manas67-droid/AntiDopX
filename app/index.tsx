@@ -12,7 +12,7 @@ import {
 export default function WelcomeScreen() {
   return (
     <LinearGradient
-      colors={['#26D0CE', '#1AB6D9']}
+      colors={['#06B6D4', '#1178d9']}
       style={styles.container}
     >
       <SafeAreaView style={styles.content}>
@@ -45,11 +45,11 @@ export default function WelcomeScreen() {
           </Text>
         </TouchableOpacity>
 
-        <View style={styles.dots}>
+        {/* <View style={styles.dots}>
           <View style={[styles.dot, styles.activeDot]} />
           <View style={styles.dot} />
           <View style={styles.dot} />
-        </View>
+        </View>  */}
       </SafeAreaView>
     </LinearGradient>
   );
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: '#1AB6D9',
+    color: '#06B6D4',
     fontWeight: '700',
     fontSize: 18,
   },
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 
-  dots: {
+  /* dots: {
     flexDirection: 'row',
     marginTop: 30,
   },
@@ -136,5 +136,5 @@ const styles = StyleSheet.create({
   activeDot: {
     width: 24,
     backgroundColor: '#fff',
-  },
+  }, */
 });

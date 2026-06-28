@@ -307,6 +307,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+<<<<<<< HEAD
   loadingContainer: {
     flex: 1,
     backgroundColor: '#fff',
@@ -337,6 +338,17 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
   },
+=======
+hero: {
+  backgroundColor: '#06B6D4',
+  paddingTop: 24,
+  paddingHorizontal: 24,
+  paddingBottom: 90, // increase this
+  borderBottomLeftRadius: 40,
+  borderBottomRightRadius: 40,
+},
+
+>>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
   userRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -356,9 +368,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   missionHeading: {
+<<<<<<< HEAD
     color: '#14C8E8',
     fontWeight: '700',
     fontSize: 16,
+=======
+  color: '#06B6D4',
+  fontWeight: '700',
+  fontSize: 16,
+>>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
   },
   missionHeader: {
     flexDirection: 'row',
@@ -434,7 +452,7 @@ const styles = StyleSheet.create({
   },
   levelValue: {
     color: '#fff',
-    fontSize: 36,
+    fontSize: 28,
     fontWeight: '700',
   },
   xpValue: {
@@ -450,9 +468,10 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: 10,
-    backgroundColor: '#84CC16',
+  backgroundColor: '#fff',
     borderRadius: 20,
   },
+<<<<<<< HEAD
   missionCard: {
     backgroundColor: '#fff',
     marginHorizontal: 20,
@@ -468,6 +487,31 @@ const styles = StyleSheet.create({
       height: 8,
     },
   },
+=======
+
+ missionCard: {
+  backgroundColor: '#fff',
+  marginHorizontal: 20,
+  marginTop: -55,        // <-- overlap
+  borderRadius: 28,
+  padding: 22,
+  elevation: 8,
+
+  shadowColor: '#06B6D4',
+  shadowOpacity: 0.12,
+  shadowRadius: 20,
+  shadowOffset: {
+    width: 0,
+    height: 8,
+  },
+},
+  missionTitle: {
+    color: '#06B6D4',
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+
+>>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
   missionText: {
     fontSize: 22,
     fontWeight: '700',
@@ -487,6 +531,7 @@ const styles = StyleSheet.create({
     color: '#0F172A',
   },
   gridSubtitle: {
+<<<<<<< HEAD
     color: '#64748B',
     marginTop: 4,
   },
@@ -595,4 +640,125 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 14,
   },
+=======
+  color: '#64748B',
+  marginTop: 4,
+},
+
+weekHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingHorizontal: 20,
+},
+
+eventCount: {
+  color: '#64748B',
+},
+
+eventCard: {
+  backgroundColor: '#fff',
+  marginHorizontal: 20,
+  marginBottom: 14,
+  borderRadius: 24,
+  padding: 16,
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+
+dayCircle: {
+  width: 50,
+  height: 50,
+  borderRadius: 25,
+  backgroundColor: '#F1F5F9',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginRight: 14,
+},
+
+dayText: {
+  fontWeight: '700',
+  color: '#475569',
+},
+
+eventTitle: {
+  fontSize: 17,
+  fontWeight: '700',
+},
+
+eventSubtitle: {
+  color: '#64748B',
+},
+
+liveBadge: {
+  backgroundColor: '#DCFCE7',
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 999,
+},
+
+newBadge: {
+  backgroundColor: '#DCFCE7',
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 999,
+},
+
+liveText: {
+  color: '#22C55E',
+  fontWeight: '700',
+},
+
+badgeHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingHorizontal: 20,
+},
+
+viewAll: {
+  color: '#06B6D4',
+  fontWeight: '600',
+},
+
+badgesRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  paddingHorizontal: 20,
+  marginBottom: 24,
+},
+
+badgeCard: {
+  alignItems: 'center',
+},
+
+badgeIcon: {
+  fontSize: 40,
+},
+
+badgeName: {
+  marginTop: 8,
+  fontSize: 12,
+  fontWeight: '600',
+},
+
+rankCard: {
+  marginHorizontal: 20,
+  backgroundColor: '#22C55E',
+  borderRadius: 24,
+  padding: 24,
+},
+
+rankTitle: {
+  color: '#fff',
+  fontSize: 16,
+},
+
+rankText: {
+  color: '#fff',
+  fontWeight: '700',
+  fontSize: 24,
+  marginTop: 8,
+},
+>>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
 });

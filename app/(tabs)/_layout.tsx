@@ -21,7 +21,7 @@ export default function TabLayout() {
     elevation: 10,
   },
 
-  tabBarActiveTintColor: '#14C8E8',
+  tabBarActiveTintColor: '#06B6D4',
   tabBarInactiveTintColor: '#94A3B8',
 
   tabBarLabelStyle: {
@@ -61,14 +61,14 @@ export default function TabLayout() {
           width: 60,
           height: 60,
           borderRadius: 30,
-          backgroundColor: '#14C8E8',
+          backgroundColor: '#06B6D4',
 
           justifyContent: 'center',
           alignItems: 'center',
 
           marginTop: -22,
 
-          shadowColor: '#14C8E8',
+          shadowColor: '#06B6D4',
           shadowOffset: {
             width: 0,
             height: 4,
@@ -91,7 +91,7 @@ export default function TabLayout() {
       <Text
         style={{
           color: focused
-            ? '#14C8E8'
+            ? '#06B6D4'
             : '#64748B',
           fontSize: 12,
           marginTop: 6,

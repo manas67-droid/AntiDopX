@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useCallback, useState } from 'react';
+=======
+import { useCallback, useEffect, useState } from "react";
+>>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
 import {
   ActivityIndicator,
   Alert,
@@ -7,31 +11,35 @@ import {
   Text,
   TouchableOpacity,
   View,
+<<<<<<< HEAD
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
+=======
+} from "react-native";
+>>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
 
 import {
   getLeaderboard,
   type LeaderboardEntry,
-} from '../../src/firebase/leaderboardService';
+} from "../../src/firebase/leaderboardService";
 
-const TOP_3_COLORS = ['#F59E0B', '#94A3B8', '#CD7F32'];
-const TOP_3_EMOJIS = ['🥇', '🥈', '🥉'];
+const TOP_3_COLORS = ["#F59E0B", "#94A3B8", "#CD7F32"];
+const TOP_3_EMOJIS = ["🥇", "🥈", "🥉"];
 
 export default function LeaderboardScreen() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const loadLeaderboard = useCallback(async () => {
     setIsLoading(true);
-    setError('');
+    setError("");
 
     const result = await getLeaderboard();
 
     if (!result.success) {
       setError(result.error);
-      Alert.alert('Error', result.error);
+      Alert.alert("Error", result.error);
       setIsLoading(false);
       return;
     }
@@ -54,15 +62,11 @@ export default function LeaderboardScreen() {
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
     >
-     <View style={styles.header}>
-  <Text style={styles.headerTitle}>
-    Leaderboard
-  </Text>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Leaderboard</Text>
 
-  <Text style={styles.headerSubtitle}>
-    Top clean athletes this month
-  </Text>
-</View>
+        <Text style={styles.headerSubtitle}>Top clean athletes this month</Text>
+      </View>
 
       <TouchableOpacity
         style={styles.refreshButton}
@@ -70,100 +74,79 @@ export default function LeaderboardScreen() {
         disabled={isLoading}
       >
         <Text style={styles.refreshButtonText}>
-          {isLoading ? 'Refreshing...' : 'Refresh'}
+          {isLoading ? "Refreshing..." : "Refresh"}
         </Text>
       </TouchableOpacity>
 
-      {isLoading ? (
-        <ActivityIndicator color="#60A5FA" />
-      ) : null}
+      {isLoading ? <ActivityIndicator color="#60A5FA" /> : null}
 
-      {error ? (
-        <Text style={styles.errorText}>
-          {error}
-        </Text>
-      ) : null}
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
       {!isLoading && entries.length === 0 && !error ? (
-        <Text style={styles.emptyText}>
-          No leaderboard entries yet.
-        </Text>
+        <Text style={styles.emptyText}>No leaderboard entries yet.</Text>
       ) : null}
 
       {/* TOP 3 PODIUM */}
-     {top3.length === 3 && (
-  <View style={styles.podiumContainer}>
+      {top3.length === 3 && (
+        <View style={styles.podiumContainer}>
+          {/* SECOND */}
+          <View style={styles.sidePodium}>
+            <View style={styles.avatarSilver}>
+              <Text style={styles.avatarLabel}>{top3[1]?.name?.charAt(0)}</Text>
+            </View>
 
-    {/* SECOND */}
-    <View style={styles.sidePodium}>
-      <View style={styles.avatarSilver}>
-        <Text style={styles.avatarLabel}>
-          {top3[1]?.name?.charAt(0)}
-        </Text>
-      </View>
+            <Text style={styles.podiumName}>{top3[1]?.name}</Text>
 
-      <Text style={styles.podiumName}>
-        {top3[1]?.name}
-      </Text>
+            <Text style={styles.podiumXP}>
+              {top3[1]?.xp.toLocaleString()} XP
+            </Text>
 
-      <Text style={styles.podiumXP}>
-        {top3[1]?.xp.toLocaleString()} XP
-      </Text>
+            <View style={[styles.podiumBlock, { height: 70 }]}>
+              <Text style={styles.blockNumber}>2</Text>
+            </View>
+          </View>
 
-      <View style={[styles.podiumBlock, { height: 70 }]}>
-        <Text style={styles.blockNumber}>2</Text>
-      </View>
-    </View>
+          {/* FIRST */}
+          <View style={styles.centerPodium}>
+            <Text style={styles.crown}>👑</Text>
 
-    {/* FIRST */}
-    <View style={styles.centerPodium}>
-      <Text style={styles.crown}>👑</Text>
+            <View style={styles.avatarGold}>
+              <Text style={styles.avatarLabel}>{top3[0]?.name?.charAt(0)}</Text>
+            </View>
 
-      <View style={styles.avatarGold}>
-        <Text style={styles.avatarLabel}>
-          {top3[0]?.name?.charAt(0)}
-        </Text>
-      </View>
+            <Text style={styles.podiumName}>{top3[0]?.name}</Text>
 
-      <Text style={styles.podiumName}>
-        {top3[0]?.name}
-      </Text>
+            <Text style={styles.podiumXP}>
+              {top3[0]?.xp.toLocaleString()} XP
+            </Text>
 
-      <Text style={styles.podiumXP}>
-        {top3[0]?.xp.toLocaleString()} XP
-      </Text>
+            <View style={[styles.podiumBlock, { height: 110 }]}>
+              <Text style={styles.blockNumber}>1</Text>
+            </View>
+          </View>
 
-      <View style={[styles.podiumBlock, { height: 110 }]}>
-        <Text style={styles.blockNumber}>1</Text>
-      </View>
-    </View>
+          {/* THIRD */}
+          <View style={styles.sidePodium}>
+            <View style={styles.avatarBronze}>
+              <Text style={styles.avatarLabel}>{top3[2]?.name?.charAt(0)}</Text>
+            </View>
 
-    {/* THIRD */}
-    <View style={styles.sidePodium}>
-      <View style={styles.avatarBronze}>
-        <Text style={styles.avatarLabel}>
-          {top3[2]?.name?.charAt(0)}
-        </Text>
-      </View>
+            <Text style={styles.podiumName}>{top3[2]?.name}</Text>
 
-      <Text style={styles.podiumName}>
-        {top3[2]?.name}
-      </Text>
+            <Text style={styles.podiumXP}>
+              {top3[2]?.xp.toLocaleString()} XP
+            </Text>
 
-      <Text style={styles.podiumXP}>
-        {top3[2]?.xp.toLocaleString()} XP
-      </Text>
-
-      <View style={[styles.podiumBlock, { height: 55 }]}>
-        <Text style={styles.blockNumber}>3</Text>
-      </View>
-    </View>
-
-  </View>
-)}
+            <View style={[styles.podiumBlock, { height: 55 }]}>
+              <Text style={styles.blockNumber}>3</Text>
+            </View>
+          </View>
+        </View>
+      )}
 
       {/* REST OF LEADERBOARD */}
       {entries.map((entry, index) => (
+<<<<<<< HEAD
   <View
         key={entry.uid}
     style={styles.entryCard}
@@ -171,39 +154,38 @@ export default function LeaderboardScreen() {
     <Text style={styles.rank}>
       {index + 1}
     </Text>
+=======
+        <View
+          key={`${entry.name}-${entry.sport}-${index}`}
+          style={styles.entryCard}
+        >
+          <Text style={styles.rank}>{index + 1}</Text>
+>>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
 
-    <View style={styles.avatarCircle}>
-      <Text style={styles.avatarText}>
-        {entry.name
-          .split(' ')
-          .map(word => word[0])
-          .join('')
-          .slice(0, 2)
-          .toUpperCase()}
-      </Text>
-    </View>
+          <View style={styles.avatarCircle}>
+            <Text style={styles.avatarText}>
+              {entry.name
+                .split(" ")
+                .map((word) => word[0])
+                .join("")
+                .slice(0, 2)
+                .toUpperCase()}
+            </Text>
+          </View>
 
-    <View style={styles.entryDetails}>
-      <Text style={styles.entryName}>
-        {entry.name}
-      </Text>
+          <View style={styles.entryDetails}>
+            <Text style={styles.entryName}>{entry.name}</Text>
 
-      <Text style={styles.entrySport}>
-        {entry.sport}
-      </Text>
-    </View>
+            <Text style={styles.entrySport}>{entry.sport}</Text>
+          </View>
 
-    <View style={styles.scoreGroup}>
-      <Text style={styles.xp}>
-        {entry.xp.toLocaleString()}
-      </Text>
+          <View style={styles.scoreGroup}>
+            <Text style={styles.xp}>{entry.xp.toLocaleString()}</Text>
 
-      <Text style={styles.level}>
-        XP
-      </Text>
-    </View>
-  </View>
-))}
+            <Text style={styles.level}>XP</Text>
+          </View>
+        </View>
+      ))}
     </ScrollView>
   );
 }
@@ -211,64 +193,64 @@ export default function LeaderboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-   backgroundColor: '#F8FAFC',
+    backgroundColor: "#F8FAFC",
   },
-contentContainer: {
-  paddingHorizontal: 20,
-  paddingTop: 20,
-  paddingBottom: 120, // Increased bottom spacing
-},
-header: {
-  marginTop: 25,
-  marginBottom: 20,
-},
+  contentContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 120, // Increased bottom spacing
+  },
+  header: {
+    marginTop: 25,
+    marginBottom: 20,
+  },
 
- headerTitle: {
-  color: '#0F172A',
-  fontSize: 30,
-  fontWeight: '700',
-},
+  headerTitle: {
+    color: "#0F172A",
+    fontSize: 30,
+    fontWeight: "700",
+  },
 
   headerSubtitle: {
-  color: '#64748B',
-  fontSize: 16,
-  marginTop: 4,
+    color: "#64748B",
+    fontSize: 16,
+    marginTop: 4,
   },
 
   refreshButton: {
-  alignSelf: 'flex-start',
-  backgroundColor: '#06B6D4',
-  borderRadius: 12,
-  paddingHorizontal: 18,
-  paddingVertical: 12,
-  marginBottom: 20,
-},
+    alignSelf: "flex-start",
+    backgroundColor: "#06B6D4",
+    borderRadius: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    marginBottom: 20,
+  },
 
   refreshButtonText: {
-    color: 'white',
-    fontWeight: '700',
+    color: "white",
+    fontWeight: "700",
   },
 
   podium: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 10,
     marginVertical: 20,
   },
 
   podiumCard: {
     flex: 1,
-    backgroundColor: '#1E293B',
+    backgroundColor: "#1E293B",
     borderRadius: 20,
     padding: 14,
-    alignItems: 'center',
+    alignItems: "center",
     borderWidth: 2,
-    borderColor: '#334155',
+    borderColor: "#334155",
   },
 
   podiumFirst: {
-    borderColor: '#F59E0B',
-    backgroundColor: '#1E293B',
+    borderColor: "#F59E0B",
+    backgroundColor: "#1E293B",
     transform: [{ scale: 1.05 }],
   },
 
@@ -279,53 +261,53 @@ header: {
 
   podiumRank: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 4,
   },
 
   podiumSport: {
-    color: '#94A3B8',
+    color: "#94A3B8",
     fontSize: 12,
-    textAlign: 'center',
+    textAlign: "center",
   },
 
   podiumDetail: {
-    color: '#94A3B8',
+    color: "#94A3B8",
     fontSize: 11,
     marginTop: 4,
   },
 
- entryCard: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  backgroundColor: '#FFFFFF',
-  borderRadius: 24,
-  padding: 16,
-  marginBottom: 12,
-  borderWidth: 1,
-  borderColor: '#E2E8F0',
-},
+  entryCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
 
- rank: {
-  width: 35,
-  fontSize: 22,
-  fontWeight: '700',
-  color: '#475569',
-},
+  rank: {
+    width: 35,
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#475569",
+  },
   avatarCircle: {
-  width: 50,
-  height: 50,
-  borderRadius: 25,
-  backgroundColor: '#06B6D4',
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginHorizontal: 12,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#06B6D4",
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 12,
   },
 
   avatarText: {
-  color: '#fff',
-  fontWeight: '700',
-  fontSize: 18,
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 18,
   },
   entryDetails: {
     flex: 1,
@@ -333,139 +315,139 @@ header: {
   },
 
   entryName: {
-  color: '#0F172A',
-  fontSize: 22,
-  fontWeight: '700',
+    color: "#0F172A",
+    fontSize: 22,
+    fontWeight: "700",
   },
 
   entrySport: {
-  color: '#64748B',
-  fontSize: 14,
-  marginTop: 2,
+    color: "#64748B",
+    fontSize: 14,
+    marginTop: 2,
   },
   scoreGroup: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
     gap: 4,
   },
 
- xp: {
-  color: '#0F172A',
-  fontSize: 22,
-  fontWeight: '800',
-},
+  xp: {
+    color: "#0F172A",
+    fontSize: 22,
+    fontWeight: "800",
+  },
 
   level: {
-  color: '#64748B',
-  fontSize: 13,
-  textAlign: 'right',
+    color: "#64748B",
+    fontSize: 13,
+    textAlign: "right",
   },
 
   streak: {
-    color: '#F97316',
+    color: "#F97316",
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   emptyText: {
-    color: '#CBD5E1',
+    color: "#CBD5E1",
     fontSize: 16,
   },
 
   errorText: {
-    color: '#EF4444',
+    color: "#EF4444",
     fontSize: 15,
     marginTop: 10,
   },
 
-podiumContainer: {
-  backgroundColor: '#06B6D4',
-  borderRadius: 32,
-  paddingTop: 18,
-  paddingBottom: 10,
-  paddingHorizontal: 16,
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'flex-end',
-  marginBottom: 10,
-},
+  podiumContainer: {
+    backgroundColor: "#06B6D4",
+    borderRadius: 32,
+    paddingTop: 18,
+    paddingBottom: 10,
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    marginBottom: 10,
+  },
 
-centerPodium: {
-  alignItems: 'center',
-},
+  centerPodium: {
+    alignItems: "center",
+  },
 
-sidePodium: {
-  alignItems: 'center',
-},
+  sidePodium: {
+    alignItems: "center",
+  },
 
-crown: {
-  fontSize: 26,
-  marginBottom: 6,
-},
+  crown: {
+    fontSize: 26,
+    marginBottom: 6,
+  },
 
-avatarGold: {
-  width: 72,
-  height: 72,
-  borderRadius: 36,
-  backgroundColor: '#EC4899', // Pink
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderWidth: 3,
-  borderColor: '#FBCFE8',
-},
+  avatarGold: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: "#ed2d8d", // Pink
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "#FBCFE8",
+  },
 
-avatarSilver: {
-  width: 64,
-  height: 64,
-  borderRadius: 32,
-  backgroundColor: '#FB923C', // Orange
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderWidth: 2,
-  borderColor: '#FED7AA',
-},
+  avatarSilver: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "#18dc3f", // Orange
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#FED7AA",
+  },
 
-avatarBronze: {
-  width: 64,
-  height: 64,
-  borderRadius: 32,
-  backgroundColor: '#18dcc5', // Grey
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderWidth: 2,
-  borderColor: '#CBD5E1',
-},
+  avatarBronze: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "#ec832d",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#CBD5E1",
+  },
 
-avatarLabel: {
-  color: '#fff',
-  fontWeight: '800',
-  fontSize: 22,
-},
+  avatarLabel: {
+    color: "#fff",
+    fontWeight: "800",
+    fontSize: 22,
+  },
 
-podiumBlock: {
-  width: 100,
-  backgroundColor: '#22D3EE',
-  borderTopLeftRadius: 20,
-  borderTopRightRadius: 20,
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginTop: 10,
-},
+  podiumBlock: {
+    width: 100,
+    backgroundColor: "#22D3EE",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+  },
 
-blockNumber: {
-  color: '#fff',
-  fontSize: 28,
-  fontWeight: '800',
-},
+  blockNumber: {
+    color: "#fff",
+    fontSize: 28,
+    fontWeight: "800",
+  },
 
-podiumName: {
-  color: '#fff',
-  fontWeight: '700',
-  marginTop: 8,
-  textAlign: 'center',
-},
+  podiumName: {
+    color: "#fff",
+    fontWeight: "700",
+    marginTop: 8,
+    textAlign: "center",
+  },
 
-podiumXP: {
-  color: '#E0F2FE',
-  fontSize: 13,
-  marginTop: 2,
-},
+  podiumXP: {
+    color: "#E0F2FE",
+    fontSize: 13,
+    marginTop: 2,
+  },
 });

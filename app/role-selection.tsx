@@ -35,7 +35,7 @@ export default function RoleSelectionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#14C8E8',
+    backgroundColor: '#06B6D4',
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
