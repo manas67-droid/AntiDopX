@@ -182,19 +182,8 @@ export default function QuizScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
-<<<<<<< HEAD
         <TouchableOpacity onPress={() => router.back()}>
           <Feather name="arrow-left" size={24} color="white" />
-=======
-        <TouchableOpacity
-          onPress={() => router.back()}
-        >
-          <Feather
-            name="arrow-left"
-            size={24}
-            color="#000"
-          />
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
         </TouchableOpacity>
 
         <Text style={styles.timer}>⏱ {time}s</Text>

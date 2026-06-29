@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { useCallback, useState } from 'react';
-=======
-import { useCallback, useEffect, useState } from "react";
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
 import {
   ActivityIndicator,
   Alert,
@@ -11,12 +7,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-<<<<<<< HEAD
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
-=======
-} from "react-native";
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
 
 import {
   getLeaderboard,
@@ -146,21 +138,11 @@ export default function LeaderboardScreen() {
 
       {/* REST OF LEADERBOARD */}
       {entries.map((entry, index) => (
-<<<<<<< HEAD
-  <View
-        key={entry.uid}
-    style={styles.entryCard}
-  >
-    <Text style={styles.rank}>
-      {index + 1}
-    </Text>
-=======
         <View
           key={`${entry.name}-${entry.sport}-${index}`}
           style={styles.entryCard}
         >
           <Text style={styles.rank}>{index + 1}</Text>
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
 
           <View style={styles.avatarCircle}>
             <Text style={styles.avatarText}>

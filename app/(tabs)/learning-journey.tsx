@@ -189,11 +189,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   progressCard: {
-<<<<<<< HEAD
     backgroundColor: '#16C6E8',
-=======
-    backgroundColor: "#06B6D4",
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
     borderRadius: 30,
     padding: 24,
     marginBottom: 30,
@@ -243,11 +239,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   status: {
-<<<<<<< HEAD
     color: '#0EA5E9',
-=======
-    color: "#06B6D4",
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
     fontSize: 12,
     fontWeight: '700',
     marginBottom: 6,

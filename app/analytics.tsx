@@ -128,15 +128,7 @@ export default function AnalyticsScreen() {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-<<<<<<< HEAD
           <Ionicons name="arrow-back" size={22} color="white" />
-=======
-          <Ionicons
-            name="arrow-back"
-            size={22}
-            color="#64748B"
-          />
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
         </TouchableOpacity>
 
         <View style={styles.filter}>
@@ -277,7 +269,6 @@ function KpiCard({
 }
 
 const styles = StyleSheet.create({
-<<<<<<< HEAD
   container: {
     flex: 1,
     backgroundColor: '#0F172A',
@@ -315,13 +306,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '700',
   },
-=======
- container: {
-  flex: 1,
-  backgroundColor: '#F8FAFC',
-  paddingHorizontal: 18,
-},
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
   headerRow: {
     marginTop: 50,
     flexDirection: 'row',
@@ -329,7 +313,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backButton: {
-<<<<<<< HEAD
     width: 42,
     height: 42,
     borderRadius: 12,
@@ -359,59 +342,11 @@ const styles = StyleSheet.create({
     marginTop: 6,
     marginBottom: 20,
   },
-=======
-  width: 40,
-  height: 40,
-  borderRadius: 20,
-  backgroundColor: '#FFFFFF',
-
-  justifyContent: 'center',
-  alignItems: 'center',
-
-  borderWidth: 1,
-  borderColor: '#E5E7EB',
-
-  elevation: 2,
-},
- filter: {
-  backgroundColor: '#FFFFFF',
-
-  paddingHorizontal: 16,
-  paddingVertical: 10,
-
-  borderRadius: 20,
-
-  borderWidth: 1,
-  borderColor: '#E5E7EB',
-
-  elevation: 2,
-},
-filterText: {
-  color: '#0F172A',
-  fontSize: 12,
-  fontWeight: '600',
-},
- title: {
-  color: '#0F172A',
-  fontSize: 38,
-  fontWeight: '800',
-  marginTop: 24,
-},
-
-  subtitle: {
-  color: '#64748B',
-  fontSize: 15,
-  marginTop: 4,
-  marginBottom: 18,
-},
-
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
   kpiGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-<<<<<<< HEAD
   kpiCard: {
     width: '48%',
     backgroundColor: '#1E293B',
@@ -465,83 +400,10 @@ filterText: {
     padding: 20,
     marginTop: 20,
   },
-=======
-kpiCard: {
-  width: '48%',
-
-  backgroundColor: '#FFFFFF',
-
-  borderRadius: 22,
-
-  padding: 18,
-
-  marginBottom: 16,
-
-  borderWidth: 1,
-  borderColor: '#E5E7EB',
-
-  shadowColor: '#000',
-  shadowOpacity: 0.05,
-  shadowRadius: 8,
-  shadowOffset: {
-    width: 0,
-    height: 3,
-  },
-
-  elevation: 3,
-},
-
- kpiIcon: {
-  width: 42,
-  height: 42,
-  borderRadius: 21,
-  backgroundColor: '#1EB9F0',
-  justifyContent: 'center',
-  alignItems: 'center',
-},
-
-kpiValue: {
-  color: '#0F172A',
-  fontSize: 24,
-  fontWeight: 'bold',
-  marginTop: 12,
-},
-
-kpiLabel: {
-  color: '#64748B',
-  marginTop: 4,
-  fontSize: 12,
-},
-
-card: {
-  backgroundColor: '#FFFFFF',
-
-  borderRadius: 24,
-
-  padding: 20,
-
-  marginTop: 18,
-
-  borderWidth: 1,
-  borderColor: '#E5E7EB',
-
-  shadowColor: '#000',
-  shadowOpacity: 0.05,
-  shadowRadius: 8,
-  shadowOffset: {
-    width: 0,
-    height: 3,
-  },
-
-  elevation: 3,
-},
-
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
   chartHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-<<<<<<< HEAD
   chartLabel: {
     color: '#94A3B8',
     fontSize: 12,
@@ -549,16 +411,6 @@ card: {
   },
   chartXP: {
     color: 'white',
-=======
-
- chartLabel: {
-  color: '#64748B',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-chartXP: {
-  color: '#0F172A',
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 4,
@@ -594,7 +446,6 @@ chartXP: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-<<<<<<< HEAD
   moduleName: {
     color: 'white',
     fontWeight: '600',
@@ -602,18 +453,6 @@ chartXP: {
   modulePercent: {
     color: '#94A3B8',
   },
-=======
-
- moduleName: {
-  color: '#0F172A',
-    fontWeight: '600',
-  },
-
- modulePercent: {
-  color: '#64748B',
-},
-
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
   progressBackground: {
     height: 8,
     backgroundColor:  '#E5E7EB',
@@ -626,25 +465,11 @@ chartXP: {
     borderRadius: 10,
   },
   warningCard: {
-<<<<<<< HEAD
     backgroundColor: '#F59E0B',
     borderRadius: 24,
     padding: 20,
     marginTop: 20,
   },
-=======
-  backgroundColor: '#FF824D',
-
-  borderRadius: 24,
-
-  padding: 20,
-
-  marginTop: 20,
-
-  marginBottom: 40,
-},
-
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
   warningLabel: {
     color: 'white',
     fontSize: 12,
@@ -662,7 +487,6 @@ chartXP: {
     lineHeight: 22,
   },
   studyButton: {
-<<<<<<< HEAD
     backgroundColor: 'white',
     alignSelf: 'flex-start',
     marginTop: 16,
@@ -670,21 +494,6 @@ chartXP: {
     paddingVertical: 10,
     borderRadius: 20,
   },
-=======
-  backgroundColor: '#FFFFFF',
-
-  paddingHorizontal: 18,
-
-  paddingVertical: 10,
-
-  borderRadius: 24,
-
-  marginTop: 18,
-
-  alignSelf: 'flex-start',
-},
-
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
   studyButtonText: {
     color: '#F59E0B',
     fontWeight: 'bold',
