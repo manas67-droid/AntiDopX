@@ -13,9 +13,7 @@ import {
 } from 'react-native';
 
 import { auth, db } from '../../src/firebase/config';
-import { getCompletionPercent } from '../../src/firebase/moduleService';
 import { getUserProfile } from '../../src/firebase/userService';
-import { defaultModuleProgress } from '../../src/types/userProfile';
 
 export default function ProfileScreen() {
   const [name, setName] = useState('');
@@ -24,8 +22,6 @@ export default function ProfileScreen() {
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState('');
   const [streak, setStreak] = useState(0);
-  const [completedModulesLabel, setCompletedModulesLabel] = useState('0/5');
-  const [savedMedicinesCount, setSavedMedicinesCount] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [editSport, setEditSport] = useState('');
@@ -39,17 +35,12 @@ export default function ProfileScreen() {
     if (!result.success || !result.data) return;
 
     const user = result.data;
-    const progress = user.progress || defaultModuleProgress();
-    const completionPercent = getCompletionPercent(progress);
-
     setName(user.name || '');
     setSport(user.sport || '');
     setAge(String(user.age || ''));
     setXp(user.xp || 0);
     setLevel(user.level || 'Rookie');
     setStreak(user.streak || 0);
-    setCompletedModulesLabel(`${completionPercent}%`);
-    setSavedMedicinesCount(user.savedMedicines?.length || 0);
   }, []);
 
   useFocusEffect(
@@ -87,11 +78,8 @@ export default function ProfileScreen() {
       setAge(String(Number(editAge) || 0));
       setIsEditing(false);
       Alert.alert('Success', 'Profile updated');
-    } catch (error: unknown) {
-      Alert.alert(
-        'Error',
-        error instanceof Error ? error.message : 'Something went wrong'
-      );
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
     }
   };
 
@@ -106,20 +94,16 @@ export default function ProfileScreen() {
   };
 
   const initials = name
-    ? name
-        .split(' ')
-        .map((word: string) => word[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase()
+    ? name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()
     : 'AT';
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingBottom: 120 }}
-      showsVerticalScrollIndicator={false}
-    >
+   <ScrollView
+  style={styles.container}
+  contentContainerStyle={{ paddingBottom: 120 }}
+  showsVerticalScrollIndicator={false}
+>
+      {/* Header */}
       <View style={styles.headerRow}>
         <Text style={styles.headerTitle}>Profile</Text>
 
@@ -133,6 +117,7 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Profile Card */}
       <View style={[styles.profileCard, { backgroundColor: '#06B6D4' }]}>
         <View style={styles.profileRow}>
           <View style={styles.avatar}>
@@ -173,13 +158,14 @@ export default function ProfileScreen() {
 
                 <View style={styles.badge}>
                   <FontAwesome5 name="shield-alt" size={12} color="#fff" />
-                  <Text style={styles.badgeText}>{level}</Text>
+                  <Text style={styles.badgeText}>Clean Athlete</Text>
                 </View>
               </>
             )}
           </View>
         </View>
 
+        {/* Stats */}
         <View style={styles.statsRow}>
           <StatCard icon="bolt" value={String(xp)} label="XP" />
           <StatCard icon="fire" value={String(streak)} label="Streak" />
@@ -187,51 +173,40 @@ export default function ProfileScreen() {
         </View>
       </View>
 
+      {/* Quick Cards */}
       <View style={styles.quickRow}>
         <QuickCard
           title="Achievements"
           subtitle="View Badges"
           icon="trophy"
-          onPress={() => router.push('/achievements')}
+          onPress={() => router.push('/achievements' as any)}
         />
         <QuickCard
           title="Analytics"
           subtitle="Knowledge Growth"
           icon="chart-bar"
-          onPress={() => router.push('/analytics')}
+          onPress={() => router.push('/analytics' as any)}
         />
       </View>
 
+      {/* Library */}
       <Text style={styles.sectionTitle}>Library</Text>
 
-      <MenuRow
-        icon="book"
-        title="Completed Modules"
-        value={completedModulesLabel}
-        onPress={() => router.push('/learning-journey')}
-      />
-      <MenuRow
-        icon="pills"
-        title="Saved Medicines"
-        value={String(savedMedicinesCount)}
-        onPress={() => router.push('/medicinescanner')}
-      />
-      <MenuRow
-        icon="capsules"
-        title="Saved Supplements"
-        value="Roulette"
-        onPress={() => router.push('/roulette')}
-      />
+      <MenuRow icon="book" title="Completed Modules" value="Progress" />
+      <MenuRow icon="pills" title="Saved Medicines" value="Scanner" />
+      <MenuRow icon="capsules" title="Saved Supplements" value="Roulette" />
 
+      {/* Account */}
       <Text style={styles.sectionTitle}>Account</Text>
 
       <MenuRow title="Notifications" value="On" />
       <MenuRow title="Language" value="English" />
       <MenuRow title="Privacy & Data" />
 
+      {/* Logout */}
       <TouchableOpacity
         style={styles.logoutButton}
-        onPress={handleLogout}
+        onPress={() => router.push('/athlete-register' as any)}
         activeOpacity={0.8}
       >
         <MaterialIcons name="logout" size={22} color="white" />
@@ -272,7 +247,7 @@ function QuickCard({
 }) {
   return (
     <TouchableOpacity style={styles.quickCard} onPress={onPress}>
-      <FontAwesome5 name={icon} size={22} color="#06B6D4" />
+      <FontAwesome5 name={icon} size={22} color='#06B6D4' />
       <Text style={styles.quickTitle}>{title}</Text>
       <Text style={styles.quickSubtitle}>{subtitle}</Text>
     </TouchableOpacity>
@@ -283,28 +258,14 @@ function MenuRow({
   title,
   value,
   icon,
-  onPress,
 }: {
   title: string;
   value?: string;
   icon?: string;
-  onPress?: () => void;
 }) {
   return (
-    <TouchableOpacity style={styles.row} onPress={onPress} disabled={!onPress}>
+    <TouchableOpacity style={styles.row}>
       {icon && (
-<<<<<<< HEAD
-        <FontAwesome5
-          name={icon}
-          size={18}
-          color="#06B6D4"
-          style={{ marginRight: 12 }}
-        />
-      )}
-      <Text style={styles.rowTitle}>{title}</Text>
-      {value && <Text style={styles.rowValue}>{value}</Text>}
-      <MaterialIcons name="chevron-right" size={22} color="#06B6D4" />
-=======
         <View style={styles.iconCircle}>
           <FontAwesome5
             name={icon}
@@ -329,7 +290,6 @@ function MenuRow({
         size={20}
         color="#64748B"
       />
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
     </TouchableOpacity>
   );
 }
@@ -339,6 +299,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 20,
   },
+
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -346,21 +307,25 @@ const styles = StyleSheet.create({
     marginTop: 50,
     marginBottom: 20,
   },
+
   headerTitle: {
     color: '#000000',
     fontSize: 30,
     fontWeight: '700',
   },
+
   editBtn: {
     backgroundColor: '#06B6D4',
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 14,
   },
+
   editBtnText: {
     color: 'white',
     fontWeight: '700',
   },
+
   profileCard: {
     backgroundColor: '#06B6D4',
     borderRadius: 30,
@@ -371,11 +336,13 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 8,
   },
+
   profileRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
   },
+
   avatar: {
     width: 80,
     height: 80,
@@ -387,21 +354,25 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.3)',
     marginRight: 16,
   },
+
   avatarText: {
     color: '#FFFFFF',
     fontSize: 28,
     fontWeight: '700',
   },
+
   userName: {
     color: '#FFFFFF',
     fontSize: 24,
     fontWeight: '700',
   },
+
   userInfo: {
     color: '#EAFBFF',
     fontSize: 14,
     marginTop: 4,
   },
+
   editInput: {
     backgroundColor: 'rgba(255,255,255,0.2)',
     borderRadius: 10,
@@ -410,6 +381,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     padding: 10,
   },
+
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -420,17 +392,20 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     marginTop: 10,
   },
+
   badgeText: {
     color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '600',
     marginLeft: 6,
   },
+
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 12,
   },
+
   statCard: {
     flex: 1,
     backgroundColor: 'rgba(255,255,255,0.18)',
@@ -439,21 +414,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 4,
   },
+
   statValue: {
     color: '#FFFFFF',
     fontSize: 22,
     fontWeight: '700',
   },
+
   statLabel: {
     color: '#EAFBFF',
     fontSize: 12,
     marginTop: 4,
   },
+
   quickRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
   },
+
   quickCard: {
     width: '48%',
     backgroundColor: '#fff',
@@ -465,44 +444,19 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 4,
   },
+
   quickTitle: {
     color: '#000',
     fontWeight: '700',
     fontSize: 15,
     marginTop: 10,
   },
+
   quickSubtitle: {
     color: '#000',
     marginTop: 4,
     fontSize: 12,
   },
-<<<<<<< HEAD
-  sectionTitle: {
-    color: '#000',
-    fontSize: 22,
-    fontWeight: '700',
-    marginTop: 30,
-    marginBottom: 12,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 18,
-    borderRadius: 18,
-    marginBottom: 10,
-  },
-  rowTitle: {
-    flex: 1,
-    color: '#000',
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  rowValue: {
-    color: '#2a3038',
-    marginRight: 8,
-  },
-=======
 
  sectionTitle: {
   fontSize: 30,
@@ -561,17 +515,17 @@ iconCircle: {
   borderWidth: 1,
   borderColor: '#E5E7EB',
 },
->>>>>>> 621bdfd5b36facd420e855fe8e8c270d43711ec9
   logoutButton: {
-    backgroundColor: '#EF4444',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 18,
-    borderRadius: 18,
-    marginTop: 30,
-    marginBottom: 8,
-  },
+  backgroundColor: '#EF4444',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  paddingVertical: 18,
+  borderRadius: 18,
+  marginTop: 30,
+  marginBottom: 8, // Extra space above bottom tab
+},
+
   logoutText: {
     color: '#FFFFFF',
     fontSize: 16,
