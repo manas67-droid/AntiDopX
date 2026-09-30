@@ -25,12 +25,23 @@ const MODULE_CHART_COLORS: Record<ModuleKey, string> = {
   antiDopingBasics: '#22C55E',
   wadaRules: '#2563EB',
   testingProcedures: '#F59E0B',
-  tue: '#475569',
+  tue: '#06B6D4',
   supplements: '#8B5CF6',
+  prohibitedSubstances: '#EF4444',
+  prohibitedMethods: '#EC4899',
+  dopingControlProcess: '#14B8A6',
+  athleteRightsResponsibilities: '#6366F1',
+  medicationAwareness: '#F97316',
+  nutritionPerformance: '#10B981',
+  dopingRisks: '#DC2626',
+  ethicsInSport: '#84CC16',
+  cleanSport: '#3B82F6',
+  whereToGetHelp: '#A855F7',
+  youngAthleteAwareness: '#EAB308',
 };
 
 export const getModuleChartColor = (moduleKey: ModuleKey): string =>
-  MODULE_CHART_COLORS[moduleKey];
+  MODULE_CHART_COLORS[moduleKey] || '#06B6D4';
 
 export const isModuleUnlocked = (
   moduleIndex: number,

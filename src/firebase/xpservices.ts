@@ -6,7 +6,6 @@ import {
 } from '../types/serviceResponse';
 import {
   createEmptyMonthlyXP,
-  defaultModuleProgress,
 } from '../types/userProfile';
 import { db } from './config';
 import {

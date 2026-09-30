@@ -4,298 +4,469 @@ import {
   MaterialIcons,
 } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 
+import { AppBadge } from '../src/components/common/AppBadge';
+import { AppButton } from '../src/components/common/AppButton';
+import { FeedbackCard } from '../src/components/common/FeedbackCard';
 import { auth } from '../src/firebase/config';
 import {
   saveMedicineScan,
-  scanMedicineText,
+  scanMedicineBarcode,
+  searchMedicines,
   type MedicineLookupResult,
   type MedicineStatus,
 } from '../src/firebase/medicineScannerService';
+import { useTranslation } from '../src/localization';
+import type { AntiDopingStatus } from '../src/types/medicine';
 
-type ScanResultView = {
-  status: MedicineStatus;
-  title: string;
-  note: string;
-  color: string;
-  icon: 'check-circle' | 'warning' | 'cancel' | 'help-outline';
-  cached: boolean;
-};
-
-const getResultPresentation = (
-  lookup: MedicineLookupResult,
-  cached = false
-): ScanResultView => {
-  if (lookup.status === 'Allowed') {
-    return {
-      status: lookup.status,
-      title: lookup.drugName,
-      note: lookup.guidance,
-      color: '#16A34A',
-      icon: 'check-circle',
-      cached,
-    };
-  }
-
-  if (lookup.status === 'Use With Caution') {
-    return {
-      status: lookup.status,
-      title: lookup.drugName,
-      note: lookup.guidance,
-      color: '#F59E0B',
-      icon: 'warning',
-      cached,
-    };
-  }
-
-  if (lookup.status === 'Prohibited') {
-    return {
-      status: lookup.status,
-      title: lookup.drugName,
-      note: lookup.guidance,
-      color: '#DC2626',
-      icon: 'cancel',
-      cached,
-    };
-  }
-
-  return {
-    status: lookup.status,
-    title: lookup.drugName,
-    note: lookup.guidance,
-    color: '#64748B',
-    icon: 'help-outline',
-    cached,
-  };
-};
+const SAMPLE_MEDS = ['Paracetamol', 'Dolo 650', 'Ventolin', 'Brufen', 'Sudafed', 'Clenbuterol'];
 
 export default function ScannerScreen() {
-  const [scanning, setScanning] = useState(false);
-  const [result, setResult] = useState<ScanResultView | null>(null);
-  const [medicineName, setMedicineName] = useState('');
-  const [error, setError] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
+  const { t } = useTranslation();
   const [permission, requestPermission] = useCameraPermissions();
   const [showCamera, setShowCamera] = useState(false);
+  const [scanned, setScanned] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [query, setQuery] = useState('');
+  const [selectedResult, setSelectedResult] = useState<MedicineLookupResult | null>(null);
+  const [activeIngredients, setActiveIngredients] = useState<string[]>([]);
+  const [disclaimer, setDisclaimer] = useState<string>('');
+  const [source, setSource] = useState<string>('');
+  const [lastVerified, setLastVerified] = useState<string>('');
+  const [error, setError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const scanMedicine = useCallback(async () => {
-    if (!medicineName.trim()) {
-      Alert.alert('Missing name', 'Enter a medicine name');
-      return;
-    }
+  // Animated laser line for scanner reticle
+  const laserTranslateY = useSharedValue(0);
 
-    setScanning(true);
-    setResult(null);
-    setError('');
-
-    const scanResult = await scanMedicineText(medicineName);
-
-    if (!scanResult.success) {
-      setError(scanResult.error);
-      setScanning(false);
-      return;
-    }
-
-    setResult(
-      getResultPresentation(
-        scanResult.data.lookup,
-        Boolean(scanResult.data.cached)
-      )
+  useEffect(() => {
+    laserTranslateY.value = withRepeat(
+      withTiming(200, { duration: 1800, easing: Easing.inOut(Easing.quad) }),
+      -1,
+      true
     );
-    setScanning(false);
-  }, [medicineName]);
+  }, [laserTranslateY]);
 
-  const handleSaveScan = async () => {
+  const laserStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: laserTranslateY.value }],
+    };
+  });
+
+  const mapWadaStatus = (status: AntiDopingStatus): MedicineStatus => {
+    switch (status) {
+      case 'ALLOWED':
+        return 'Allowed';
+      case 'USE_WITH_CAUTION':
+        return 'Use With Caution';
+      case 'PROHIBITED':
+        return 'Prohibited';
+      default:
+        return 'Unknown';
+    }
+  };
+
+  const handleBarcodeScanned = useCallback(async ({ data }: { data: string }) => {
+    if (scanned || !data) return;
+    setScanned(true);
+
+    try {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {}
+
+    setSearching(true);
+    setError('');
+    setSelectedResult(null);
+
+    const scanRes = await scanMedicineBarcode(data);
+    setSearching(false);
+    setShowCamera(false);
+
+    if (!scanRes.success) {
+      setError(scanRes.error);
+      return;
+    }
+
+    const res = scanRes.data;
+    setSelectedResult({
+      drugName: res.title,
+      status: mapWadaStatus(res.status),
+      guidance: res.guidance,
+      activeIngredients: res.activeIngredients,
+      disclaimer: res.disclaimer,
+      source: res.source,
+      lastVerified: res.lastVerified,
+    });
+    setActiveIngredients(res.activeIngredients);
+    setDisclaimer(res.disclaimer);
+    setSource(res.source || 'AntiDopX Reference Database');
+    setLastVerified(res.lastVerified || '2026-01-01');
+  }, [scanned]);
+
+  const handleSearch = useCallback(async (textToSearch?: string) => {
+    const searchText = (textToSearch !== undefined ? textToSearch : query).trim();
+    if (searchText.length < 2) {
+      Alert.alert(t.common.error, t.scanner.searchPlaceholder);
+      return;
+    }
+
+    setSearching(true);
+    setError('');
+    setSelectedResult(null);
+    setSaveSuccess(false);
+
+    const searchRes = await searchMedicines(searchText);
+    setSearching(false);
+
+    if (!searchRes.success) {
+      setError(searchRes.error);
+      return;
+    }
+
+    if (searchRes.data.length === 0) {
+      setSelectedResult({
+        drugName: searchText,
+        status: 'Unknown',
+        guidance: t.scanner.notFoundDesc,
+      });
+      setActiveIngredients([]);
+      setDisclaimer(t.scanner.disclaimer);
+      setSource('Not Found in Verified Database');
+      setLastVerified('Unverified');
+      return;
+    }
+
+    const first = searchRes.data[0];
+    setSelectedResult({
+      drugName: first.title,
+      status: mapWadaStatus(first.status),
+      guidance: first.guidance,
+      activeIngredients: first.activeIngredients,
+      disclaimer: first.disclaimer,
+      source: first.source,
+      lastVerified: first.lastVerified,
+    });
+    setActiveIngredients(first.activeIngredients);
+    setDisclaimer(first.disclaimer);
+    setSource(first.source || 'WADA / Global DRO Reference');
+    setLastVerified(first.lastVerified || '2026-01-01');
+  }, [query, t]);
+
+  const handleSave = async () => {
     const currentUser = auth.currentUser;
-
-    if (!currentUser || !result) {
-      Alert.alert('Error', 'Sign in and scan a medicine first.');
+    if (!currentUser || !selectedResult) {
+      Alert.alert(t.common.error, 'Sign in to save medicines to your library.');
       return;
     }
 
     setIsSaving(true);
-
-    const saveResult = await saveMedicineScan(currentUser.uid, {
-      drugName: result.title,
-      status: result.status,
-      guidance: result.note,
-    });
-
+    const saveRes = await saveMedicineScan(currentUser.uid, selectedResult);
     setIsSaving(false);
 
-    if (!saveResult.success) {
-      Alert.alert('Error', saveResult.error);
+    if (!saveRes.success) {
+      Alert.alert(t.common.error, saveRes.error);
       return;
     }
 
-    if (saveResult.data.duplicate) {
-      Alert.alert('Already saved', 'This medicine is already in your library.');
+    if (saveRes.data.duplicate) {
+      Alert.alert(t.scanner.alreadySaved, 'This item is already stored in your athlete medicine library.');
       return;
     }
+
+    setSaveSuccess(true);
+    try {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {}
 
     Alert.alert(
-      'Saved',
-      saveResult.data.xpAwarded > 0
-        ? `Medicine saved. +${saveResult.data.xpAwarded} XP awarded.`
-        : 'Medicine saved to your profile.'
+      t.common.saved,
+      saveRes.data.xpAwarded > 0
+        ? `${t.scanner.saveSuccess} (+${saveRes.data.xpAwarded} XP awarded!)`
+        : t.scanner.saveSuccess
     );
   };
 
-  if (!permission) {
-    return null;
-  }
+  const getBadgeVariant = (status: MedicineStatus): 'allowed' | 'caution' | 'prohibited' | 'unknown' => {
+    switch (status) {
+      case 'Allowed':
+        return 'allowed';
+      case 'Use With Caution':
+        return 'caution';
+      case 'Prohibited':
+        return 'prohibited';
+      default:
+        return 'unknown';
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Feather name="arrow-left" size={24} color="white" />
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <Feather name="arrow-left" size={22} color="#FFFFFF" />
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Medicine Scanner</Text>
+        <Text style={styles.headerTitle}>{t.scanner.title}</Text>
 
-        <TouchableOpacity>
-          <MaterialIcons name="flashlight-on" size={24} color="white" />
+        <TouchableOpacity
+          onPress={() => router.push('/ai-coach' as any)}
+          style={styles.aiButton}
+        >
+          <MaterialCommunityIcons name="robot" size={20} color="#06B6D4" />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.scannerArea}>
-        <View style={styles.scannerBox}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Scanner Window / Camera */}
+        <View style={styles.scannerWrapper}>
           {showCamera ? (
-            <>
-              <CameraView style={StyleSheet.absoluteFillObject} />
+            <View style={styles.cameraBox}>
+              <CameraView
+                style={StyleSheet.absoluteFill}
+                facing="back"
+                barcodeScannerSettings={{
+                  barcodeTypes: [
+                    'qr',
+                    'ean13',
+                    'ean8',
+                    'upc_a',
+                    'upc_e',
+                    'code128',
+                    'code39',
+                  ],
+                }}
+                onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
+              />
+              {/* Overlay target frame */}
+              <View style={styles.reticleFrame}>
+                <Animated.View style={[styles.laserLine, laserStyle]} />
+              </View>
+
               <TouchableOpacity
                 style={styles.closeCameraButton}
-                onPress={() => setShowCamera(false)}
+                onPress={() => {
+                  setShowCamera(false);
+                  setScanned(false);
+                }}
               >
-                <Text style={styles.closeCameraText}>Close Camera</Text>
+                <Text style={styles.closeCameraText}>{t.scanner.closeCamera}</Text>
               </TouchableOpacity>
-            </>
+            </View>
           ) : (
-            <MaterialCommunityIcons
-              name="barcode-scan"
-              size={80}
-              color="#38BDF8"
-            />
+            <TouchableOpacity
+              style={styles.scannerPlaceholder}
+              activeOpacity={0.85}
+              onPress={async () => {
+                if (!permission?.granted) {
+                  const res = await requestPermission();
+                  if (!res.granted) {
+                    Alert.alert('Permission Denied', 'Camera access is required to scan medicine barcodes.');
+                    return;
+                  }
+                }
+                setScanned(false);
+                setShowCamera(true);
+              }}
+            >
+              <View style={styles.scannerIconCircle}>
+                <MaterialCommunityIcons name="barcode-scan" size={48} color="#06B6D4" />
+              </View>
+              <Text style={styles.scannerPlaceholderTitle}>{t.scanner.openCamera}</Text>
+              <Text style={styles.scannerPlaceholderSubtitle}>{t.scanner.instructions}</Text>
+            </TouchableOpacity>
           )}
+
+          {searching ? (
+            <View style={styles.loadingRow}>
+              <ActivityIndicator color="#06B6D4" size="small" />
+              <Text style={styles.loadingText}>{t.common.loading}</Text>
+            </View>
+          ) : null}
         </View>
 
-        {scanning ? (
-          <View style={styles.scanningRow}>
-            <ActivityIndicator color="#14C8E8" />
-            <Text style={styles.scanningText}>Scanning...</Text>
+        {/* Manual Search Section */}
+        <View style={styles.searchSection}>
+          <Text style={styles.sectionLabel}>{t.scanner.manualSearch}</Text>
+          <View style={styles.searchInputRow}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder={t.scanner.searchPlaceholder}
+              placeholderTextColor="#64748B"
+              value={query}
+              onChangeText={setQuery}
+              returnKeyType="search"
+              onSubmitEditing={() => handleSearch()}
+            />
+            {query ? (
+              <TouchableOpacity
+                style={styles.clearBtn}
+                onPress={() => setQuery('')}
+              >
+                <Feather name="x" size={18} color="#94A3B8" />
+              </TouchableOpacity>
+            ) : null}
           </View>
-        ) : null}
-      </View>
 
-      <Text style={styles.instructions}>
-        Point camera at the medicine label
-      </Text>
+          <AppButton
+            title={t.scanner.checkMedicine}
+            onPress={() => handleSearch()}
+            loading={searching}
+            style={{ marginTop: 10 }}
+          />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Enter medicine name"
-        placeholderTextColor="#94A3B8"
-        value={medicineName}
-        onChangeText={setMedicineName}
-      />
-
-      {error ? (
-        <View style={styles.errorBox}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={scanMedicine}>
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
+          {/* Quick sample chips */}
+          <View style={styles.chipsRow}>
+            {SAMPLE_MEDS.map((med) => (
+              <TouchableOpacity
+                key={med}
+                style={styles.chip}
+                onPress={() => {
+                  setQuery(med);
+                  void handleSearch(med);
+                }}
+              >
+                <Text style={styles.chipText}>{med}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
-      ) : null}
 
-      <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={styles.secondaryButton}
-          onPress={async () => {
-            const response = await requestPermission();
+        {error ? (
+          <FeedbackCard
+            type="error"
+            title={t.common.error}
+            description={error}
+            actionLabel={t.common.retry}
+            onAction={() => handleSearch()}
+          />
+        ) : null}
 
-            if (response.granted) {
-              setShowCamera(true);
-            } else {
-              Alert.alert('Permission required', 'Camera access is needed.');
-            }
-          }}
-        >
-          <MaterialIcons name="photo-library" size={18} color="white" />
-          <Text style={styles.smallButtonText}>Upload</Text>
-        </TouchableOpacity>
+        {/* Verification Result Card */}
+        {selectedResult ? (
+          <View style={styles.resultCard}>
+            <View style={styles.resultTopRow}>
+              <AppBadge
+                label={selectedResult.status.toUpperCase()}
+                variant={getBadgeVariant(selectedResult.status)}
+              />
+              {source ? (
+                <Text style={styles.sourceText} numberOfLines={1}>
+                  {source}
+                </Text>
+              ) : null}
+            </View>
 
-        <TouchableOpacity
-          style={styles.scanButton}
-          onPress={scanMedicine}
-          disabled={scanning}
-        >
-          <Text style={styles.scanButtonText}>
-            {scanning ? 'Scanning...' : 'Check Medicine'}
-          </Text>
-        </TouchableOpacity>
+            <Text style={styles.resultMedicineName}>
+              {selectedResult.drugName}
+            </Text>
 
-        <TouchableOpacity
-          style={styles.secondaryButton}
-          onPress={() => setMedicineName('')}
-        >
-          <Text style={styles.smallButtonText}>Clear</Text>
-        </TouchableOpacity>
-      </View>
+            {/* Active Ingredients List */}
+            {activeIngredients.length > 0 ? (
+              <View style={styles.ingredientsBox}>
+                <Text style={styles.ingredientsHeader}>
+                  🧪 {t.scanner.activeIngredients}:
+                </Text>
+                {activeIngredients.map((item, index) => (
+                  <Text key={`${item}-${index}`} style={styles.ingredientItem}>
+                    • {item}
+                  </Text>
+                ))}
+              </View>
+            ) : null}
 
-      {result ? (
-        <View
-          style={[
-            styles.resultCard,
-            {
-              borderColor: result.color,
-            },
-          ]}
-        >
-          <View style={styles.resultHeader}>
-            <MaterialIcons name={result.icon} size={32} color={result.color} />
+            {/* Official Guidance */}
+            <View style={styles.guidanceBox}>
+              <Text style={styles.guidanceTitle}>📋 Anti-Doping Assessment:</Text>
+              <Text style={styles.guidanceText}>{selectedResult.guidance}</Text>
+            </View>
 
-            <View>
-              <Text style={styles.resultStatus}>
-                {result.status.toUpperCase()}
-                {result.cached ? ' • CACHED' : ''}
+            {/* Safety Disclaimer */}
+            <View style={styles.disclaimerBox}>
+              <MaterialIcons name="shield" size={18} color="#D97706" style={{ marginTop: 2 }} />
+              <Text style={styles.disclaimerText}>
+                {disclaimer || t.scanner.disclaimer}
               </Text>
-              <Text style={styles.resultTitle}>{result.title}</Text>
+            </View>
+
+            {lastVerified ? (
+              <Text style={styles.verifiedDate}>
+                {t.scanner.lastVerified}: {lastVerified}
+              </Text>
+            ) : null}
+
+            {/* Actions: Save to Library & Ask AI Coach */}
+            <View style={styles.actionButtonsRow}>
+              <TouchableOpacity
+                style={[styles.saveBtn, saveSuccess && styles.savedBtn]}
+                onPress={handleSave}
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.saveBtnText}>
+                    {saveSuccess ? `✓ ${t.common.saved}` : `+ ${t.scanner.saveToLibrary}`}
+                  </Text>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.askAiBtn}
+                onPress={() => {
+                  router.push({
+                    pathname: '/ai-coach',
+                    params: {
+                      initialQuestion: `Can you explain the anti-doping status and risks of ${selectedResult.drugName}?`,
+                    },
+                  } as any);
+                }}
+              >
+                <MaterialCommunityIcons name="robot" size={18} color="#06B6D4" />
+                <Text style={styles.askAiBtnText}>{t.dashboard.askAi}</Text>
+              </TouchableOpacity>
             </View>
           </View>
+        ) : null}
 
-          <Text style={styles.note}>{result.note}</Text>
-
-          <View style={styles.actionRow}>
-            <TouchableOpacity style={styles.altButton}>
-              <Text style={styles.altButtonText}>Alternatives</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleSaveScan}
-              disabled={isSaving}
-            >
-              <Text style={styles.saveButtonText}>
-                {isSaving ? 'Saving...' : 'Save'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+        {/* Global Reference Info Card */}
+        <View style={styles.infoCard}>
+          <Text style={styles.infoTitle}>🛡️ Official Reference Resources</Text>
+          <Text style={styles.infoText}>
+            AntiDopX cross-references active ingredients against the World Anti-Doping Agency (WADA) International Standard Prohibited List and National Anti-Doping Organization guidelines.
+          </Text>
+          <Text style={styles.infoSubtext}>
+            Always verify prescription formulations with Global DRO (globaldro.com) or certified sports medical doctors before high-stakes competitions.
+          </Text>
         </View>
-      ) : null}
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -304,170 +475,320 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F172A',
-    padding: 20,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1E293B',
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#1E293B',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
-    color: 'white',
+    color: '#FFFFFF',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '800',
   },
-  scannerArea: {
-    flex: 1,
+  aiButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#1E293B',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(6,182,212,0.4)',
   },
-  scannerBox: {
-    width: 260,
-    height: 260,
-    borderWidth: 2,
-    borderColor: '#14C8E8',
-    borderRadius: 30,
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 100,
+  },
+  scannerWrapper: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  cameraBox: {
+    width: '100%',
+    height: 280,
+    borderRadius: 24,
     overflow: 'hidden',
-    justifyContent: 'center',
-    alignItems: 'center',
+    position: 'relative',
+    backgroundColor: '#000000',
+    borderWidth: 2,
+    borderColor: '#06B6D4',
+  },
+  reticleFrame: {
+    position: 'absolute',
+    top: 35,
+    left: '15%',
+    width: '70%',
+    height: 210,
+    borderWidth: 2,
+    borderColor: '#06B6D4',
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  laserLine: {
+    height: 3,
+    backgroundColor: '#EF4444',
+    shadowColor: '#EF4444',
+    shadowOpacity: 0.9,
+    shadowRadius: 6,
+    elevation: 4,
   },
   closeCameraButton: {
-    marginTop: 10,
-    backgroundColor: '#EF4444',
-    padding: 12,
-    borderRadius: 10,
+    position: 'absolute',
+    bottom: 12,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(239,68,68,0.9)',
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
   closeCameraText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
   },
-  scanningRow: {
+  scannerPlaceholder: {
+    width: '100%',
+    height: 200,
+    backgroundColor: '#1E293B',
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: '#334155',
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  scannerIconCircle: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    backgroundColor: 'rgba(6,182,212,0.12)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  scannerPlaceholderTitle: {
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  scannerPlaceholderSubtitle: {
+    color: '#94A3B8',
+    fontSize: 13,
+    textAlign: 'center',
+  },
+  loadingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12,
     gap: 8,
+    marginTop: 12,
   },
-  scanningText: {
-    color: '#14C8E8',
-    fontWeight: 'bold',
-  },
-  instructions: {
-    color: '#94A3B8',
-    textAlign: 'center',
+  loadingText: {
+    color: '#06B6D4',
+    fontWeight: '600',
     fontSize: 14,
-    marginBottom: 20,
   },
-  input: {
+  searchSection: {
     backgroundColor: '#1E293B',
-    color: 'white',
-    padding: 16,
-    borderRadius: 12,
+    borderRadius: 24,
+    padding: 20,
     marginBottom: 20,
   },
-  errorBox: {
-    backgroundColor: '#7F1D1D',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 16,
-  },
-  errorText: {
-    color: '#FECACA',
+  sectionLabel: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
     marginBottom: 10,
   },
-  retryButton: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#EF4444',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 10,
+  searchInputRow: {
+    position: 'relative',
+    justifyContent: 'center',
   },
-  retryButtonText: {
-    color: 'white',
-    fontWeight: '700',
+  searchInput: {
+    backgroundColor: '#0F172A',
+    color: '#FFFFFF',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 15,
+    borderWidth: 1,
+    borderColor: '#334155',
   },
-  buttonRow: {
+  clearBtn: {
+    position: 'absolute',
+    right: 14,
+  },
+  chipsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 14,
   },
-  secondaryButton: {
-    backgroundColor: '#1E293B',
-    width: '28%',
-    padding: 14,
-    borderRadius: 14,
-    alignItems: 'center',
+  chip: {
+    backgroundColor: '#0F172A',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#334155',
   },
-  smallButtonText: {
-    color: 'white',
-    marginTop: 2,
-    fontSize: 10,
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  scanButton: {
-    backgroundColor: '#14C8E8',
-    width: '40%',
-    padding: 18,
-    borderRadius: 14,
-    alignItems: 'center',
-  },
-  scanButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-    textAlign: 'center',
+  chipText: {
+    color: '#94A3B8',
+    fontSize: 12,
+    fontWeight: '600',
   },
   resultCard: {
     backgroundColor: '#1E293B',
-    borderWidth: 3,
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 20,
+    borderWidth: 1.5,
+    borderColor: '#334155',
+    marginBottom: 20,
   },
-  resultHeader: {
+  resultTopRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 12,
   },
-  resultStatus: {
+  sourceText: {
     color: '#94A3B8',
     fontSize: 11,
-    marginLeft: 10,
+    maxWidth: '50%',
   },
-  resultTitle: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 10,
+  resultMedicineName: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: 14,
   },
-  note: {
+  ingredientsBox: {
+    backgroundColor: '#0F172A',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 14,
+  },
+  ingredientsHeader: {
+    color: '#06B6D4',
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
+  ingredientItem: {
+    color: '#E2E8F0',
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  guidanceBox: {
+    marginBottom: 14,
+  },
+  guidanceTitle: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  guidanceText: {
     color: '#CBD5E1',
-    marginTop: 15,
+    fontSize: 14,
     lineHeight: 22,
   },
-  actionRow: {
+  disclaimerBox: {
     flexDirection: 'row',
-    marginTop: 20,
-    justifyContent: 'space-between',
+    backgroundColor: 'rgba(217,119,6,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(217,119,6,0.3)',
+    borderRadius: 14,
+    padding: 12,
+    gap: 8,
+    marginBottom: 14,
   },
-  altButton: {
-    backgroundColor: '#334155',
-    width: '48%',
-    padding: 14,
-    borderRadius: 12,
+  disclaimerText: {
+    color: '#FDE68A',
+    fontSize: 12,
+    lineHeight: 18,
+    flex: 1,
   },
-  altButtonText: {
-    color: 'white',
-    textAlign: 'center',
+  verifiedDate: {
+    color: '#64748B',
+    fontSize: 11,
+    marginBottom: 16,
   },
-  saveButton: {
-    backgroundColor: '#14C8E8',
-    width: '48%',
-    padding: 14,
-    borderRadius: 12,
+  actionButtonsRow: {
+    flexDirection: 'row',
+    gap: 10,
   },
-  saveButtonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontWeight: 'bold',
+  saveBtn: {
+    flex: 1,
+    backgroundColor: '#06B6D4',
+    paddingVertical: 14,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  savedBtn: {
+    backgroundColor: '#10B981',
+  },
+  saveBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  askAiBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: '#0F172A',
+    borderWidth: 1,
+    borderColor: '#06B6D4',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 16,
+  },
+  askAiBtnText: {
+    color: '#06B6D4',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  infoCard: {
+    backgroundColor: '#1E293B',
+    borderRadius: 24,
+    padding: 20,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+  infoTitle: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  infoText: {
+    color: '#94A3B8',
+    fontSize: 13,
+    lineHeight: 20,
+    marginBottom: 6,
+  },
+  infoSubtext: {
+    color: '#64748B',
+    fontSize: 12,
+    lineHeight: 18,
   },
 });

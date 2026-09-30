@@ -15,18 +15,26 @@ export default function RoleSelectionScreen() {
         <Text style={styles.cardTitle}>Athlete</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.card} onPress={() => {
-    alert('Coach Selected');
-  }}>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => {
+          router.push('/coach/dashboard' as any);
+        }}
+      >
         <Text style={styles.emoji}>🎯</Text>
-        <Text style={styles.cardTitle}>Coach</Text>
+        <Text style={styles.cardTitle}>Coach / Mentor</Text>
+        <Text style={styles.cardDescription}>Monitor athletes, track anti-doping curriculum, and communicate directly.</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.card} onPress={() => {
-    alert('Parent Selected');
-  }}>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => {
+          router.push('/coach/dashboard' as any);
+        }}
+      >
         <Text style={styles.emoji}>👨‍👩‍👧</Text>
-        <Text style={styles.cardTitle}>Parent</Text>
+        <Text style={styles.cardTitle}>Parent / Guardian</Text>
+        <Text style={styles.cardDescription}>Support young athletes with safe medication guidance and awareness.</Text>
       </TouchableOpacity>
     </View>
   );

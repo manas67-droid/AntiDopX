@@ -1,11 +1,14 @@
 {
   "expo": {
-    "name": "athlete-training-academy-v2",
-    "slug": "athlete-training-academy-v2",
+    "name": "AntiDopX",
+    "slug": "AntiDopX",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "athletetrainingacademyv2",
+    "extra": {
+      "webClientId": "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com"
+    },
+    "scheme": "antidopx",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true
@@ -43,7 +46,10 @@
           "cameraPermission": "Allow Athlete Training Academy to access your camera"
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-font",
+      "expo-image",
+      "expo-status-bar"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -1,50 +1,122 @@
-# Welcome to your Expo app 👋
+# AntiDopX — Youth Athlete Anti-Doping Education & Mentorship Platform
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+> **Empowering young athletes with clean sport education, real-time medicine safety checking, grounded AI mentorship, and interactive gamification.**
 
-## Get started
+Built with **React Native**, **Expo SDK 57**, **Expo Router**, **TypeScript**, and **Firebase** (Auth, Firestore, Cloud Functions).
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## 🌟 Key Features
 
-2. Start the app
+### 1. 📚 16-Module Interactive Curriculum
+- Full anti-doping curriculum based on WADA regulations (Strict Liability, Prohibited Lists, TUE, DCO interactions, Supplements, Whistleblowing, Mental Health, and more).
+- Structured lessons with key takeaways, pro tips, and review question banks.
+- Dynamic lesson routing via `/modules/[slug]` and visual progress tracking.
 
-   ```bash
-   npx expo start
-   ```
+### 2. ⚡ Adaptive Quiz Arena & Micro-Interactions
+- Real-time countdown timer with haptic feedback on answers.
+- Instant rationale and explanation reveal on correct and incorrect selections.
+- Multi-tier difficulty progression (Easy, Medium, Hard, Scenario, Rapid-Fire).
+- Anti-tamper server-side score calculation and XP award via Firebase Cloud Functions.
 
-In the output, you'll find options to open the app in a
+### 3. 🔍 Medicine Barcode Scanner & Safety Reference Engine
+- Real-time barcode scanning using Expo 57 `CameraView` with animated laser reticle.
+- Comprehensive reference database mapping active ingredients, ATC codes, and WADA prohibited statuses (`ALLOWED`, `CAUTION`, `PROHIBITED_IN_COMPETITION`, `PROHIBITED_ALWAYS`, `VERIFICATION_REQUIRED`).
+- Manual medicine search fallback with sample queries.
+- Strict liability anti-doping warnings on every scan result.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### 4. 🤖 Grounded AI Doping Coach (English & Hindi)
+- Conversational youth-oriented learning coach grounded in official WADA references.
+- Athlete context injection (XP, level, sport, recent mistakes).
+- Quick prompt chips for fast access to common doping topics (TUE, Strict Liability, Supplements).
+- Strict guardrails: Never hallucinates medicine safety; always directs athletes to official sources.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### 5. 👥 Coach Portal & Real-Time Athlete-Coach Messaging
+- Dedicated Coach Dashboard with team KPIs, average quiz scores, and high-risk athlete identification.
+- Searchable athlete roster with progress breakdowns and weak topic tracking.
+- Real-time 1-on-1 athlete-coach messaging powered by Cloud Firestore `onSnapshot` listeners.
 
-## Get a fresh project
+### 6. 🌐 Native Multilingual Support (English 🇬🇧 & हिंदी 🇮🇳)
+- Built-in localization architecture with instant in-app language switching.
+- Persistent language preference stored via `@react-native-async-storage/async-storage`.
 
-When you're ready, run:
+### 7. 🎰 Supplement Roulette Simulator
+- Interactive risk discovery wheel demonstrating supplement contamination hazards.
+- Ability to save supplements to athlete library with +15 XP reward.
 
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technology |
+|---|---|
+| **Framework** | Expo SDK 57 (`57.0.25`), React Native 0.76+ |
+| **Routing** | Expo Router (File-based routing) |
+| **Language** | TypeScript (Strict Mode) |
+| **State & Local Storage** | React Context, AsyncStorage |
+| **Backend & Database** | Firebase Authentication, Cloud Firestore |
+| **Server Logic** | Firebase Cloud Functions v2 (TypeScript, Node 20) |
+| **Animations** | React Native Reanimated, Expo Haptics |
+| **Camera & Hardware** | Expo Camera (`CameraView`), Expo Barcode Scanner |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v20 or v22)
+- npm or yarn
+- Expo Go app on iOS/Android or an Expo Development Build
+
+### 1. Install Dependencies
 ```bash
-npm run reset-project
+# Install root project dependencies
+npm install
+
+# Install Cloud Functions dependencies
+npm --prefix functions install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Environment Configuration
+Create a `.env` file in the root directory (or configure `src/firebase/config.ts`):
+```env
+EXPO_PUBLIC_FIREBASE_API_KEY=your_api_key
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+EXPO_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
 
-## Learn more
+### 3. Build & Run
+```bash
+# Type check application code
+npx tsc --noEmit
 
-To learn more about developing your project with Expo, look at the following resources:
+# Build Cloud Functions
+npm run --prefix functions build
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+# Start Expo development server
+npx expo start
+```
 
-## Join the community
+---
 
-Join our community of developers creating universal apps.
+## 📱 Hardware & Expo Go Compatibility
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+| Feature | Expo Go Support | Development Build (`npx expo run:*`) |
+|---|---|---|
+| Camera & Barcode Scanner | ✅ Fully supported via `CameraView` | ✅ Fully supported |
+| Haptic Feedback | ✅ Fully supported | ✅ Fully supported |
+| Real-time Firestore Chat | ✅ Fully supported | ✅ Fully supported |
+| Audio/Video Modules | ✅ Fully supported | ✅ Fully supported |
+| Remote Push Notifications (FCM/APNs) | ⚠️ Simulation only in Expo Go | ✅ Native build required |
+
+---
+
+## 🔒 Security & Data Integrity
+
+- Complete role-based access control (RBAC) enforced via `firestore.rules`.
+- Athletes can only read and write their authorized conversations.
+- Cloud Functions perform verified transactions for sensitive gamification XP operations and immutable audit logging in `/auditLogs`.
+- Review [SECURITY.md](file:///c:/Users/manas/athlete-training-academy-v2/SECURITY.md) and [ARCHITECTURE.md](file:///c:/Users/manas/athlete-training-academy-v2/ARCHITECTURE.md) for detailed policies.

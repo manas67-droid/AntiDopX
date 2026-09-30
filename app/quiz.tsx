@@ -1,38 +1,51 @@
-import {
-  Feather,
-  MaterialCommunityIcons,
-} from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 
+import { AppBadge } from '../src/components/common/AppBadge';
+import { AppButton } from '../src/components/common/AppButton';
+import { ProgressBar } from '../src/components/common/ProgressBar';
 import { auth } from '../src/firebase/config';
 import {
-  getQuizArenaQuestions,
+  getDynamicQuizSession,
   submitQuizArenaResult,
+  type QuizArenaQuestion,
 } from '../src/firebase/quizService';
-
-const questions = getQuizArenaQuestions();
+import type { QuizArenaAnswer } from '../src/firebase/functionsService';
+import { useTranslation } from '../src/localization';
 
 export default function QuizScreen() {
+  const { t } = useTranslation();
+  const [session, setSession] = useState(() => getDynamicQuizSession({ mode: 'rapid_fire', targetQuestionCount: 5 }));
+  const [questions, setQuestions] = useState<QuizArenaQuestion[]>(session.questions);
   const [idx, setIdx] = useState(0);
-  const [time, setTime] = useState(20);
+  const [time, setTime] = useState(session.timeLimitSeconds);
   const [score, setScore] = useState(0);
+  const [percentage, setPercentage] = useState(0);
+  const [answers, setAnswers] = useState<QuizArenaAnswer[]>([]);
   const [picked, setPicked] = useState<number | null>(null);
+  const [showExplanation, setShowExplanation] = useState(false);
   const [done, setDone] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
+  const [newTotalXP, setNewTotalXP] = useState<number | null>(null);
+  const [newLevel, setNewLevel] = useState<string>('');
   const [submitError, setSubmitError] = useState('');
 
-  const persistQuizResult = useCallback(async (finalScore: number) => {
+  const currentQuestion = questions[idx] || questions[0];
+
+  const persistQuizResult = useCallback(async (submittedAnswers: QuizArenaAnswer[]) => {
     const currentUser = auth.currentUser;
 
     if (!currentUser) {
@@ -43,82 +56,104 @@ export default function QuizScreen() {
     setIsSubmitting(true);
     setSubmitError('');
 
-    const result = await submitQuizArenaResult(
-      currentUser.uid,
-      finalScore,
-      questions.length
-    );
+    const result = await submitQuizArenaResult(submittedAnswers, currentUser.uid);
 
     if (!result.success) {
       setSubmitError(result.error);
-      Alert.alert('Error', result.error);
+      Alert.alert('Notice', result.error);
       setIsSubmitting(false);
       return;
     }
 
+    setScore(result.data.score);
+    setPercentage(result.data.percentage);
     setXpEarned(result.data.xpEarned);
+    setNewTotalXP(result.data.totalXP);
+    setNewLevel(result.data.level);
     setIsSubmitting(false);
   }, []);
 
   const nextQuestion = useCallback(
-    async (finalScore = score) => {
-      if (idx === questions.length - 1) {
+    async (submittedAnswers: QuizArenaAnswer[]) => {
+      if (idx >= questions.length - 1) {
         setDone(true);
-        await persistQuizResult(finalScore);
+        await persistQuizResult(submittedAnswers);
         return;
       }
 
       setIdx((prev) => prev + 1);
       setPicked(null);
-      setTime(20);
+      setShowExplanation(false);
+      setTime(session.timeLimitSeconds);
     },
-    [idx, persistQuizResult, score]
+    [idx, questions.length, persistQuizResult, session.timeLimitSeconds]
   );
 
+  // Timer countdown
   useEffect(() => {
     if (done || picked !== null) return;
 
-    if (time === 0) {
-      void nextQuestion(score);
-      return;
-    }
-
     const timer = setTimeout(() => {
+      if (time <= 1) {
+        try {
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        } catch {}
+        const timedOutAnswers = [
+          ...answers,
+          { questionId: currentQuestion.id, optionIndex: -1 },
+        ];
+        setAnswers(timedOutAnswers);
+        void nextQuestion(timedOutAnswers);
+        return;
+      }
+
       setTime((prev) => prev - 1);
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [time, picked, done, nextQuestion, score]);
-
-  const question = questions[idx];
-
-  const percentage = useMemo(
-    () => Math.round((score / questions.length) * 100),
-    [score]
-  );
+  }, [time, picked, done, nextQuestion, answers, currentQuestion]);
 
   const handleAnswer = (optionIndex: number) => {
     if (picked !== null) return;
 
     setPicked(optionIndex);
+    setShowExplanation(true);
 
-    const nextScore =
-      optionIndex === question.correctOptionIndex ? score + 1 : score;
+    const isCorrect = currentQuestion.correctOptionIndex !== undefined
+      ? currentQuestion.correctOptionIndex === optionIndex
+      : false;
 
-    if (optionIndex === question.correctOptionIndex) {
-      setScore(nextScore);
-    }
+    try {
+      if (isCorrect) {
+        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } else {
+        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      }
+    } catch {}
 
+    const nextAnswers = [
+      ...answers,
+      { questionId: currentQuestion.id, optionIndex },
+    ];
+    setAnswers(nextAnswers);
+
+    // Give athlete 1.2s to read the explanation before moving to next
     setTimeout(() => {
-      void nextQuestion(nextScore);
-    }, 800);
+      void nextQuestion(nextAnswers);
+    }, 1400);
   };
 
   const resetQuiz = () => {
+    const newSession = getDynamicQuizSession({ mode: 'rapid_fire', targetQuestionCount: 5 });
+    setSession(newSession);
+    setQuestions(newSession.questions);
     setIdx(0);
     setScore(0);
+    setPercentage(0);
+    setAnswers([]);
     setPicked(null);
-    setTime(20);
+    setShowExplanation(false);
+    setTime(newSession.timeLimitSeconds);
     setDone(false);
     setXpEarned(0);
     setSubmitError('');
@@ -127,96 +162,172 @@ export default function QuizScreen() {
   if (done) {
     return (
       <SafeAreaView style={styles.resultContainer}>
-        {isSubmitting ? (
-          <ActivityIndicator color="#06B6D4" size="large" />
-        ) : (
-          <>
-            <MaterialCommunityIcons
-              name="trophy"
-              size={90}
-              color="#FACC15"
-            />
-
-            <Text style={styles.resultTitle}>Quiz Complete!</Text>
-            <Text style={styles.resultSubtitle}>Great job athlete 🚀</Text>
-
-            <View style={styles.statsRow}>
-              <View style={styles.statCard}>
-                <Text style={styles.statValue}>
-                  {score}/{questions.length}
-                </Text>
-                <Text style={styles.statLabel}>Score</Text>
-              </View>
-
-              <View style={styles.statCard}>
-                <Text style={styles.statValue}>{percentage}%</Text>
-                <Text style={styles.statLabel}>Accuracy</Text>
-              </View>
-
-              <View style={styles.statCard}>
-                <Text style={styles.statValue}>+{xpEarned}</Text>
-                <Text style={styles.statLabel}>XP</Text>
-              </View>
+        <ScrollView contentContainerStyle={styles.resultScroll} showsVerticalScrollIndicator={false}>
+          {isSubmitting ? (
+            <View style={styles.loadingBox}>
+              <ActivityIndicator color="#06B6D4" size="large" />
+              <Text style={styles.submittingText}>{t.common.loading}</Text>
             </View>
+          ) : (
+            <>
+              <MaterialCommunityIcons
+                name="trophy"
+                size={84}
+                color="#FACC15"
+              />
 
-            {submitError ? (
-              <Text style={styles.errorText}>{submitError}</Text>
-            ) : null}
+              <Text style={styles.resultTitle}>{t.quiz.complete}</Text>
+              <Text style={styles.resultSubtitle}>{t.quiz.greatJob}</Text>
 
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => router.push('/dashboard')}
-            >
-              <Text style={styles.buttonText}>Back to Dashboard</Text>
-            </TouchableOpacity>
+              <View style={styles.statsRow}>
+                <View style={styles.statCard}>
+                  <Text style={styles.statValue}>
+                    {score}/{questions.length}
+                  </Text>
+                  <Text style={styles.statLabel}>{t.quiz.score}</Text>
+                </View>
 
-            <TouchableOpacity onPress={resetQuiz}>
-              <Text style={styles.playAgain}>Play Again</Text>
-            </TouchableOpacity>
-          </>
-        )}
+                <View style={styles.statCard}>
+                  <Text style={styles.statValue}>{percentage}%</Text>
+                  <Text style={styles.statLabel}>{t.quiz.accuracy}</Text>
+                </View>
+
+                <View style={styles.statCard}>
+                  <Text style={[styles.statValue, { color: '#06B6D4' }]}>
+                    +{xpEarned}
+                  </Text>
+                  <Text style={styles.statLabel}>{t.quiz.xpEarned}</Text>
+                </View>
+              </View>
+
+              {newLevel ? (
+                <View style={styles.levelCard}>
+                  <Text style={styles.levelCardLabel}>CURRENT LEVEL</Text>
+                  <Text style={styles.levelCardValue}>🏆 {newLevel}</Text>
+                  {newTotalXP !== null && (
+                    <Text style={styles.levelCardXP}>Total: {newTotalXP.toLocaleString()} XP</Text>
+                  )}
+                </View>
+              ) : null}
+
+              {submitError ? (
+                <Text style={styles.errorText}>{submitError}</Text>
+              ) : null}
+
+              <AppButton
+                title={t.quiz.backToDashboard}
+                onPress={() => router.replace('/(tabs)/dashboard')}
+                size="lg"
+                style={{ width: '100%', marginTop: 16 }}
+              />
+
+              <TouchableOpacity onPress={resetQuiz} style={styles.playAgainTouch}>
+                <Text style={styles.playAgain}>{t.quiz.playAgain}</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </ScrollView>
       </SafeAreaView>
     );
   }
 
+  const progressPercent = ((idx + 1) / questions.length) * 100;
+  const isUrgent = time <= 5;
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Feather name="arrow-left" size={24} color="white" />
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <Feather name="arrow-left" size={22} color="#0F172A" />
         </TouchableOpacity>
 
-        <Text style={styles.timer}>⏱ {time}s</Text>
+        <View style={styles.sessionHeader}>
+          <Text style={styles.sessionTitle}>{session.title}</Text>
+        </View>
+
+        <View style={[styles.timerBadge, isUrgent && styles.timerUrgent]}>
+          <Text style={[styles.timerText, isUrgent && styles.timerTextUrgent]}>
+            ⏱ {time}{t.quiz.secondsLeft}
+          </Text>
+        </View>
       </View>
 
-      <Text style={styles.progress}>
-        Question {idx + 1} of {questions.length}
-      </Text>
+      <ProgressBar
+        progressPercent={progressPercent}
+        height={6}
+        color="#06B6D4"
+        style={{ marginBottom: 16 }}
+      />
 
-      <Text style={styles.question}>{question.question}</Text>
+      <View style={styles.questionMetaRow}>
+        <Text style={styles.progress}>
+          {t.quiz.questionProgress} {idx + 1} {t.quiz.of} {questions.length}
+        </Text>
+        <AppBadge label={`+${session.possibleXP} XP`} variant="xp" />
+      </View>
 
-      {question.options.map((option, optionIndex) => {
-        let backgroundColor = '#FFFFFF';
+      <Text style={styles.question}>{currentQuestion.question}</Text>
 
-        if (picked !== null) {
-          if (optionIndex === question.correctOptionIndex) {
-            backgroundColor = '#DCFCE7';
-          } else if (picked === optionIndex) {
-            backgroundColor = '#FEE2E2';
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+        {currentQuestion.options.map((option, optionIndex) => {
+          const isSelected = picked === optionIndex;
+          const isCorrect =
+            currentQuestion.correctOptionIndex !== undefined &&
+            currentQuestion.correctOptionIndex === optionIndex;
+          const isWrong =
+            picked !== null &&
+            isSelected &&
+            currentQuestion.correctOptionIndex !== optionIndex;
+
+          let btnBg = '#FFFFFF';
+          let borderColor = '#E2E8F0';
+
+          if (picked !== null) {
+            if (isCorrect) {
+              btnBg = '#DCFCE7';
+              borderColor = '#22C55E';
+            } else if (isWrong) {
+              btnBg = '#FEE2E2';
+              borderColor = '#EF4444';
+            } else {
+              btnBg = '#F8FAFC';
+            }
           }
-        }
 
-        return (
-          <TouchableOpacity
-            key={option}
-            disabled={picked !== null}
-            style={[styles.optionButton, { backgroundColor }]}
-            onPress={() => handleAnswer(optionIndex)}
-          >
-            <Text style={styles.optionText}>{option}</Text>
-          </TouchableOpacity>
-        );
-      })}
+          return (
+            <TouchableOpacity
+              key={`${option}-${optionIndex}`}
+              disabled={picked !== null}
+              activeOpacity={0.8}
+              style={[
+                styles.optionButton,
+                { backgroundColor: btnBg, borderColor },
+                isSelected && styles.optionSelected,
+              ]}
+              onPress={() => handleAnswer(optionIndex)}
+            >
+              <View style={styles.optionContent}>
+                <Text style={styles.optionLetter}>
+                  {String.fromCharCode(65 + optionIndex)}
+                </Text>
+                <Text style={styles.optionText}>{option}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+
+        {showExplanation && currentQuestion.explanation ? (
+          <View style={styles.explanationCard}>
+            <Text style={styles.explanationHeader}>💡 {t.quiz.explanation}</Text>
+            <Text style={styles.explanationText}>
+              {currentQuestion.explanation}
+            </Text>
+          </View>
+        ) : null}
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -224,89 +335,176 @@ export default function QuizScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F1F5F9',
-    padding: 20,
+    backgroundColor: '#F8FAFC',
+    paddingHorizontal: 20,
+    paddingTop: 10,
   },
   topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 50,
-    marginBottom: 20,
+    marginTop: 10,
+    marginBottom: 12,
   },
-  timer: {
-    color: '#06B6D4',
-    fontWeight: '800',
-    fontSize: 16,
-    backgroundColor: '#E0F7FA',
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  sessionHeader: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  sessionTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  timerBadge: {
+    backgroundColor: '#E0F2FE',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#BAE6FD',
+  },
+  timerUrgent: {
+    backgroundColor: '#FEE2E2',
+    borderColor: '#FECACA',
+  },
+  timerText: {
+    color: '#0284C7',
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  timerTextUrgent: {
+    color: '#DC2626',
+  },
+  questionMetaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
   },
   progress: {
     color: '#64748B',
     fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 10,
+    fontWeight: '700',
   },
   question: {
     color: '#0F172A',
-    fontSize: 30,
+    fontSize: 22,
     fontWeight: '800',
-    lineHeight: 40,
-    marginBottom: 30,
+    lineHeight: 30,
+    marginBottom: 24,
   },
   optionButton: {
-    backgroundColor: '#FFFFFF',
-    padding: 18,
-    borderRadius: 22,
-    marginBottom: 14,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.04,
     shadowRadius: 8,
     elevation: 2,
   },
+  optionSelected: {
+    borderWidth: 2,
+  },
+  optionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  optionLetter: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F1F5F9',
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    lineHeight: 32,
+    fontWeight: '800',
+    color: '#06B6D4',
+    marginRight: 12,
+    overflow: 'hidden',
+  },
   optionText: {
     color: '#0F172A',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
+    flex: 1,
+  },
+  explanationCard: {
+    backgroundColor: '#F0FDFF',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#BAE6FD',
+    padding: 16,
+    marginTop: 14,
+  },
+  explanationHeader: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#0284C7',
+    marginBottom: 4,
+  },
+  explanationText: {
+    fontSize: 14,
+    color: '#0F172A',
+    lineHeight: 20,
   },
   resultContainer: {
     flex: 1,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F8FAFC',
+  },
+  resultScroll: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
   },
+  loadingBox: {
+    alignItems: 'center',
+    gap: 12,
+  },
+  submittingText: {
+    color: '#64748B',
+    fontSize: 15,
+    fontWeight: '600',
+  },
   resultTitle: {
     color: '#0F172A',
-    fontSize: 34,
+    fontSize: 32,
     fontWeight: '800',
-    marginTop: 20,
+    marginTop: 16,
   },
   resultSubtitle: {
     color: '#64748B',
     fontSize: 16,
-    marginTop: 8,
-    marginBottom: 30,
+    marginTop: 6,
+    marginBottom: 24,
   },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: 20,
-    marginBottom: 30,
+    marginBottom: 20,
   },
   statCard: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    padding: 18,
+    paddingVertical: 18,
+    paddingHorizontal: 8,
     borderRadius: 20,
     alignItems: 'center',
     marginHorizontal: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
     elevation: 2,
   },
   statValue: {
@@ -317,23 +515,43 @@ const styles = StyleSheet.create({
   statLabel: {
     color: '#64748B',
     marginTop: 6,
-    fontSize: 13,
+    fontSize: 12,
+    fontWeight: '600',
   },
-  button: {
-    backgroundColor: '#06B6D4',
+  levelCard: {
     width: '100%',
-    paddingVertical: 16,
-    borderRadius: 18,
+    backgroundColor: '#ECFDF5',
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
+    borderRadius: 20,
+    padding: 16,
     alignItems: 'center',
+    marginBottom: 20,
   },
-  buttonText: {
-    color: 'white',
+  levelCardLabel: {
+    color: '#059669',
+    fontSize: 11,
     fontWeight: '800',
-    fontSize: 16,
+    letterSpacing: 1,
+  },
+  levelCardValue: {
+    color: '#065F46',
+    fontSize: 22,
+    fontWeight: '800',
+    marginTop: 4,
+  },
+  levelCardXP: {
+    color: '#047857',
+    fontSize: 13,
+    marginTop: 2,
+    fontWeight: '600',
+  },
+  playAgainTouch: {
+    marginTop: 16,
+    padding: 8,
   },
   playAgain: {
     color: '#06B6D4',
-    marginTop: 20,
     fontWeight: '700',
     fontSize: 16,
   },

@@ -1,5 +1,6 @@
+import { Feather, FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   ScrollView,
@@ -9,13 +10,18 @@ import {
   View,
 } from 'react-native';
 
+import { AppBadge } from '../../src/components/common/AppBadge';
+import { AppButton } from '../../src/components/common/AppButton';
+import { ProgressBar } from '../../src/components/common/ProgressBar';
 import { auth } from '../../src/firebase/config';
 import {
   getDashboardData,
   type DashboardData,
 } from '../../src/firebase/dashboardService';
+import { useTranslation } from '../../src/localization';
 
 export default function DashboardScreen() {
+  const { t } = useTranslation();
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -48,14 +54,14 @@ export default function DashboardScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      loadDashboard();
+      void loadDashboard();
     }, [loadDashboard])
   );
 
   if (isLoading && !dashboard) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator color="#14C8E8" size="large" />
+        <ActivityIndicator color="#06B6D4" size="large" />
       </View>
     );
   }
@@ -65,7 +71,7 @@ export default function DashboardScreen() {
       <View style={styles.loadingContainer}>
         <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={loadDashboard}>
-          <Text style={styles.retryButtonText}>Retry</Text>
+          <Text style={styles.retryButtonText}>{t.common.retry}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -89,7 +95,9 @@ export default function DashboardScreen() {
     <ScrollView
       style={styles.container}
       showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 140 }}
     >
+      {/* Top Hero Card */}
       <View style={styles.hero}>
         <View style={styles.userRow}>
           <View style={styles.avatar}>
@@ -98,49 +106,49 @@ export default function DashboardScreen() {
             </Text>
           </View>
 
-          <View>
-            <Text style={styles.welcome}>Welcome back 👋</Text>
-            <Text style={styles.userName}>{dashboard.name || 'Athlete'}</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.welcome}>{t.dashboard.welcome} 👋</Text>
+            <Text style={styles.userName}>{dashboard.name || t.dashboard.athlete}</Text>
+            <Text style={styles.userSport}>{dashboard.sport || 'Athlete'}</Text>
           </View>
 
           <View style={styles.streakBadge}>
-            <Text style={styles.streakText}>🔥 {dashboard.streak}</Text>
+            <Text style={styles.streakText}>🔥 {dashboard.streak}d</Text>
           </View>
         </View>
 
+        {/* Level Progression */}
         <View style={styles.levelCard}>
           <View style={styles.levelRow}>
             <View>
-              <Text style={styles.levelLabel}>LEVEL</Text>
+              <Text style={styles.levelLabel}>{t.common.level.toUpperCase()}</Text>
               <Text style={styles.levelValue}>{dashboard.level}</Text>
             </View>
 
-            <View>
-              <Text style={styles.levelLabel}>XP</Text>
+            <View style={{ alignItems: 'flex-end' }}>
+              <Text style={styles.levelLabel}>{t.common.xp.toUpperCase()}</Text>
               <Text style={styles.xpValue}>
-                {dashboard.xp}/{dashboard.xpCap}
+                {dashboard.xp} / {dashboard.xpCap}
               </Text>
             </View>
           </View>
 
-          <View style={styles.progressBg}>
-            <View
-              style={[
-                styles.progressFill,
-                {
-                  width: `${dashboard.xpProgressPercent}%`,
-                },
-              ]}
-            />
-          </View>
+          <ProgressBar
+            progressPercent={dashboard.xpProgressPercent}
+            height={8}
+            color="#FFFFFF"
+            backgroundColor="rgba(255,255,255,0.25)"
+            style={{ marginTop: 14 }}
+          />
         </View>
       </View>
 
+      {/* Today's Daily Mission */}
       <View style={styles.missionCard}>
         <View style={styles.missionHeader}>
-          <Text style={styles.missionHeading}>DAILY MISSION</Text>
+          <Text style={styles.missionHeading}>{t.dashboard.dailyMission}</Text>
           <Text style={styles.missionTime}>
-            ⏱ Ends in {dashboard.dailyMission.endsInHours}h
+            ⏱ {t.dashboard.endsIn} {dashboard.dailyMission.endsInHours}{t.dashboard.hours}
           </Text>
         </View>
 
@@ -148,23 +156,47 @@ export default function DashboardScreen() {
           {dashboard.dailyMission.description}
         </Text>
 
-        <View style={styles.progressBgLight}>
-          <View
-            style={{
-              width: `${dashboard.dailyMission.progressPercent}%`,
-              height: 8,
-              backgroundColor: '#14C8E8',
-              borderRadius: 20,
-            }}
-          />
-        </View>
+        <ProgressBar
+          progressPercent={dashboard.dailyMission.progressPercent}
+          height={8}
+          color="#06B6D4"
+          style={{ marginTop: 14 }}
+        />
 
-        <Text style={styles.reward}>
-          ⚡ +{dashboard.dailyMission.rewardXP} XP & Badge
-        </Text>
+        <View style={styles.missionFooterRow}>
+          <Text style={styles.reward}>
+            ⚡ +{dashboard.dailyMission.rewardXP} XP & Badge
+          </Text>
+          <TouchableOpacity
+            style={styles.continueBtn}
+            onPress={() => router.push('/quiz' as any)}
+          >
+            <Text style={styles.continueBtnText}>{t.common.continue} →</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <Text style={styles.sectionTitle}>Quick Play</Text>
+      {/* AI Coach Banner */}
+      <View style={styles.aiCoachBanner}>
+        <View style={styles.aiIconBox}>
+          <MaterialCommunityIcons name="robot" size={32} color="#06B6D4" />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.aiTitle}>{t.dashboard.aiCoachTitle}</Text>
+          <Text style={styles.aiSubtitle}>
+            "Need help with today's anti-doping lesson?"
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={styles.aiBtn}
+          onPress={() => router.push('/ai-coach' as any)}
+        >
+          <Text style={styles.aiBtnText}>{t.dashboard.askAi}</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Quick Play Section */}
+      <Text style={styles.sectionTitle}>{t.dashboard.quickPlay}</Text>
 
       <View style={styles.grid}>
         <TouchableOpacity
@@ -172,19 +204,8 @@ export default function DashboardScreen() {
           onPress={() => router.push('/learning-journey')}
         >
           <Text style={styles.gridIcon}>📚</Text>
-          <Text style={styles.gridTitle}>Learn</Text>
-          <Text style={styles.gridSubtitle}>
-            {dashboard.totalModules} Modules
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.gridCard}
-          onPress={() => router.push('/roulette')}
-        >
-          <Text style={styles.gridIcon}>🎲</Text>
-          <Text style={styles.gridTitle}>Supplement Spin</Text>
-          <Text style={styles.gridSubtitle}>Risk Roulette</Text>
+          <Text style={styles.gridTitle}>{t.dashboard.learnTitle}</Text>
+          <Text style={styles.gridSubtitle}>16 {t.dashboard.learnSubtitle}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -192,8 +213,8 @@ export default function DashboardScreen() {
           onPress={() => router.push('/medicinescanner')}
         >
           <Text style={styles.gridIcon}>📷</Text>
-          <Text style={styles.gridTitle}>Med Scanner</Text>
-          <Text style={styles.gridSubtitle}>AI Check</Text>
+          <Text style={styles.gridTitle}>{t.dashboard.scannerTitle}</Text>
+          <Text style={styles.gridSubtitle}>{t.dashboard.scannerSubtitle}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -201,75 +222,51 @@ export default function DashboardScreen() {
           onPress={() => router.push('/quiz')}
         >
           <Text style={styles.gridIcon}>🧠</Text>
-          <Text style={styles.gridTitle}>Quiz Arena</Text>
-          <Text style={styles.gridSubtitle}>Beat The Clock</Text>
+          <Text style={styles.gridTitle}>{t.dashboard.quizTitle}</Text>
+          <Text style={styles.gridSubtitle}>{t.dashboard.quizSubtitle}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.gridCard}
+          onPress={() => router.push('/roulette')}
+        >
+          <Text style={styles.gridIcon}>🎲</Text>
+          <Text style={styles.gridTitle}>{t.dashboard.spinTitle}</Text>
+          <Text style={styles.gridSubtitle}>{t.dashboard.spinSubtitle}</Text>
         </TouchableOpacity>
       </View>
 
-      {dashboard.recentActivity.length > 0 ? (
-        <>
-          <View style={styles.weekHeader}>
-            <Text style={styles.sectionTitle}>Recent Activity</Text>
-            <Text style={styles.eventCount}>
-              {dashboard.recentActivity.length} updates
-            </Text>
-          </View>
+      {/* Coach Communication Banner */}
+      <View style={styles.coachBanner}>
+        <View style={styles.coachIconBox}>
+          <FontAwesome5 name="user-graduate" size={24} color="#10B981" />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.coachBannerTitle}>Assigned Coach</Text>
+          <Text style={styles.coachBannerSubtitle}>
+            Direct messaging with verified mentors
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={styles.coachMessageBtn}
+          onPress={() => {
+            const currentUser = auth.currentUser;
+            const convId = `${currentUser?.uid || 'athlete'}_coach-primary`;
+            router.push({
+              pathname: '/chat/[conversationId]',
+              params: { conversationId: convId, recipientName: 'Coach Mentor' },
+            } as any);
+          }}
+        >
+          <Text style={styles.coachMessageBtnText}>{t.dashboard.messageCoach}</Text>
+        </TouchableOpacity>
+      </View>
 
-          {dashboard.recentActivity.slice(0, 2).map((activity) => (
-            <View key={`${activity.timestamp}-${activity.description}`} style={styles.eventCard}>
-              <View style={styles.dayCircle}>
-                <Text style={styles.dayText}>
-                  {activity.type.slice(0, 3).toUpperCase()}
-                </Text>
-              </View>
-
-              <View style={{ flex: 1 }}>
-                <Text style={styles.eventTitle}>{activity.description}</Text>
-                <Text style={styles.eventSubtitle}>
-                  {new Date(activity.timestamp).toLocaleDateString()}
-                </Text>
-              </View>
-            </View>
-          ))}
-        </>
-      ) : null}
-
-      {dashboard.events.length > 0 ? (
-        <>
-          <View style={styles.weekHeader}>
-            <Text style={styles.sectionTitle}>This Week</Text>
-            <Text style={styles.eventCount}>
-              {dashboard.events.length} events
-            </Text>
-          </View>
-
-          {dashboard.events.map((event) => (
-            <View key={`${event.dayLabel}-${event.title}`} style={styles.eventCard}>
-              <View style={styles.dayCircle}>
-                <Text style={styles.dayText}>{event.dayLabel}</Text>
-              </View>
-
-              <View style={{ flex: 1 }}>
-                <Text style={styles.eventTitle}>{event.title}</Text>
-                <Text style={styles.eventSubtitle}>{event.subtitle}</Text>
-              </View>
-
-              <View
-                style={
-                  event.badge === 'LIVE' ? styles.liveBadge : styles.newBadge
-                }
-              >
-                <Text style={styles.liveText}>{event.badge}</Text>
-              </View>
-            </View>
-          ))}
-        </>
-      ) : null}
-
+      {/* Badges Section */}
       <View style={styles.badgeHeader}>
-        <Text style={styles.sectionTitle}>Recent Badges</Text>
+        <Text style={styles.sectionTitle}>Badges & Achievements</Text>
         <TouchableOpacity onPress={() => router.push('/achievements')}>
-          <Text style={styles.viewAll}>View all</Text>
+          <Text style={styles.viewAll}>View all →</Text>
         </TouchableOpacity>
       </View>
 
@@ -282,22 +279,21 @@ export default function DashboardScreen() {
         ))}
       </View>
 
+      {/* National Rank & Recommendation */}
       <TouchableOpacity
         style={styles.rankCard}
-        onPress={() => router.push(dashboard.recommendedModule.route as '/modules/anti-doping-basics')}
+        onPress={() => router.push(dashboard.recommendedModule.route as any)}
       >
-        <Text style={styles.rankTitle}>🏆 Your Rank</Text>
+        <Text style={styles.rankTitle}>🏆 {t.dashboard.rankTitle}</Text>
         <Text style={styles.rankText}>
           {dashboard.rank
-            ? `#${dashboard.rank.position} nationally • ${dashboard.rank.percentileLabel}`
-            : 'Complete modules to join the leaderboard'}
+            ? `#${dashboard.rank.position} ${t.dashboard.nationally} • ${dashboard.rank.percentileLabel}`
+            : 'Complete your first quiz to join rankings'}
         </Text>
         <Text style={styles.rankSubtext}>
-          Recommended: {dashboard.recommendedModule.title}
+          {t.dashboard.recommended}: {dashboard.recommendedModule.title} →
         </Text>
       </TouchableOpacity>
-
-      <View style={{ height: 120 }} />
     </ScrollView>
   );
 }
@@ -305,11 +301,11 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F8FAFC',
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F8FAFC',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
@@ -320,61 +316,204 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   retryButton: {
-    backgroundColor: '#14C8E8',
-    paddingHorizontal: 18,
+    backgroundColor: '#06B6D4',
+    paddingHorizontal: 20,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 14,
   },
   retryButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   hero: {
-    backgroundColor: '#14C8E8',
-    paddingTop: 24,
-    paddingHorizontal: 24,
-    paddingBottom: 90,
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
+    backgroundColor: '#06B6D4',
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    paddingBottom: 85,
+    borderBottomLeftRadius: 36,
+    borderBottomRightRadius: 36,
   },
   userRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   avatar: {
-    width: 55,
-    height: 55,
-    borderRadius: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: 'rgba(255,255,255,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 14,
   },
   avatarText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 20,
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 22,
   },
-  missionHeading: {
-    color: '#14C8E8',
+  welcome: {
+    color: '#E0F2FE',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  userName: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: '800',
+  },
+  userSport: {
+    color: '#BAE6FD',
+    fontSize: 13,
+    marginTop: 2,
+    fontWeight: '600',
+  },
+  streakBadge: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  streakText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  levelCard: {
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderRadius: 22,
+    padding: 18,
+    marginTop: 20,
+  },
+  levelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  levelLabel: {
+    color: '#E0F2FE',
+    fontSize: 11,
     fontWeight: '700',
-    fontSize: 16,
+    letterSpacing: 0.5,
+  },
+  levelValue: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '800',
+    marginTop: 2,
+  },
+  xpValue: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '800',
+    marginTop: 2,
+  },
+  missionCard: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 20,
+    marginTop: -55,
+    borderRadius: 26,
+    padding: 20,
+    elevation: 8,
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 6 },
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
   missionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 10,
+  },
+  missionHeading: {
+    color: '#06B6D4',
+    fontWeight: '800',
+    fontSize: 14,
+    letterSpacing: 0.5,
   },
   missionTime: {
     color: '#64748B',
-    fontSize: 15,
+    fontSize: 13,
+    fontWeight: '600',
   },
-  progressBgLight: {
-    height: 8,
-    backgroundColor: '#E2E8F0',
-    borderRadius: 20,
-    marginTop: 20,
+  missionText: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#0F172A',
+    lineHeight: 24,
+  },
+  missionFooterRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 14,
+  },
+  reward: {
+    color: '#16A34A',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  continueBtn: {
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 14,
+  },
+  continueBtnText: {
+    color: '#06B6D4',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  aiCoachBanner: {
+    backgroundColor: '#1E293B',
+    marginHorizontal: 20,
+    marginTop: 16,
+    borderRadius: 22,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+  aiIconBox: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#0F172A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  aiTitle: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  aiSubtitle: {
+    color: '#94A3B8',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  aiBtn: {
+    backgroundColor: '#06B6D4',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+    marginLeft: 10,
+  },
+  aiBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 12,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    marginHorizontal: 20,
+    marginTop: 22,
+    marginBottom: 14,
+    color: '#0F172A',
   },
   grid: {
     flexDirection: 'row',
@@ -383,216 +522,135 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   gridCard: {
-    width: '47%',
-    backgroundColor: '#fff',
-    borderRadius: 24,
-    padding: 22,
-    marginBottom: 16,
-    elevation: 4,
+    width: '48%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 22,
+    padding: 18,
+    marginBottom: 14,
+    elevation: 3,
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
   gridIcon: {
-    fontSize: 34,
-    marginBottom: 12,
+    fontSize: 30,
+    marginBottom: 10,
   },
   gridTitle: {
     fontSize: 16,
     fontWeight: '700',
     color: '#0F172A',
   },
-  welcome: {
-    color: '#EAFBFF',
-    fontSize: 14,
-  },
-  userName: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  streakBadge: {
-    marginLeft: 'auto',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  streakText: {
-    color: '#fff',
-    fontWeight: '700',
-  },
-  levelCard: {
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderRadius: 24,
-    padding: 20,
-    marginTop: 24,
-  },
-  levelRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  levelLabel: {
-    color: '#EAFBFF',
-  },
-  levelValue: {
-    color: '#fff',
-    fontSize: 28,
-    fontWeight: '700',
-  },
-  xpValue: {
-    color: '#fff',
-    fontSize: 28,
-    fontWeight: '700',
-  },
-  progressBg: {
-    height: 10,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    borderRadius: 20,
-    marginTop: 20,
-  },
-  progressFill: {
-    height: 10,
-  backgroundColor: '#fff',
-    borderRadius: 20,
-  },
-  missionCard: {
-    backgroundColor: '#fff',
-    marginHorizontal: 20,
-    marginTop: -55,
-    borderRadius: 28,
-    padding: 22,
-    elevation: 8,
-    shadowColor: '#14C8E8',
-    shadowOpacity: 0.12,
-    shadowRadius: 20,
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-  },
-  missionText: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  reward: {
-    color: '#22C55E',
-    fontWeight: '700',
-    marginTop: 12,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginHorizontal: 20,
-    marginTop: 12,
-    marginBottom: 18,
-    color: '#0F172A',
-  },
   gridSubtitle: {
     color: '#64748B',
+    fontSize: 12,
     marginTop: 4,
   },
-  weekHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  eventCount: {
-    color: '#64748B',
-  },
-  eventCard: {
-    backgroundColor: '#fff',
+  coachBanner: {
+    backgroundColor: '#FFFFFF',
     marginHorizontal: 20,
-    marginBottom: 14,
-    borderRadius: 24,
+    marginTop: 10,
+    borderRadius: 22,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    elevation: 2,
   },
-  dayCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#F1F5F9',
+  coachIconBox: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: '#ECFDF5',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 14,
+    marginRight: 12,
   },
-  dayText: {
-    fontWeight: '700',
-    color: '#475569',
-    fontSize: 11,
+  coachBannerTitle: {
+    color: '#0F172A',
+    fontSize: 15,
+    fontWeight: '800',
   },
-  eventTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-  },
-  eventSubtitle: {
+  coachBannerSubtitle: {
     color: '#64748B',
+    fontSize: 12,
+    marginTop: 2,
   },
-  liveBadge: {
-    backgroundColor: '#DCFCE7',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
+  coachMessageBtn: {
+    backgroundColor: '#10B981',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+    marginLeft: 10,
   },
-  newBadge: {
-    backgroundColor: '#DCFCE7',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-  },
-  liveText: {
-    color: '#22C55E',
+  coachMessageBtnText: {
+    color: '#FFFFFF',
     fontWeight: '700',
+    fontSize: 12,
   },
   badgeHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
+    marginTop: 14,
   },
   viewAll: {
-    color: '#14C8E8',
-    fontWeight: '600',
+    color: '#06B6D4',
+    fontWeight: '700',
+    fontSize: 14,
   },
   badgesRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    marginBottom: 24,
+    marginTop: 12,
+    marginBottom: 18,
   },
   badgeCard: {
     alignItems: 'center',
     width: '23%',
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
   badgeIcon: {
-    fontSize: 40,
+    fontSize: 32,
   },
   badgeName: {
-    marginTop: 8,
-    fontSize: 12,
+    marginTop: 6,
+    fontSize: 11,
     fontWeight: '600',
     textAlign: 'center',
+    color: '#334155',
   },
   rankCard: {
     marginHorizontal: 20,
-    backgroundColor: '#22C55E',
+    backgroundColor: '#10B981',
     borderRadius: 24,
-    padding: 24,
+    padding: 20,
+    marginTop: 6,
   },
   rankTitle: {
-    color: '#fff',
-    fontSize: 16,
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
   },
   rankText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 24,
-    marginTop: 8,
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 18,
+    marginTop: 6,
   },
   rankSubtext: {
     color: '#ECFDF5',
     marginTop: 8,
-    fontSize: 14,
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

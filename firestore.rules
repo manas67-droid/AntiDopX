@@ -1,0 +1,94 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return signedIn() && (
+        request.auth.token.role == 'ADMIN' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN')
+      );
+    }
+
+    function isAssignedCoach(athleteUid) {
+      return signedIn() && (
+        (resource != null && resource.data.coachId == request.auth.uid) ||
+        request.auth.token.role == 'COACH' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'COACH')
+      );
+    }
+
+    // User profile documents: Any authenticated athlete can create, read, and write their own profile
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin() || isAssignedCoach(uid) || signedIn();
+      allow write: if isOwner(uid) || isAdmin();
+    }
+
+    // 1-on-1 Athlete-Coach Conversations
+    match /conversations/{convId} {
+      allow read: if signedIn() && (
+        request.auth.uid in resource.data.participants ||
+        isAdmin()
+      );
+      allow create: if signedIn() && (
+        request.auth.uid in request.resource.data.participants
+      );
+      allow update: if signedIn() && (
+        request.auth.uid in resource.data.participants
+      );
+      allow delete: if isAdmin();
+
+      // Messages sub-collection
+      match /messages/{msgId} {
+        allow read: if signedIn();
+        allow create: if signedIn() && request.auth.uid == request.resource.data.senderId;
+        allow update: if signedIn();
+        allow delete: if isAdmin();
+      }
+    }
+
+    // Formal Coach-Athlete assignment directory
+    match /coachAssignments/{assignmentId} {
+      allow read: if signedIn();
+      allow write: if signedIn();
+    }
+
+    // Public / Group Leaderboard
+    match /leaderboard/{entryId} {
+      allow read: if signedIn();
+      allow write: if signedIn();
+    }
+
+    // Anti-Doping Daily/Weekly Challenges
+    match /challenges/{challengeId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // Medicine & Active Ingredient Reference
+    match /medicineEntries/{entryId} {
+      allow read: if signedIn();
+      allow write: if signedIn();
+    }
+
+    // Immutable Audit Logs for Regulatory & Compliance
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if signedIn();
+    }
+
+    // Default deny for unknown collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

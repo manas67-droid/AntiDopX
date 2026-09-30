@@ -12,7 +12,7 @@ export default function OnboardingScreen() {
 
       <Text style={styles.subtitle}>
         Many athletes fail doping tests because
-        they don't know the rules.
+        they don{"'"}t know the rules.
       </Text>
 
       <Text style={styles.description}>
@@ -27,7 +27,7 @@ export default function OnboardingScreen() {
   }}
 >
         <Text style={styles.buttonText}>
-          I'm Ready
+          I{"'"}m Ready
         </Text>
       </TouchableOpacity>
     </View>

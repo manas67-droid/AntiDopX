@@ -4,8 +4,10 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import {
   Alert,
+  Modal,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -14,18 +16,23 @@ import {
 
 import { auth, db } from '../../src/firebase/config';
 import { getUserProfile } from '../../src/firebase/userService';
+import { useTranslation, type SupportedLanguage } from '../../src/localization';
 
 export default function ProfileScreen() {
+  const { t, language, setLanguage } = useTranslation();
   const [name, setName] = useState('');
   const [sport, setSport] = useState('');
   const [age, setAge] = useState('');
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState('');
   const [streak, setStreak] = useState(0);
+  const [role, setRole] = useState<'ATHLETE' | 'COACH' | 'ADMIN'>('ATHLETE');
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [editSport, setEditSport] = useState('');
   const [editAge, setEditAge] = useState('');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
 
   const loadProfile = useCallback(async () => {
     const currentUser = auth.currentUser;
@@ -41,6 +48,9 @@ export default function ProfileScreen() {
     setXp(user.xp || 0);
     setLevel(user.level || 'Rookie');
     setStreak(user.streak || 0);
+    if (user.role) {
+      setRole(user.role);
+    }
   }, []);
 
   useFocusEffect(
@@ -93,26 +103,37 @@ export default function ProfileScreen() {
     }
   };
 
+  const toggleLanguage = async (lang: SupportedLanguage) => {
+    await setLanguage(lang);
+    setShowLanguageModal(false);
+  };
+
   const initials = name
-    ? name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()
+    ? name
+        .split(' ')
+        .map((w: string) => w[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase()
     : 'AT';
 
   return (
-   <ScrollView
-  style={styles.container}
-  contentContainerStyle={{ paddingBottom: 120 }}
-  showsVerticalScrollIndicator={false}
->
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 120 }}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Header */}
       <View style={styles.headerRow}>
-        <Text style={styles.headerTitle}>Profile</Text>
+        <Text style={styles.headerTitle}>{t.profile.title}</Text>
 
         <TouchableOpacity
           style={styles.editBtn}
           onPress={isEditing ? handleSaveEdit : handleStartEdit}
+          activeOpacity={0.8}
         >
           <Text style={styles.editBtnText}>
-            {isEditing ? 'Save' : 'Edit'}
+            {isEditing ? t.profile.save : t.profile.edit}
           </Text>
         </TouchableOpacity>
       </View>
@@ -153,12 +174,12 @@ export default function ProfileScreen() {
             ) : (
               <>
                 <Text style={styles.userName}>{name || 'Athlete'}</Text>
-                <Text style={styles.userInfo}>{sport || 'Athlete'}</Text>
+                <Text style={styles.userInfo}>{sport || 'Clean Sport Candidate'}</Text>
                 <Text style={styles.userInfo}>Age: {age || 'N/A'}</Text>
 
                 <View style={styles.badge}>
                   <FontAwesome5 name="shield-alt" size={12} color="#fff" />
-                  <Text style={styles.badgeText}>Clean Athlete</Text>
+                  <Text style={styles.badgeText}>Clean Athlete • {role}</Text>
                 </View>
               </>
             )}
@@ -167,17 +188,17 @@ export default function ProfileScreen() {
 
         {/* Stats */}
         <View style={styles.statsRow}>
-          <StatCard icon="bolt" value={String(xp)} label="XP" />
-          <StatCard icon="fire" value={String(streak)} label="Streak" />
-          <StatCard icon="trophy" value={level} label="Level" />
+          <StatCard icon="bolt" value={String(xp)} label={t.common.xp} />
+          <StatCard icon="fire" value={String(streak)} label={t.common.streak} />
+          <StatCard icon="trophy" value={level} label={t.common.level} />
         </View>
       </View>
 
       {/* Quick Cards */}
       <View style={styles.quickRow}>
         <QuickCard
-          title="Achievements"
-          subtitle="View Badges"
+          title="Badges & Rewards"
+          subtitle="Achievements"
           icon="trophy"
           onPress={() => router.push('/achievements' as any)}
         />
@@ -189,28 +210,146 @@ export default function ProfileScreen() {
         />
       </View>
 
+      {/* Coach & AI Portals */}
+      <Text style={styles.sectionTitle}>Portals & Mentorship</Text>
+      <MenuRow
+        icon="chalkboard-teacher"
+        title="Coach & Mentor Portal"
+        value={role === 'COACH' || role === 'ADMIN' ? 'Active' : 'Open'}
+        onPress={() => router.push('/coach/dashboard' as any)}
+      />
+      <MenuRow
+        icon="robot"
+        title="AI Doping Coach"
+        value="24/7 Available"
+        onPress={() => router.push('/ai-coach' as any)}
+      />
+
       {/* Library */}
       <Text style={styles.sectionTitle}>Library</Text>
+      <MenuRow
+        icon="book"
+        title="Completed Modules"
+        value="All 16"
+        onPress={() => router.push('/learning-journey' as any)}
+      />
+      <MenuRow
+        icon="pills"
+        title="Saved Medicines"
+        value="Scanner DB"
+        onPress={() => router.push('/medicinescanner' as any)}
+      />
+      <MenuRow
+        icon="capsules"
+        title="Saved Supplements"
+        value="Roulette"
+        onPress={() => router.push('/roulette' as any)}
+      />
 
-      <MenuRow icon="book" title="Completed Modules" value="Progress" />
-      <MenuRow icon="pills" title="Saved Medicines" value="Scanner" />
-      <MenuRow icon="capsules" title="Saved Supplements" value="Roulette" />
+      {/* Account Settings */}
+      <Text style={styles.sectionTitle}>{t.profile.account}</Text>
 
-      {/* Account */}
-      <Text style={styles.sectionTitle}>Account</Text>
+      <View style={styles.row}>
+        <FontAwesome5
+          name="bell"
+          size={18}
+          color="#06B6D4"
+          style={{ marginRight: 12 }}
+        />
+        <Text style={styles.rowTitle}>{t.profile.notifications}</Text>
+        <Switch
+          value={notificationsEnabled}
+          onValueChange={(val) => {
+            setNotificationsEnabled(val);
+            Alert.alert(
+              'Notification Preferences',
+              val
+                ? 'Daily revision & mission reminders enabled.'
+                : 'Reminders disabled.'
+            );
+          }}
+          trackColor={{ false: '#E2E8F0', true: '#06B6D4' }}
+        />
+      </View>
 
-      <MenuRow title="Notifications" value="On" />
-      <MenuRow title="Language" value="English" />
-      <MenuRow title="Privacy & Data" />
+      <MenuRow
+        icon="language"
+        title={t.profile.language}
+        value={language === 'hi' ? 'हिंदी (Hindi)' : 'English'}
+        onPress={() => setShowLanguageModal(true)}
+      />
+
+      <MenuRow
+        icon="shield-alt"
+        title={t.profile.privacy}
+        value="WADA Compliant"
+        onPress={() => {
+          Alert.alert(
+            'AntiDopX Data & Privacy Policy',
+            'Your anti-doping educational progress, scan queries, and coach communications are strictly confidential and stored securely in accordance with WADA guidelines and local athlete data protection standards.\n\nNever share personal TUE certificates or medical records on unsecured channels.'
+          );
+        }}
+      />
+
+      {/* Language Picker Modal */}
+      <Modal
+        visible={showLanguageModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowLanguageModal(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowLanguageModal(false)}
+        >
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>{t.profile.selectLanguage} / भाषा चुनें</Text>
+            <TouchableOpacity
+              style={[
+                styles.langOption,
+                language === 'en' && styles.langOptionActive,
+              ]}
+              onPress={() => toggleLanguage('en')}
+            >
+              <Text style={styles.langEmoji}>🇬🇧</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.langName}>English</Text>
+                <Text style={styles.langSub}>Default international anti-doping terminology</Text>
+              </View>
+              {language === 'en' && (
+                <MaterialIcons name="check" size={22} color="#06B6D4" />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.langOption,
+                language === 'hi' && styles.langOptionActive,
+              ]}
+              onPress={() => toggleLanguage('hi')}
+            >
+              <Text style={styles.langEmoji}>🇮🇳</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.langName}>हिंदी (Hindi)</Text>
+                <Text style={styles.langSub}>खिलाड़ियों के लिए संपूर्ण डोपिंग-रोधी शिक्षा</Text>
+              </View>
+              {language === 'hi' && (
+                <MaterialIcons name="check" size={22} color="#06B6D4" />
+              )}
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
 
       {/* Logout */}
       <TouchableOpacity
         style={styles.logoutButton}
-        onPress={() => router.push('/athlete-register' as any)}
+        onPress={handleLogout}
         activeOpacity={0.8}
       >
         <MaterialIcons name="logout" size={22} color="white" />
-        <Text style={styles.logoutText}>Logout</Text>
+        <Text style={styles.logoutText}>{t.profile.logout}</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -247,7 +386,7 @@ function QuickCard({
 }) {
   return (
     <TouchableOpacity style={styles.quickCard} onPress={onPress}>
-      <FontAwesome5 name={icon} size={22} color='#06B6D4' />
+      <FontAwesome5 name={icon} size={22} color="#06B6D4" />
       <Text style={styles.quickTitle}>{title}</Text>
       <Text style={styles.quickSubtitle}>{subtitle}</Text>
     </TouchableOpacity>
@@ -258,13 +397,19 @@ function MenuRow({
   title,
   value,
   icon,
+  onPress,
 }: {
   title: string;
   value?: string;
   icon?: string;
+  onPress?: () => void;
 }) {
   return (
-    <TouchableOpacity style={styles.row}>
+    <TouchableOpacity
+      style={styles.row}
+      onPress={onPress}
+      activeOpacity={onPress ? 0.7 : 1}
+    >
       {icon && (
         <FontAwesome5
           name={icon}
@@ -279,13 +424,13 @@ function MenuRow({
     </TouchableOpacity>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: 20,
   },
-
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -293,25 +438,21 @@ const styles = StyleSheet.create({
     marginTop: 50,
     marginBottom: 20,
   },
-
   headerTitle: {
     color: '#000000',
     fontSize: 30,
     fontWeight: '700',
   },
-
   editBtn: {
     backgroundColor: '#06B6D4',
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 14,
   },
-
   editBtnText: {
     color: 'white',
     fontWeight: '700',
   },
-
   profileCard: {
     backgroundColor: '#06B6D4',
     borderRadius: 30,
@@ -322,13 +463,11 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 8,
   },
-
   profileRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
   },
-
   avatar: {
     width: 80,
     height: 80,
@@ -340,25 +479,21 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.3)',
     marginRight: 16,
   },
-
   avatarText: {
     color: '#FFFFFF',
     fontSize: 28,
     fontWeight: '700',
   },
-
   userName: {
     color: '#FFFFFF',
     fontSize: 24,
     fontWeight: '700',
   },
-
   userInfo: {
     color: '#EAFBFF',
     fontSize: 14,
     marginTop: 4,
   },
-
   editInput: {
     backgroundColor: 'rgba(255,255,255,0.2)',
     borderRadius: 10,
@@ -367,7 +502,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     padding: 10,
   },
-
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -378,20 +512,17 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     marginTop: 10,
   },
-
   badgeText: {
     color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '600',
     marginLeft: 6,
   },
-
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 12,
   },
-
   statCard: {
     flex: 1,
     backgroundColor: 'rgba(255,255,255,0.18)',
@@ -400,25 +531,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 4,
   },
-
   statValue: {
     color: '#FFFFFF',
     fontSize: 22,
     fontWeight: '700',
   },
-
   statLabel: {
     color: '#EAFBFF',
     fontSize: 12,
     marginTop: 4,
   },
-
   quickRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
   },
-
   quickCard: {
     width: '48%',
     backgroundColor: '#fff',
@@ -430,16 +557,14 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 4,
   },
-
   quickTitle: {
     color: '#000',
     fontWeight: '700',
     fontSize: 15,
     marginTop: 10,
   },
-
   quickSubtitle: {
-    color: '#000',
+    color: '#64748B',
     marginTop: 4,
     fontSize: 12,
   },
@@ -457,6 +582,8 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 18,
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
   },
   rowTitle: {
     flex: 1,
@@ -465,24 +592,77 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   rowValue: {
-    color: '#2a3038',
+    color: '#64748B',
     marginRight: 8,
+    fontSize: 14,
+    fontWeight: '500',
   },
   logoutButton: {
-  backgroundColor: '#EF4444',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  paddingVertical: 18,
-  borderRadius: 18,
-  marginTop: 30,
-  marginBottom: 8, // Extra space above bottom tab
-},
-
+    backgroundColor: '#EF4444',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 18,
+    borderRadius: 18,
+    marginTop: 30,
+    marginBottom: 8,
+  },
   logoutText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
     marginLeft: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 24,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#0F172A',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  langOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    marginBottom: 12,
+  },
+  langOptionActive: {
+    borderColor: '#06B6D4',
+    backgroundColor: '#F0FDFA',
+  },
+  langEmoji: {
+    fontSize: 28,
+    marginRight: 14,
+  },
+  langName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  langSub: {
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 2,
   },
 });

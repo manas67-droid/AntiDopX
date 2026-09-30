@@ -2,10 +2,10 @@ import {
   getErrorMessage,
   type ServiceResponse,
 } from '../types/serviceResponse';
-import type { UserProfile } from '../types/userProfile';
 import {
   defaultModuleProgress,
   type RecentActivityEntry,
+  type UserProfile,
 } from '../types/userProfile';
 import type { AchievementKey } from './achievementService';
 import { achievementLabels } from './achievementService';

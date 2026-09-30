@@ -1,6 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Alert,
   ScrollView,
@@ -19,25 +19,20 @@ import {
 } from "../src/firebase/scenarioService";
 
 export default function ScenarioScreen() {
-  const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [scenarios] = useState<Scenario[]>(() => {
+    const result = getScenarios();
+    return result.success ? result.data : [];
+  });
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   const [xpEarnedMessage, setXpEarnedMessage] = useState<string>("");
 
-  // Load scenarios on mount
-  useEffect(() => {
-    const result = getScenarios();
-    if (result.success && result.data) {
-      setScenarios(result.data);
-    }
-  }, []);
-
-  // Reset selection when scenario changes
-  useEffect(() => {
+  const changeScenario = (nextIndex: number) => {
+    setCurrentIndex(nextIndex);
     setSelected(null);
     setXpEarnedMessage("");
-  }, [currentIndex]);
+  };
 
   const current =
     scenarios.length > 0 && currentIndex < scenarios.length
@@ -168,7 +163,7 @@ export default function ScenarioScreen() {
                 {currentIndex > 0 && (
                   <TouchableOpacity
                     style={styles.navButton}
-                    onPress={() => setCurrentIndex((i) => i - 1)}
+                    onPress={() => changeScenario(currentIndex - 1)}
                   >
                     <Text style={styles.navButtonText}>← Previous</Text>
                   </TouchableOpacity>
@@ -177,7 +172,7 @@ export default function ScenarioScreen() {
                 {currentIndex < scenarios.length - 1 && (
                   <TouchableOpacity
                     style={styles.navButtonPrimary}
-                    onPress={() => setCurrentIndex((i) => i + 1)}
+                    onPress={() => changeScenario(currentIndex + 1)}
                   >
                     <Text style={styles.navButtonPrimaryText}>
                       Next Scenario →

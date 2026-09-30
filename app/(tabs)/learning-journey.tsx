@@ -134,7 +134,7 @@ export default function LearningJourneyScreen() {
             <TouchableOpacity
               key={entry.module.slug}
               style={styles.moduleCard}
-              onPress={() => router.push(entry.module.route)}
+              onPress={() => router.push(entry.module.route as any)}
             >
               {content}
             </TouchableOpacity>

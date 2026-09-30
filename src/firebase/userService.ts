@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { doc, getDoc } from 'firebase/firestore';
 
 import {
@@ -11,6 +12,7 @@ import {
 } from '../types/userProfile';
 import { defaultAchievements } from './achievementService';
 import { db } from './config';
+import { LOCAL_PROFILE_STORAGE_KEY } from './firestoreService';
 import { getTotalMonthlyXP, normalizeMonthlyXP } from './xpUtils';
 
 const parseUserProfile = (
@@ -59,17 +61,41 @@ export const getUserProfile = async (
     const docSnap = await getDoc(docRef);
 
     if (!docSnap.exists()) {
+      // Try local storage fallback
+      const cached = await AsyncStorage.getItem(LOCAL_PROFILE_STORAGE_KEY);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (parsed.uid === uid || !parsed.uid) {
+            return { success: true, data: parseUserProfile(uid, parsed) };
+          }
+        } catch {}
+      }
+
       return {
         success: false,
         error: 'User profile not found',
       };
     }
 
+    const profile = parseUserProfile(uid, docSnap.data());
+    // Keep local cache fresh
+    void AsyncStorage.setItem(LOCAL_PROFILE_STORAGE_KEY, JSON.stringify(profile));
+
     return {
       success: true,
-      data: parseUserProfile(uid, docSnap.data()),
+      data: profile,
     };
   } catch (error: unknown) {
+    // If Firestore fails (permission denied or network), attempt to serve from local storage
+    try {
+      const cached = await AsyncStorage.getItem(LOCAL_PROFILE_STORAGE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        return { success: true, data: parseUserProfile(uid, parsed) };
+      }
+    } catch {}
+
     return {
       success: false,
       error: getErrorMessage(error),

@@ -1,5 +1,6 @@
 import type { Achievements } from '../firebase/achievementService';
-import type { ModuleKey } from '../learning/modules';
+import type { ModuleKey } from './learning';
+import type { UserRole } from './roles';
 
 export type ModuleProgress = Record<ModuleKey, boolean>;
 
@@ -22,7 +23,7 @@ export type DailyMissionProgress = {
 };
 
 export type RecentActivityEntry = {
-  type: 'module' | 'quiz' | 'scenario' | 'scan' | 'challenge';
+  type: 'module' | 'quiz' | 'scenario' | 'scan' | 'challenge' | 'chat';
   description: string;
   timestamp: string;
 };
@@ -40,6 +41,10 @@ export type UserProfile = {
   email: string;
   age: number;
   sport: string;
+  role?: UserRole;
+  assignedCoachId?: string;
+  assignedCoachName?: string;
+  language?: 'en' | 'hi';
   xp: number;
   level: string;
   streak: number;
@@ -63,6 +68,17 @@ export const defaultModuleProgress = (): ModuleProgress => ({
   testingProcedures: false,
   tue: false,
   supplements: false,
+  prohibitedSubstances: false,
+  prohibitedMethods: false,
+  dopingControlProcess: false,
+  athleteRightsResponsibilities: false,
+  medicationAwareness: false,
+  nutritionPerformance: false,
+  dopingRisks: false,
+  ethicsInSport: false,
+  cleanSport: false,
+  whereToGetHelp: false,
+  youngAthleteAwareness: false,
 });
 
 export const createEmptyMonthlyXP = (): MonthlyXP => ({

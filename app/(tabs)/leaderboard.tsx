@@ -15,9 +15,6 @@ import {
   type LeaderboardEntry,
 } from "../../src/firebase/leaderboardService";
 
-const TOP_3_COLORS = ["#F59E0B", "#94A3B8", "#CD7F32"];
-const TOP_3_EMOJIS = ["🥇", "🥈", "🥉"];
-
 export default function LeaderboardScreen() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,8 +44,6 @@ export default function LeaderboardScreen() {
   );
 
   const top3 = entries.slice(0, 3);
-  const rest = entries.slice(3);
-
   return (
     <ScrollView
       style={styles.container}

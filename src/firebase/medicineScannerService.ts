@@ -10,8 +10,16 @@ import {
   type ServiceResponse,
 } from '../types/serviceResponse';
 import type { SavedMedicine } from '../types/userProfile';
-import { addXP } from './xpservices';
 import { db } from './config';
+import {
+  lookupMedicineByBarcode,
+  searchMedicinesByNameOrIngredient,
+} from '../services/medicineReferenceService';
+import type {
+  AntiDopingStatus,
+  MedicineScanResult as TrustedScanResult,
+} from '../types/medicine';
+import { calculateLevel } from './xpUtils';
 
 export type MedicineStatus =
   | 'Allowed'
@@ -23,6 +31,10 @@ export type MedicineLookupResult = {
   drugName: string;
   status: MedicineStatus;
   guidance: string;
+  activeIngredients?: string[];
+  disclaimer?: string;
+  source?: string;
+  lastVerified?: string;
 };
 
 export type MedicineScanResult = {
@@ -32,76 +44,27 @@ export type MedicineScanResult = {
   cached?: boolean;
 };
 
-const medicineDatabase: MedicineLookupResult[] = [
-  {
-    drugName: 'Paracetamol',
-    status: 'Allowed',
-    guidance:
-      'Generally allowed, but always check combination products for other active ingredients.',
-  },
-  {
-    drugName: 'Ibuprofen',
-    status: 'Allowed',
-    guidance:
-      'Generally allowed, but use only as medically appropriate.',
-  },
-  {
-    drugName: 'Pseudoephedrine',
-    status: 'Use With Caution',
-    guidance:
-      'Can be restricted above urinary thresholds. Check dose, timing, and current anti-doping rules.',
-  },
-  {
-    drugName: 'Salbutamol',
-    status: 'Use With Caution',
-    guidance:
-      'Permitted only within specific inhaled dose limits unless a valid TUE applies.',
-  },
-  {
-    drugName: 'Stanozolol',
-    status: 'Prohibited',
-    guidance:
-      'Prohibited in sport. Do not use without qualified medical and anti-doping guidance.',
-  },
-  {
-    drugName: 'Clenbuterol',
-    status: 'Prohibited',
-    guidance:
-      'Prohibited in sport. Seek qualified support if this appears on a medicine label.',
-  },
-];
-
-const unknownLookup: MedicineLookupResult = {
-  drugName: 'Unknown',
-  status: 'Unknown',
-  guidance:
-    'No match found in the database. Verify the active ingredient with an official anti-doping source.',
+const mapStatusToLegacy = (status: AntiDopingStatus): MedicineStatus => {
+  switch (status) {
+    case 'ALLOWED':
+      return 'Allowed';
+    case 'USE_WITH_CAUTION':
+      return 'Use With Caution';
+    case 'PROHIBITED':
+      return 'Prohibited';
+    default:
+      return 'Unknown';
+  }
 };
 
-const scanCache = new Map<string, MedicineScanResult>();
-
-const normalize = (value: string) => value.trim().toLowerCase();
-
-export const detectDrugNameFromText = async (
-  ocrText: string
-): Promise<ServiceResponse<string | null>> => {
+export const scanMedicineBarcode = async (
+  barcode: string
+): Promise<ServiceResponse<TrustedScanResult>> => {
   try {
-    const normalizedText = normalize(ocrText);
-
-    if (!normalizedText) {
-      return {
-        success: false,
-        error: 'No medicine text provided',
-      };
-    }
-
-    const match = medicineDatabase.find((medicine) =>
-      normalizedText.includes(normalize(medicine.drugName))
-    );
-
+    const result = lookupMedicineByBarcode(barcode);
     return {
       success: true,
-      data: match?.drugName || null,
+      data: result,
     };
   } catch (error: unknown) {
     return {
@@ -111,27 +74,14 @@ export const detectDrugNameFromText = async (
   }
 };
 
-export const lookupProhibitedStatus = async (
-  drugName: string | null
-): Promise<ServiceResponse<MedicineLookupResult>> => {
+export const searchMedicines = async (
+  query: string
+): Promise<ServiceResponse<TrustedScanResult[]>> => {
   try {
-    if (!drugName) {
-      return {
-        success: true,
-        data: unknownLookup,
-      };
-    }
-
-    const match = medicineDatabase.find(
-      (medicine) => normalize(medicine.drugName) === normalize(drugName)
-    );
-
+    const results = searchMedicinesByNameOrIngredient(query);
     return {
       success: true,
-      data: match || {
-        ...unknownLookup,
-        drugName,
-      },
+      data: results,
     };
   } catch (error: unknown) {
     return {
@@ -141,46 +91,45 @@ export const lookupProhibitedStatus = async (
   }
 };
 
+// Backward-compatible method
 export const scanMedicineText = async (
   ocrText: string
 ): Promise<ServiceResponse<MedicineScanResult>> => {
   try {
-    const cacheKey = normalize(ocrText);
-    const cachedResult = scanCache.get(cacheKey);
+    const matches = searchMedicinesByNameOrIngredient(ocrText);
 
-    if (cachedResult) {
+    if (matches.length > 0) {
+      const best = matches[0];
       return {
         success: true,
         data: {
-          ...cachedResult,
-          cached: true,
+          rawText: ocrText,
+          detectedDrugName: best.title,
+          lookup: {
+            drugName: best.title,
+            status: mapStatusToLegacy(best.status),
+            guidance: best.guidance,
+            activeIngredients: best.activeIngredients,
+            disclaimer: best.disclaimer,
+            source: best.source,
+            lastVerified: best.lastVerified,
+          },
         },
       };
     }
 
-    const detectionResult = await detectDrugNameFromText(ocrText);
-
-    if (!detectionResult.success) {
-      return detectionResult;
-    }
-
-    const lookupResult = await lookupProhibitedStatus(detectionResult.data);
-
-    if (!lookupResult.success) {
-      return lookupResult;
-    }
-
-    const result: MedicineScanResult = {
-      rawText: ocrText,
-      detectedDrugName: detectionResult.data,
-      lookup: lookupResult.data,
-    };
-
-    scanCache.set(cacheKey, result);
-
     return {
       success: true,
-      data: result,
+      data: {
+        rawText: ocrText,
+        detectedDrugName: null,
+        lookup: {
+          drugName: ocrText.trim(),
+          status: 'Unknown',
+          guidance:
+            'No verified match was found in the AntiDopX reference database. Confirm every active ingredient with Global DRO or your NADO.',
+        },
+      },
     };
   } catch (error: unknown) {
     return {
@@ -207,9 +156,9 @@ export const saveMedicineScan = async (
 
     const savedMedicines =
       (userSnap.data().savedMedicines as SavedMedicine[]) || [];
-    const normalizedName = normalize(lookup.drugName);
+    const normalizedName = lookup.drugName.trim().toLowerCase();
     const isDuplicate = savedMedicines.some(
-      (medicine) => normalize(medicine.drugName) === normalizedName
+      (medicine) => medicine.drugName.trim().toLowerCase() === normalizedName
     );
 
     if (isDuplicate) {
@@ -229,23 +178,23 @@ export const saveMedicineScan = async (
       scannedAt: new Date().toISOString(),
     };
 
+    let xpAwarded = 0;
+    const currentXP = Number(userSnap.data().xp || 0);
+    const newXP = currentXP + 15;
+    const newLevel = calculateLevel(newXP);
+
     await updateDoc(userRef, {
       savedMedicines: arrayUnion(savedEntry),
+      xp: newXP,
+      level: newLevel,
       recentActivity: arrayUnion({
         type: 'scan',
-        description: `Scanned ${lookup.drugName} (${lookup.status})`,
+        description: `Verified ${lookup.drugName} (${lookup.status})`,
         timestamp: new Date().toISOString(),
       }),
     });
 
-    let xpAwarded = 0;
-
-    if (lookup.status !== 'Unknown') {
-      const xpResult = await addXP(uid, 10);
-      if (xpResult.success) {
-        xpAwarded = 10;
-      }
-    }
+    xpAwarded = 15;
 
     return {
       success: true,
