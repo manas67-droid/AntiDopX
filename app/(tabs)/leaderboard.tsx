@@ -78,7 +78,7 @@ export default function LeaderboardScreen() {
         <Text style={styles.emptyText}>No leaderboard entries yet.</Text>
       ) : null}
 
-      {/* TOP 3 PODIUM */}
+  
       {top3.length === 3 && (
         <View style={styles.podiumContainer}>
           {/* SECOND */}
@@ -97,8 +97,6 @@ export default function LeaderboardScreen() {
               <Text style={styles.blockNumber}>2</Text>
             </View>
           </View>
-
-          {/* FIRST */}
           <View style={styles.centerPodium}>
             <Text style={styles.crown}>👑</Text>
 
@@ -116,8 +114,6 @@ export default function LeaderboardScreen() {
               <Text style={styles.blockNumber}>1</Text>
             </View>
           </View>
-
-          {/* THIRD */}
           <View style={styles.sidePodium}>
             <View style={styles.avatarBronze}>
               <Text style={styles.avatarLabel}>{top3[2]?.name?.charAt(0)}</Text>
@@ -135,8 +131,6 @@ export default function LeaderboardScreen() {
           </View>
         </View>
       )}
-
-      {/* REST OF LEADERBOARD */}
       {entries.map((entry, index) => (
         <View
           key={`${entry.name}-${entry.sport}-${index}`}

@@ -16,7 +16,6 @@ export default function ChallengesScreen() {
         Fast games. Real knowledge.
       </Text>
 
-      {/* Featured Card */}
       <TouchableOpacity
         style={styles.featuredCard}
         onPress={() => router.push('/scenario'as any)}
@@ -39,8 +38,7 @@ export default function ChallengesScreen() {
         </Text>
       </TouchableOpacity> 
 
-      {/* Games Grid */}
-
+    
       <View style={styles.grid}>
         <GameCard
   title="Supplement Roulette"
@@ -73,7 +71,6 @@ export default function ChallengesScreen() {
 />
 </View>
 
-      {/* Tournament Section */}
 
       <Text style={styles.sectionTitle}>
         🏆 Live Tournaments
