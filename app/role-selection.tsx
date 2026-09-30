@@ -29,12 +29,12 @@ export default function RoleSelectionScreen() {
       <TouchableOpacity
         style={styles.card}
         onPress={() => {
-          router.push('/coach/dashboard' as any);
+          router.push('/parent/guide' as any);
         }}
       >
         <Text style={styles.emoji}>👨‍👩‍👧</Text>
         <Text style={styles.cardTitle}>Parent / Guardian</Text>
-        <Text style={styles.cardDescription}>Support young athletes with safe medication guidance and awareness.</Text>
+        <Text style={styles.cardDescription}>Support young athletes with safe medication guidance, TUE protocols, and testing rights.</Text>
       </TouchableOpacity>
     </View>
   );

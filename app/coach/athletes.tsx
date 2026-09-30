@@ -4,13 +4,13 @@ import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppBadge } from '../../src/components/common/AppBadge';
 import { ProgressBar } from '../../src/components/common/ProgressBar';

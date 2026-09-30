@@ -26,6 +26,7 @@ export default function RootLayout() {
           <Stack.Screen name="coach/athletes" />
           <Stack.Screen name="coach/athlete-detail" />
           <Stack.Screen name="chat/[conversationId]" />
+          <Stack.Screen name="parent/guide" />
         </Stack>
 
         <StatusBar style="auto" />

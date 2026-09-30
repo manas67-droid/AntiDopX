@@ -34,10 +34,15 @@ export default function AthleteRegisterScreen() {
   const [password, setPassword] = useState('');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  const webClientId = getGoogleWebClientId();
+  const configuredClientId = getGoogleWebClientId();
+  const fallbackClientId = 'antidopx-client.apps.googleusercontent.com';
+  const effectiveClientId = configuredClientId || fallbackClientId;
+
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-    clientId: webClientId || undefined,
-    webClientId: webClientId || undefined,
+    clientId: effectiveClientId,
+    webClientId: effectiveClientId,
+    androidClientId: effectiveClientId,
+    iosClientId: effectiveClientId,
   });
 
   useEffect(() => {
