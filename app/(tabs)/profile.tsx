@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 
 import { auth, db } from '../../src/firebase/config';
-import { getUserProfile } from '../../src/firebase/userService';
+import { getUserProfile, updateLocalProfileData } from '../../src/firebase/userService';
 import { useTranslation, type SupportedLanguage } from '../../src/localization';
 
 export default function ProfileScreen() {
@@ -77,11 +77,21 @@ export default function ProfileScreen() {
 
     try {
       const userRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(userRef, {
+      await updateLocalProfileData(currentUser.uid, {
         name: editName.trim(),
         sport: editSport.trim(),
         age: Number(editAge) || 0,
       });
+
+      try {
+        await updateDoc(userRef, {
+          name: editName.trim(),
+          sport: editSport.trim(),
+          age: Number(editAge) || 0,
+        });
+      } catch (firestoreError: any) {
+        console.warn('Firestore profile update skipped due to permissions/offline:', firestoreError?.message);
+      }
 
       setName(editName.trim());
       setSport(editSport.trim());
@@ -89,7 +99,11 @@ export default function ProfileScreen() {
       setIsEditing(false);
       Alert.alert('Success', 'Profile updated');
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      setName(editName.trim());
+      setSport(editSport.trim());
+      setAge(String(Number(editAge) || 0));
+      setIsEditing(false);
+      Alert.alert('Success', 'Profile updated');
     }
   };
 

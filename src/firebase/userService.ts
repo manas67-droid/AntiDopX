@@ -105,3 +105,50 @@ export const getUserProfile = async (
 
 export const getUserMonthlyXPTotal = (profile: UserProfile): number =>
   getTotalMonthlyXP(profile.monthlyXP || createEmptyMonthlyXP());
+
+export const getLocalProfile = async (uid?: string): Promise<UserProfile | null> => {
+  try {
+    const cached = await AsyncStorage.getItem(LOCAL_PROFILE_STORAGE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      return parseUserProfile(uid || parsed.uid || 'current-athlete', parsed);
+    }
+  } catch {}
+  return null;
+};
+
+export const saveLocalProfile = async (profile: UserProfile): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(LOCAL_PROFILE_STORAGE_KEY, JSON.stringify(profile));
+  } catch {}
+};
+
+export const updateLocalProfileData = async (
+  uid: string,
+  partial: Partial<UserProfile>
+): Promise<UserProfile> => {
+  const existing = (await getLocalProfile(uid)) || parseUserProfile(uid, {});
+  const updated: UserProfile = {
+    ...existing,
+    ...partial,
+    progress: {
+      ...existing.progress,
+      ...(partial.progress || {}),
+    },
+    completedModules: {
+      ...existing.completedModules,
+      ...(partial.completedModules || {}),
+    },
+    quizScores: {
+      ...existing.quizScores,
+      ...(partial.quizScores || {}),
+    },
+    achievements: {
+      ...existing.achievements,
+      ...(partial.achievements || {}),
+    },
+    recentActivity: partial.recentActivity || existing.recentActivity,
+  };
+  await saveLocalProfile(updated);
+  return updated;
+};

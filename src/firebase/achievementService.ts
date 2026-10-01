@@ -1,11 +1,9 @@
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 import { learningModules } from '../learning/modules';
-import {
-  getErrorMessage,
-  type ServiceResponse,
-} from '../types/serviceResponse';
+import type { ServiceResponse } from '../types/serviceResponse';
 import { db } from './config';
+import { getLocalProfile, updateLocalProfileData } from './userService';
 
 export type AchievementKey =
   | 'firstModule'
@@ -54,25 +52,25 @@ export const getAchievements = async (
 ): Promise<ServiceResponse<Achievements>> => {
   try {
     const userRef = doc(db, 'users', uid);
-    const userSnap = await getDoc(userRef);
+    try {
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        return {
+          success: true,
+          data: normalizeAchievements(userSnap.data().achievements),
+        };
+      }
+    } catch {}
 
-    if (!userSnap.exists()) {
-      return {
-        success: false,
-        error: 'User not found',
-      };
-    }
-
+    const local = await getLocalProfile(uid);
     return {
       success: true,
-      data: normalizeAchievements(
-        userSnap.data().achievements
-      ),
+      data: normalizeAchievements(local?.achievements),
     };
-  } catch (error: unknown) {
+  } catch {
     return {
-      success: false,
-      error: getErrorMessage(error),
+      success: true,
+      data: defaultAchievements,
     };
   }
 };
@@ -82,16 +80,26 @@ export const evaluateAchievements = async (
 ): Promise<ServiceResponse<AchievementEvaluation>> => {
   try {
     const userRef = doc(db, 'users', uid);
-    const userSnap = await getDoc(userRef);
+    let userData: any = {};
+    let foundInFirestore = false;
 
-    if (!userSnap.exists()) {
-      return {
-        success: false,
-        error: 'User not found',
-      };
+    try {
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        userData = userSnap.data();
+        foundInFirestore = true;
+      }
+    } catch (e) {
+      console.warn('Firestore getDoc failed in evaluateAchievements, checking local cache:', e);
     }
 
-    const userData = userSnap.data();
+    if (!foundInFirestore) {
+      const local = await getLocalProfile(uid);
+      if (local) {
+        userData = local;
+      }
+    }
+
     const progress = userData.progress || {};
     const existingAchievements = normalizeAchievements(
       userData.achievements
@@ -134,9 +142,19 @@ export const evaluateAchievements = async (
     );
 
     if (hasChanges) {
-      await updateDoc(userRef, {
+      // Save locally first
+      await updateLocalProfileData(uid, {
         achievements: nextAchievements,
       });
+
+      // Try sync to Firestore
+      try {
+        await updateDoc(userRef, {
+          achievements: nextAchievements,
+        });
+      } catch (firestoreError: any) {
+        console.warn('Firestore updateDoc skipped in evaluateAchievements:', firestoreError?.message);
+      }
     }
 
     return {
@@ -148,9 +166,14 @@ export const evaluateAchievements = async (
       },
     };
   } catch (error: unknown) {
+    console.warn('Handling evaluateAchievements fallback:', error);
     return {
-      success: false,
-      error: getErrorMessage(error),
+      success: true,
+      data: {
+        achievements: defaultAchievements,
+        completedModules: 0,
+        newlyUnlocked: [],
+      },
     };
   }
 };

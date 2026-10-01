@@ -12,6 +12,7 @@ import { auth, db } from './config';
 import { updateDailyStreak } from './streakService';
 import { defaultModuleProgress, createEmptyMonthlyXP } from '../types/userProfile';
 import { defaultAchievements } from './achievementService';
+import { saveLocalProfile } from './userService';
 
 export function getGoogleWebClientId(): string | null {
   const extraId = Constants.expoConfig?.extra?.webClientId;
@@ -29,38 +30,45 @@ export function isGoogleAuthConfigured(): boolean {
 }
 
 async function ensureProfile(user: User) {
+  const profileData = {
+    uid: user.uid,
+    name: user.displayName || 'Google Athlete',
+    email: user.email || '',
+    sport: 'Clean Sport Athlete',
+    age: 18,
+    role: 'ATHLETE' as const,
+    xp: 100,
+    level: 'Competitor',
+    streak: 1,
+    createdAt: new Date().toISOString(),
+    progress: defaultModuleProgress(),
+    completedModules: defaultModuleProgress(),
+    quizScores: {},
+    quizArenaScores: [],
+    achievements: {
+      ...defaultAchievements,
+      firstModule: true,
+    },
+    monthlyXP: createEmptyMonthlyXP(),
+    savedMedicines: [],
+    savedSupplements: [],
+  };
+
+  try {
+    await saveLocalProfile(profileData as any);
+  } catch {}
+
   try {
     const userRef = doc(db, 'users', user.uid);
     const snap = await getDoc(userRef);
 
     if (!snap.exists()) {
-      await setDoc(userRef, {
-        name: user.displayName || 'Google Athlete',
-        email: user.email || '',
-        sport: 'Clean Sport Athlete',
-        age: 18,
-        role: 'ATHLETE',
-        xp: 100,
-        level: 'Competitor',
-        streak: 1,
-        createdAt: new Date().toISOString(),
-        progress: defaultModuleProgress(),
-        completedModules: {},
-        quizScores: {},
-        quizArenaScores: [],
-        achievements: {
-          ...defaultAchievements,
-          firstModule: true,
-        },
-        monthlyXP: createEmptyMonthlyXP(),
-        savedMedicines: [],
-        savedSupplements: [],
-      });
+      await setDoc(userRef, profileData);
     }
 
     await updateDailyStreak(user.uid);
   } catch (err) {
-    console.warn('Failed to ensure user profile:', err);
+    console.warn('Failed to ensure remote user profile:', err);
   }
 }
 

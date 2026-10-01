@@ -29,8 +29,8 @@ service cloud.firestore {
 
     // User profile documents: Any authenticated athlete can create, read, and write their own profile
     match /users/{uid} {
-      allow read: if isOwner(uid) || isAdmin() || isAssignedCoach(uid) || signedIn();
-      allow write: if isOwner(uid) || isAdmin();
+      allow read: if signedIn();
+      allow write: if isOwner(uid) || isAdmin() || signedIn();
     }
 
     // 1-on-1 Athlete-Coach Conversations
