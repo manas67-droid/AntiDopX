@@ -100,20 +100,20 @@ export const askAICoach = async (
   if (matchedMedicine) {
     references.push(matchedMedicine.source);
     if (isHindi) {
-      reply = `🔍 **${matchedMedicine.brandName} (${matchedMedicine.genericName})** की स्थिति:\n\n` +
+      reply = `**${matchedMedicine.brandName} (${matchedMedicine.genericName})** की स्थिति:\n\n` +
         `• **एंटी-डोपिंग स्थिति:** ${matchedMedicine.overallStatus}\n` +
         `• **सक्रिय घटक:** ${matchedMedicine.activeIngredients.map((i) => `${i.name} [${i.wadaStatus}]`).join(', ')}\n` +
         `• **मार्गदर्शन:** ${matchedMedicine.officialGuidance}\n\n` +
-        `⚠️ **महत्वपूर्ण चेतावनी:** ${matchedMedicine.medicalDisclaimer}\n` +
+        `**महत्वपूर्ण चेतावनी:** ${matchedMedicine.medicalDisclaimer}\n` +
         `प्रतिस्पर्धा से पहले हमेशा अपने खेल चिकित्सक या NADA से पुष्टि करें।`;
       followUps.push('TUE क्या है और इसके लिए कैसे आवेदन करें?');
       followUps.push('सप्लीमेंट्स में संदूषण (Contamination) का क्या जोखिम है?');
     } else {
-      reply = `🔍 **${matchedMedicine.brandName} (${matchedMedicine.genericName})** Status Assessment:\n\n` +
+      reply = `**${matchedMedicine.brandName} (${matchedMedicine.genericName})** Status Assessment:\n\n` +
         `• **Anti-Doping Status:** ${matchedMedicine.overallStatus}\n` +
         `• **Active Ingredients:** ${matchedMedicine.activeIngredients.map((i) => `${i.name} [${i.wadaStatus}]`).join(', ')}\n` +
         `• **Official Guidance:** ${matchedMedicine.officialGuidance}\n\n` +
-        `⚠️ **Safety Notice:** ${matchedMedicine.medicalDisclaimer}\n` +
+        `**Safety Notice:** ${matchedMedicine.medicalDisclaimer}\n` +
         `Always verify prescription treatments with your certified sports doctor or official NADO portal prior to competition.`;
       followUps.push('What is a TUE and when do I need one?');
       followUps.push('How do I check combination cold medicines?');
@@ -122,9 +122,9 @@ export const askAICoach = async (
   } else if (matchedTopic) {
     references.push(`AntiDopX Learning Module: ${matchedTopic.topic}`);
     if (isHindi) {
-      reply = `📘 **${matchedTopic.topic} पर आधिकारिक जानकारी:**\n\n` +
+      reply = `**${matchedTopic.topic} पर आधिकारिक जानकारी:**\n\n` +
         `${matchedTopic.summary}\n\n` +
-        `📌 **मुख्य नियम व सुझाव:**\n${matchedTopic.criteria}\n\n` +
+        `**मुख्य नियम व सुझाव:**\n${matchedTopic.criteria}\n\n` +
         (request.athleteContext?.sport
           ? `आपके खेल (${request.athleteContext.sport}) में इन नियमों का पालन करना आपके करियर की सुरक्षा के लिए अत्यंत आवश्यक है।`
           : '');
@@ -132,9 +132,9 @@ export const askAICoach = async (
       followUps.push('सप्लीमेंट्स क्यों जोखिम भरे होते हैं?');
       followUps.push('क्विज में मेरा ज्ञान परखें');
     } else {
-      reply = `📘 **Anti-Doping Guidance on ${matchedTopic.topic}:**\n\n` +
+      reply = `**Anti-Doping Guidance on ${matchedTopic.topic}:**\n\n` +
         `${matchedTopic.summary}\n\n` +
-        `📌 **Key Protocol & Rules:**\n${matchedTopic.criteria}\n\n` +
+        `**Key Protocol & Rules:**\n${matchedTopic.criteria}\n\n` +
         (request.athleteContext?.sport
           ? `In your sport of ${request.athleteContext.sport}, adhering to these standards ensures your medals and athletic reputation remain protected.`
           : '');
@@ -145,7 +145,7 @@ export const askAICoach = async (
   } else if (query.includes('mistake') || query.includes('study next') || query.includes('weak')) {
     const weakList = request.athleteContext?.weakTopics || [];
     if (isHindi) {
-      reply = `🎯 **आपकी व्यक्तिगत अध्ययन सिफारिश:**\n\n` +
+      reply = `**आपकी व्यक्तिगत अध्ययन सिफारिश:**\n\n` +
         `आपकी प्रोफ़ाइल के अनुसार, ${weakList.length > 0 ? `कमजोर विषय (${weakList.join(', ')})` : 'नए मॉड्यूल्स'} पर ध्यान केंद्रित करने की सलाह दी जाती है।\n\n` +
         `1. 'Therapeutic Use Exemptions (TUE)' मॉड्यूल पढ़ें\n` +
         `2. 5 प्रश्नों का क्विज एरेना अभ्यास पूरा करें\n` +
@@ -153,7 +153,7 @@ export const askAICoach = async (
       followUps.push('TUE क्या होता है?');
       followUps.push('क्विज एरेना शुरू करें');
     } else {
-      reply = `🎯 **Personalized Study Recommendation:**\n\n` +
+      reply = `**Personalized Study Recommendation:**\n\n` +
         `Based on your athlete profile (Level: ${request.athleteContext?.level || 'Athlete'}, ${request.athleteContext?.streak || 0} day streak):\n\n` +
         `1. **Focus Area:** ${weakList.length > 0 ? weakList.join(', ') : 'Anti-Doping Regulations & TUE'}\n` +
         `2. **Recommended Action:** Complete the **Therapeutic Use Exemptions (TUE)** and **Supplements & Contamination** lessons.\n` +

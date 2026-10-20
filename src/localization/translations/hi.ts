@@ -92,7 +92,7 @@ export const hi: TranslationKeys = {
     of: 'का',
     secondsLeft: 'सेकंड',
     complete: 'क्विज पूरा हुआ!',
-    greatJob: 'शाबाश एथलीट! 🚀',
+    greatJob: 'शाबाश एथलीट!',
     score: 'स्कोर',
     accuracy: 'सटीकता',
     xpEarned: 'अर्जित XP',

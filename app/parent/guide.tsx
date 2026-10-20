@@ -40,11 +40,13 @@ export default function ParentGuideScreen() {
         {/* Banner Card */}
         <View style={styles.bannerCard}>
           <View style={styles.bannerRow}>
-            <Text style={styles.bannerEmoji}>👨‍👩‍👧</Text>
+            <View style={styles.bannerIconBox}>
+              <MaterialCommunityIcons name="account-group" size={26} color="#0284C7" />
+            </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.bannerTitle}>Protecting Your Young Athlete</Text>
               <Text style={styles.bannerSubtitle}>
-                Most young athletes who test positive didn't intend to cheat — they consumed contaminated supplements or everyday cold medicines.
+                Most young athletes who test positive didn&apos;t intend to cheat — they consumed contaminated supplements or everyday cold medicines.
               </Text>
             </View>
           </View>
@@ -206,9 +208,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  bannerEmoji: {
-    fontSize: 44,
-    marginRight: 16,
+  bannerIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#E0F2FE',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
   },
   bannerTitle: {
     fontSize: 18,

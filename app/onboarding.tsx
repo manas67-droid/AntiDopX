@@ -1,10 +1,13 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function OnboardingScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>🏆</Text>
+      <View style={styles.logoBox}>
+        <MaterialCommunityIcons name="shield-check" size={54} color="#0284C7" />
+      </View>
 
       <Text style={styles.title}>
         Protect Your Career
@@ -42,9 +45,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
 
-  logo: {
-    fontSize: 90,
-    marginBottom: 30,
+  logoBox: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
   },
 
   title: {

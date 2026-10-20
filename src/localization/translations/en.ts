@@ -90,7 +90,7 @@ export const en = {
     of: 'of',
     secondsLeft: 's',
     complete: 'Quiz Complete!',
-    greatJob: 'Great job, athlete! 🚀',
+    greatJob: 'Great job, athlete!',
     score: 'Score',
     accuracy: 'Accuracy',
     xpEarned: 'XP Earned',

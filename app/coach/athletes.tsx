@@ -1,4 +1,4 @@
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
@@ -86,9 +86,18 @@ export default function CoachAthletesScreen() {
         />
 
         <View style={styles.metaRow}>
-          <Text style={styles.metaText}>⚡ {item.xp} XP</Text>
-          <Text style={styles.metaText}>🔥 {item.streak}d streak</Text>
-          <Text style={styles.metaText}>🎯 {item.averageQuizScore}% quiz avg</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Feather name="zap" size={12} color="#0284C7" style={{ marginRight: 3 }} />
+            <Text style={styles.metaText}>{item.xp} XP</Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <FontAwesome5 name="fire" size={11} color="#F97316" style={{ marginRight: 3 }} />
+            <Text style={styles.metaText}>{item.streak}d streak</Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Feather name="target" size={12} color="#10B981" style={{ marginRight: 3 }} />
+            <Text style={styles.metaText}>{item.averageQuizScore}% avg</Text>
+          </View>
         </View>
 
         {item.weakTopics.length > 0 ? (

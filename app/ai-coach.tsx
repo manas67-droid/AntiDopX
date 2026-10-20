@@ -1,7 +1,7 @@
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -22,10 +22,29 @@ import { useTranslation } from '../src/localization';
 import { askAICoach } from '../src/services/aiCoachService';
 import type { AIChatMessage, AthleteLearningContext } from '../src/types/ai';
 
+const createWelcomeMessage = (lang: string, t: any): AIChatMessage => {
+  const isHi = lang === 'hi';
+  return {
+    id: 'welcome-msg',
+    role: 'assistant',
+    content: isHi
+      ? 'नमस्ते एथलीट! मैं आपका **AntiDopX AI लर्निंग कोच** हूँ। मैं WADA और NADO नियमों पर आधारित प्रामाणिक जानकारी देता हूँ। आज आप किस विषय या दवा के बारे में जानना चाहते हैं?'
+      : 'Welcome! I am your **AntiDopX AI Learning Coach**. Grounded in official WADA and National Anti-Doping guidelines, I am here to help you train hard, compete clean, and make safe medication choices. What can I clarify for you today?',
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    suggestedFollowUps: [
+      t.ai.promptTUE,
+      t.ai.promptSupplements,
+      t.ai.promptTest,
+      t.ai.promptMistakes,
+    ],
+    groundingSources: ['WADA Prohibited List 2026', 'World Anti-Doping Code'],
+  };
+};
+
 export default function AICoachScreen() {
   const { t, language } = useTranslation();
   const params = useLocalSearchParams<{ initialQuestion?: string }>();
-  const [messages, setMessages] = useState<AIChatMessage[]>([]);
+  const [messages, setMessages] = useState<AIChatMessage[]>(() => [createWelcomeMessage(language, t)]);
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
   const [athleteContext, setAthleteContext] = useState<AthleteLearningContext | undefined>();
@@ -65,35 +84,6 @@ export default function AICoachScreen() {
 
     void loadContext();
   }, [language]);
-
-  // Initial welcome message
-  useEffect(() => {
-    const isHi = language === 'hi';
-    const welcomeMsg: AIChatMessage = {
-      id: 'welcome-msg',
-      role: 'assistant',
-      content: isHi
-        ? 'नमस्ते एथलीट! मैं आपका **AntiDopX AI लर्निंग कोच** हूँ। मैं WADA और NADO नियमों पर आधारित प्रामाणिक जानकारी देता हूँ। आज आप किस विषय या दवा के बारे में जानना चाहते हैं?'
-        : 'Welcome! I am your **AntiDopX AI Learning Coach**. Grounded in official WADA and National Anti-Doping guidelines, I am here to help you train hard, compete clean, and make safe medication choices. What can I clarify for you today?',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      suggestedFollowUps: [
-        t.ai.promptTUE,
-        t.ai.promptSupplements,
-        t.ai.promptTest,
-        t.ai.promptMistakes,
-      ],
-      groundingSources: ['WADA Prohibited List 2026', 'World Anti-Doping Code'],
-    };
-
-    setMessages([welcomeMsg]);
-
-    // If an initial question was passed from Scanner or Dashboard, trigger it immediately
-    if (params.initialQuestion) {
-      setTimeout(() => {
-        void handleSend(params.initialQuestion);
-      }, 400);
-    }
-  }, [language, params.initialQuestion]);
 
   const handleSend = async (textToSend?: string) => {
     const text = (textToSend !== undefined ? textToSend : inputText).trim();
@@ -135,7 +125,7 @@ export default function AICoachScreen() {
       };
 
       setMessages((prev) => [...prev, aiMessage]);
-    } catch (err: any) {
+    } catch {
       const errorMessage: AIChatMessage = {
         id: `err-${Date.now()}`,
         role: 'assistant',
@@ -150,6 +140,16 @@ export default function AICoachScreen() {
       setLoading(false);
     }
   };
+
+  // If an initial question was passed from Scanner or Dashboard, trigger it immediately
+  useEffect(() => {
+    if (params.initialQuestion) {
+      const timer = setTimeout(() => {
+        void handleSend(params.initialQuestion);
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [params.initialQuestion]);
 
   const renderMessageItem = ({ item }: { item: AIChatMessage }) => {
     const isUser = item.role === 'user';
@@ -169,7 +169,10 @@ export default function AICoachScreen() {
 
           {item.groundingSources && item.groundingSources.length > 0 ? (
             <View style={styles.sourcesBox}>
-              <Text style={styles.sourcesTitle}>📚 Reference:</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                <Feather name="book-open" size={13} color="#0284C7" style={{ marginRight: 6 }} />
+                <Text style={styles.sourcesTitle}>Official Reference:</Text>
+              </View>
               {item.groundingSources.map((src, i) => (
                 <Text key={i} style={styles.sourceItem}>
                   • {src}
@@ -180,7 +183,10 @@ export default function AICoachScreen() {
 
           {item.suggestedFollowUps && item.suggestedFollowUps.length > 0 ? (
             <View style={styles.followUpsBox}>
-              <Text style={styles.followUpLabel}>💡 Follow-up prompts:</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                <Feather name="help-circle" size={13} color="#F59E0B" style={{ marginRight: 6 }} />
+                <Text style={styles.followUpLabel}>Suggested Prompts:</Text>
+              </View>
               {item.suggestedFollowUps.map((prompt, i) => (
                 <TouchableOpacity
                   key={i}

@@ -1,4 +1,4 @@
-import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather, FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -83,15 +83,24 @@ export default function CoachAthleteDetailScreen() {
 
           <View style={styles.statsGrid}>
             <View style={styles.statBox}>
-              <Text style={styles.statValue}>⚡ {athlete.xp}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Feather name="zap" size={16} color="#0284C7" style={{ marginRight: 4 }} />
+                <Text style={styles.statValue}>{athlete.xp}</Text>
+              </View>
               <Text style={styles.statLabel}>Total XP</Text>
             </View>
             <View style={styles.statBox}>
-              <Text style={styles.statValue}>🔥 {athlete.streak}d</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <FontAwesome5 name="fire" size={15} color="#F97316" style={{ marginRight: 4 }} />
+                <Text style={styles.statValue}>{athlete.streak}d</Text>
+              </View>
               <Text style={styles.statLabel}>Active Streak</Text>
             </View>
             <View style={styles.statBox}>
-              <Text style={styles.statValue}>🎯 {athlete.averageQuizScore}%</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Feather name="target" size={16} color="#10B981" style={{ marginRight: 4 }} />
+                <Text style={styles.statValue}>{athlete.averageQuizScore}%</Text>
+              </View>
               <Text style={styles.statLabel}>Quiz Accuracy</Text>
             </View>
           </View>
@@ -132,14 +141,20 @@ export default function CoachAthleteDetailScreen() {
 
           {athlete.weakTopics.length > 0 ? (
             <View style={styles.weakWarningBox}>
-              <Text style={styles.weakWarningTitle}>⚠️ Needs Revision:</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                <Feather name="alert-triangle" size={14} color="#F59E0B" style={{ marginRight: 6 }} />
+                <Text style={styles.weakWarningTitle}>Needs Revision:</Text>
+              </View>
               <Text style={styles.weakWarningText}>
                 {athlete.weakTopics.join(', ')}
               </Text>
             </View>
           ) : (
             <View style={styles.cleanStatusBox}>
-              <Text style={styles.cleanStatusText}>✓ High anti-doping curriculum compliance</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Feather name="check-circle" size={14} color="#10B981" style={{ marginRight: 6 }} />
+                <Text style={styles.cleanStatusText}>High anti-doping curriculum compliance</Text>
+              </View>
             </View>
           )}
         </AppCard>
@@ -152,7 +167,7 @@ export default function CoachAthleteDetailScreen() {
           return (
             <View key={module.slug} style={styles.moduleItemRow}>
               <View style={[styles.moduleStatusIcon, isDone ? styles.doneIcon : styles.pendingIcon]}>
-                <Text style={styles.statusEmoji}>{isDone ? '✓' : '•'}</Text>
+                <Feather name={isDone ? 'check' : 'minus'} size={14} color={isDone ? '#10B981' : '#94A3B8'} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={[styles.moduleTitleText, isDone && styles.doneTitleText]}>

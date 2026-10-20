@@ -1,4 +1,4 @@
-import { Feather, FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
@@ -10,8 +10,6 @@ import {
   View,
 } from 'react-native';
 
-import { AppBadge } from '../../src/components/common/AppBadge';
-import { AppButton } from '../../src/components/common/AppButton';
 import { ProgressBar } from '../../src/components/common/ProgressBar';
 import { auth } from '../../src/firebase/config';
 import {
@@ -97,23 +95,29 @@ export default function DashboardScreen() {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 140 }}
     >
-      {/* Top Hero Card */}
+      {/* Top Hero Card - Compact greeting, profile access, level & XP */}
       <View style={styles.hero}>
         <View style={styles.userRow}>
-          <View style={styles.avatar}>
+          <TouchableOpacity
+            style={styles.avatar}
+            onPress={() => router.push('/(tabs)/profile' as any)}
+            accessibilityRole="button"
+            accessibilityLabel="Open profile"
+          >
             <Text style={styles.avatarText}>
               {dashboard.name?.charAt(0)?.toUpperCase() || 'A'}
             </Text>
-          </View>
+          </TouchableOpacity>
 
           <View style={{ flex: 1 }}>
-            <Text style={styles.welcome}>{t.dashboard.welcome} 👋</Text>
+            <Text style={styles.welcome}>{t.dashboard.welcome}</Text>
             <Text style={styles.userName}>{dashboard.name || t.dashboard.athlete}</Text>
             <Text style={styles.userSport}>{dashboard.sport || 'Athlete'}</Text>
           </View>
 
           <View style={styles.streakBadge}>
-            <Text style={styles.streakText}>🔥 {dashboard.streak}d</Text>
+            <FontAwesome5 name="fire" size={13} color="#F97316" style={{ marginRight: 4 }} />
+            <Text style={styles.streakText}>{dashboard.streak}d</Text>
           </View>
         </View>
 
@@ -143,13 +147,40 @@ export default function DashboardScreen() {
         </View>
       </View>
 
+      {/* Prioritized Action: Continue Learning / Recommended Module */}
+      <View style={styles.recommendedCard}>
+        <View style={styles.recommendedBadgeRow}>
+          <View style={styles.recommendedPill}>
+            <Feather name="compass" size={12} color="#0284C7" style={{ marginRight: 4 }} />
+            <Text style={styles.recommendedPillText}>RECOMMENDED LEARNING</Text>
+          </View>
+          <Text style={styles.recommendedProgress}>
+            {dashboard.completionPercent}% {t.common.completed}
+          </Text>
+        </View>
+        <Text style={styles.recommendedTitle}>{dashboard.recommendedModule.title}</Text>
+        <Text style={styles.recommendedDesc}>
+          Master key anti-doping protocols, athlete rights, and banned substances.
+        </Text>
+        <TouchableOpacity
+          style={styles.recommendedBtn}
+          onPress={() => router.push(dashboard.recommendedModule.route as any)}
+        >
+          <Text style={styles.recommendedBtnText}>{t.common.continue}</Text>
+          <Feather name="arrow-right" size={14} color="#FFFFFF" style={{ marginLeft: 6 }} />
+        </TouchableOpacity>
+      </View>
+
       {/* Today's Daily Mission */}
       <View style={styles.missionCard}>
         <View style={styles.missionHeader}>
           <Text style={styles.missionHeading}>{t.dashboard.dailyMission}</Text>
-          <Text style={styles.missionTime}>
-            ⏱ {t.dashboard.endsIn} {dashboard.dailyMission.endsInHours}{t.dashboard.hours}
-          </Text>
+          <View style={styles.missionTimeRow}>
+            <Feather name="clock" size={12} color="#64748B" style={{ marginRight: 4 }} />
+            <Text style={styles.missionTime}>
+              {t.dashboard.endsIn} {dashboard.dailyMission.endsInHours}{t.dashboard.hours}
+            </Text>
+          </View>
         </View>
 
         <Text style={styles.missionText}>
@@ -164,9 +195,12 @@ export default function DashboardScreen() {
         />
 
         <View style={styles.missionFooterRow}>
-          <Text style={styles.reward}>
-            ⚡ +{dashboard.dailyMission.rewardXP} XP & Badge
-          </Text>
+          <View style={styles.rewardRow}>
+            <Feather name="zap" size={13} color="#16A34A" style={{ marginRight: 4 }} />
+            <Text style={styles.reward}>
+              +{dashboard.dailyMission.rewardXP} XP &amp; Badge
+            </Text>
+          </View>
           <TouchableOpacity
             style={styles.continueBtn}
             onPress={() => router.push('/quiz' as any)}
@@ -176,15 +210,34 @@ export default function DashboardScreen() {
         </View>
       </View>
 
-      {/* AI Coach Banner */}
+      {/* National Rank & Performance Summary */}
+      <TouchableOpacity
+        style={styles.rankCard}
+        onPress={() => router.push('/(tabs)/leaderboard' as any)}
+      >
+        <View style={styles.rankHeader}>
+          <Feather name="award" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+          <Text style={styles.rankTitle}>{t.dashboard.rankTitle}</Text>
+        </View>
+        <Text style={styles.rankText}>
+          {dashboard.rank
+            ? `#${dashboard.rank.position} ${t.dashboard.nationally} • ${dashboard.rank.percentileLabel}`
+            : 'Complete your first quiz to join rankings'}
+        </Text>
+        <Text style={styles.rankSubtext}>
+          View national athlete leaderboard →
+        </Text>
+      </TouchableOpacity>
+
+      {/* AI Anti-Doping Coach Shortcut */}
       <View style={styles.aiCoachBanner}>
         <View style={styles.aiIconBox}>
-          <MaterialCommunityIcons name="robot" size={32} color="#06B6D4" />
+          <MaterialCommunityIcons name="robot" size={24} color="#06B6D4" />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.aiTitle}>{t.dashboard.aiCoachTitle}</Text>
           <Text style={styles.aiSubtitle}>
-            "Need help with today's anti-doping lesson?"
+            Instant guidance on WADA regulations &amp; substances
           </Text>
         </View>
         <TouchableOpacity
@@ -195,7 +248,7 @@ export default function DashboardScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Quick Play Section */}
+      {/* Quick Play & Core Tools */}
       <Text style={styles.sectionTitle}>{t.dashboard.quickPlay}</Text>
 
       <View style={styles.grid}>
@@ -203,7 +256,9 @@ export default function DashboardScreen() {
           style={styles.gridCard}
           onPress={() => router.push('/learning-journey')}
         >
-          <Text style={styles.gridIcon}>📚</Text>
+          <View style={styles.gridIconBox}>
+            <Feather name="book-open" size={22} color="#0284C7" />
+          </View>
           <Text style={styles.gridTitle}>{t.dashboard.learnTitle}</Text>
           <Text style={styles.gridSubtitle}>16 {t.dashboard.learnSubtitle}</Text>
         </TouchableOpacity>
@@ -212,7 +267,9 @@ export default function DashboardScreen() {
           style={styles.gridCard}
           onPress={() => router.push('/medicinescanner')}
         >
-          <Text style={styles.gridIcon}>📷</Text>
+          <View style={styles.gridIconBox}>
+            <Feather name="camera" size={22} color="#0284C7" />
+          </View>
           <Text style={styles.gridTitle}>{t.dashboard.scannerTitle}</Text>
           <Text style={styles.gridSubtitle}>{t.dashboard.scannerSubtitle}</Text>
         </TouchableOpacity>
@@ -221,7 +278,9 @@ export default function DashboardScreen() {
           style={styles.gridCard}
           onPress={() => router.push('/quiz')}
         >
-          <Text style={styles.gridIcon}>🧠</Text>
+          <View style={styles.gridIconBox}>
+            <MaterialCommunityIcons name="brain" size={22} color="#0284C7" />
+          </View>
           <Text style={styles.gridTitle}>{t.dashboard.quizTitle}</Text>
           <Text style={styles.gridSubtitle}>{t.dashboard.quizSubtitle}</Text>
         </TouchableOpacity>
@@ -230,7 +289,9 @@ export default function DashboardScreen() {
           style={styles.gridCard}
           onPress={() => router.push('/roulette')}
         >
-          <Text style={styles.gridIcon}>🎲</Text>
+          <View style={styles.gridIconBox}>
+            <MaterialCommunityIcons name="dice-multiple-outline" size={22} color="#0284C7" />
+          </View>
           <Text style={styles.gridTitle}>{t.dashboard.spinTitle}</Text>
           <Text style={styles.gridSubtitle}>{t.dashboard.spinSubtitle}</Text>
         </TouchableOpacity>
@@ -239,7 +300,7 @@ export default function DashboardScreen() {
       {/* Coach Communication Banner */}
       <View style={styles.coachBanner}>
         <View style={styles.coachIconBox}>
-          <FontAwesome5 name="user-graduate" size={24} color="#10B981" />
+          <FontAwesome5 name="user-graduate" size={22} color="#10B981" />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.coachBannerTitle}>Assigned Coach</Text>
@@ -264,7 +325,7 @@ export default function DashboardScreen() {
 
       {/* Badges Section */}
       <View style={styles.badgeHeader}>
-        <Text style={styles.sectionTitle}>Badges & Achievements</Text>
+        <Text style={styles.sectionTitleWithoutMargin}>Badges &amp; Achievements</Text>
         <TouchableOpacity onPress={() => router.push('/achievements')}>
           <Text style={styles.viewAll}>View all →</Text>
         </TouchableOpacity>
@@ -272,28 +333,28 @@ export default function DashboardScreen() {
 
       <View style={styles.badgesRow}>
         {visibleBadges.map((badge) => (
-          <View key={badge.key} style={styles.badgeCard}>
-            <Text style={styles.badgeIcon}>{badge.icon}</Text>
-            <Text style={styles.badgeName}>{badge.label}</Text>
+          <View
+            key={badge.key}
+            style={[styles.badgeCard, badge.unlocked && styles.badgeCardUnlocked]}
+          >
+            <View
+              style={[
+                styles.badgeIconWrapper,
+                badge.unlocked && styles.badgeIconWrapperUnlocked,
+              ]}
+            >
+              <MaterialCommunityIcons
+                name={(badge.icon || 'medal') as any}
+                size={24}
+                color={badge.unlocked ? '#0284C7' : '#94A3B8'}
+              />
+            </View>
+            <Text style={styles.badgeName} numberOfLines={2}>
+              {badge.label}
+            </Text>
           </View>
         ))}
       </View>
-
-      {/* National Rank & Recommendation */}
-      <TouchableOpacity
-        style={styles.rankCard}
-        onPress={() => router.push(dashboard.recommendedModule.route as any)}
-      >
-        <Text style={styles.rankTitle}>🏆 {t.dashboard.rankTitle}</Text>
-        <Text style={styles.rankText}>
-          {dashboard.rank
-            ? `#${dashboard.rank.position} ${t.dashboard.nationally} • ${dashboard.rank.percentileLabel}`
-            : 'Complete your first quiz to join rankings'}
-        </Text>
-        <Text style={styles.rankSubtext}>
-          {t.dashboard.recommended}: {dashboard.recommendedModule.title} →
-        </Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -406,17 +467,84 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     marginTop: 2,
   },
+  recommendedCard: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 20,
+    marginTop: -35,
+    borderRadius: 24,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  recommendedBadgeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  recommendedPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E0F2FE',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  recommendedPillText: {
+    color: '#0284C7',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  recommendedProgress: {
+    color: '#64748B',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  recommendedTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#0F172A',
+    marginTop: 4,
+  },
+  recommendedDesc: {
+    fontSize: 13,
+    color: '#64748B',
+    lineHeight: 18,
+    marginTop: 4,
+    marginBottom: 12,
+  },
+  recommendedBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#0F172A',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    alignSelf: 'flex-start',
+  },
+  recommendedBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
+  },
   missionCard: {
     backgroundColor: '#FFFFFF',
     marginHorizontal: 20,
-    marginTop: -55,
-    borderRadius: 26,
-    padding: 20,
-    elevation: 8,
+    marginTop: 14,
+    borderRadius: 24,
+    padding: 18,
+    elevation: 3,
     shadowColor: '#0F172A',
-    shadowOpacity: 0.08,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 3 },
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
@@ -431,6 +559,10 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     fontSize: 14,
     letterSpacing: 0.5,
+  },
+  missionTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   missionTime: {
     color: '#64748B',
@@ -448,6 +580,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 14,
+  },
+  rewardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   reward: {
     color: '#16A34A',
@@ -477,9 +613,9 @@ const styles = StyleSheet.create({
     borderColor: '#334155',
   },
   aiIconBox: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     backgroundColor: '#0F172A',
     justifyContent: 'center',
     alignItems: 'center',
@@ -508,11 +644,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '800',
     marginHorizontal: 20,
     marginTop: 22,
-    marginBottom: 14,
+    marginBottom: 12,
+    color: '#0F172A',
+  },
+  sectionTitleWithoutMargin: {
+    fontSize: 18,
+    fontWeight: '800',
     color: '#0F172A',
   },
   grid: {
@@ -524,34 +665,39 @@ const styles = StyleSheet.create({
   gridCard: {
     width: '48%',
     backgroundColor: '#FFFFFF',
-    borderRadius: 22,
-    padding: 18,
+    borderRadius: 20,
+    padding: 16,
     marginBottom: 14,
-    elevation: 3,
+    elevation: 2,
     shadowColor: '#0F172A',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
-  gridIcon: {
-    fontSize: 30,
+  gridIconBox: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: '#F0F9FF',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 10,
   },
   gridTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: '#0F172A',
   },
   gridSubtitle: {
     color: '#64748B',
     fontSize: 12,
-    marginTop: 4,
+    marginTop: 2,
   },
   coachBanner: {
     backgroundColor: '#FFFFFF',
     marginHorizontal: 20,
-    marginTop: 10,
+    marginTop: 4,
     borderRadius: 22,
     padding: 16,
     flexDirection: 'row',
@@ -561,9 +707,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   coachIconBox: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#ECFDF5',
     justifyContent: 'center',
     alignItems: 'center',
@@ -596,31 +742,45 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginTop: 14,
+    marginTop: 18,
+    marginBottom: 6,
   },
   viewAll: {
     color: '#06B6D4',
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: 13,
   },
   badgesRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    marginTop: 12,
+    marginTop: 8,
     marginBottom: 18,
   },
   badgeCard: {
     alignItems: 'center',
     width: '23%',
     backgroundColor: '#FFFFFF',
-    paddingVertical: 14,
-    borderRadius: 18,
+    paddingVertical: 12,
+    paddingHorizontal: 4,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
-  badgeIcon: {
-    fontSize: 32,
+  badgeCardUnlocked: {
+    borderColor: '#BAE6FD',
+    backgroundColor: '#F8FAFC',
+  },
+  badgeIconWrapper: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#F1F5F9',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeIconWrapperUnlocked: {
+    backgroundColor: '#E0F2FE',
   },
   badgeName: {
     marginTop: 6,
@@ -631,26 +791,32 @@ const styles = StyleSheet.create({
   },
   rankCard: {
     marginHorizontal: 20,
-    backgroundColor: '#10B981',
-    borderRadius: 24,
-    padding: 20,
-    marginTop: 6,
+    backgroundColor: '#0F172A',
+    borderRadius: 22,
+    padding: 18,
+    marginTop: 14,
+  },
+  rankHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   rankTitle: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
   rankText: {
     color: '#FFFFFF',
     fontWeight: '800',
-    fontSize: 18,
+    fontSize: 17,
     marginTop: 6,
   },
   rankSubtext: {
-    color: '#ECFDF5',
-    marginTop: 8,
-    fontSize: 13,
+    color: '#94A3B8',
+    marginTop: 6,
+    fontSize: 12,
     fontWeight: '600',
   },
 });

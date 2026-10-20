@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 import { router, useFocusEffect } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   getAchievements,
   type AchievementKey,
@@ -20,37 +20,43 @@ import { getUserProfile } from '../src/firebase/userService';
 
 const achievementMeta: {
   key: AchievementKey;
-  emoji: string;
+  icon: string;
+  iconColor: string;
   title: string;
   description: string;
 }[] = [
   {
     key: 'firstModule',
-    emoji: '🏅',
+    icon: 'medal',
+    iconColor: '#0284C7',
     title: 'First Module',
     description: 'Complete your first module',
   },
   {
     key: 'threeModules',
-    emoji: '🛡️',
+    icon: 'shield-check',
+    iconColor: '#10B981',
     title: '3 Modules Completed',
     description: 'Complete 3 learning modules',
   },
   {
     key: 'fiveModules',
-    emoji: '🏆',
+    icon: 'trophy',
+    iconColor: '#F59E0B',
     title: '5 Modules Completed',
     description: 'Complete all 5 learning modules',
   },
   {
     key: 'xp100',
-    emoji: '⚡',
+    icon: 'lightning-bolt',
+    iconColor: '#38BDF8',
     title: '100 XP Earned',
     description: 'Earn 100 total XP',
   },
   {
     key: 'streak7',
-    emoji: '🔥',
+    icon: 'fire',
+    iconColor: '#F97316',
     title: '7 Day Streak',
     description: 'Maintain a 7-day streak',
   },
@@ -163,9 +169,11 @@ export default function AchievementsScreen() {
                     !isEarned && styles.lockedIcon,
                   ]}
                 >
-                  <Text style={styles.emoji}>
-                    {isEarned ? meta.emoji : '🔒'}
-                  </Text>
+                  {isEarned ? (
+                      <MaterialCommunityIcons name={meta.icon as any} size={28} color={meta.iconColor} />
+                    ) : (
+                      <Feather name="lock" size={24} color="#94A3B8" />
+                    )}
                 </View>
 
                 <Text

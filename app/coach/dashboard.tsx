@@ -1,4 +1,4 @@
-import { Feather, FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Feather, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
@@ -123,7 +123,10 @@ export default function CoachDashboardScreen() {
 
             {/* Athletes Needing Attention */}
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>⚠️ {t.coach.attentionNeeded}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Feather name="alert-triangle" size={18} color="#F59E0B" style={{ marginRight: 6 }} />
+                <Text style={styles.sectionTitle}>{t.coach.attentionNeeded}</Text>
+              </View>
               <Text style={styles.sectionCount}>
                 {metrics.athletesNeedingAttention.length} athletes
               </Text>
@@ -160,7 +163,10 @@ export default function CoachDashboardScreen() {
 
                   <View style={styles.athleteMetricsRow}>
                     <Text style={styles.metricText}>Score: {athlete.averageQuizScore}%</Text>
-                    <Text style={styles.metricText}>🔥 {athlete.streak}d streak</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <FontAwesome5 name="fire" size={11} color="#F97316" style={{ marginRight: 4 }} />
+                      <Text style={styles.metricText}>{athlete.streak}d streak</Text>
+                    </View>
                     <Text style={styles.metricText}>
                       {athlete.completedModulesCount}/{athlete.totalModulesCount} modules
                     </Text>

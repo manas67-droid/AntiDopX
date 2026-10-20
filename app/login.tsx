@@ -47,7 +47,6 @@ export default function LoginScreen() {
     if (response?.type === 'success') {
       const idToken = response.params?.id_token;
       if (idToken) {
-        setIsAuthenticating(true);
         signInWithGoogleCredential(idToken).then((res) => {
           setIsAuthenticating(false);
           if (res.success) {
@@ -228,7 +227,7 @@ export default function LoginScreen() {
           onPress={() => router.push('/athlete-register')}
         >
           <Text style={styles.signupText}>
-            Don't have an athlete account?{' '}
+            Don&apos;t have an athlete account?{' '}
             <Text style={styles.signupHighlight}>Sign Up</Text>
           </Text>
         </TouchableOpacity>

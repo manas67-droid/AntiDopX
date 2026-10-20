@@ -1,4 +1,5 @@
 import { useFocusEffect, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useCallback, useState } from 'react';
 import {
   Alert,
@@ -184,7 +185,7 @@ export function LearningModuleScreen({ module }: LearningModuleScreenProps) {
       {alreadyCompleted && (
         <View style={styles.alreadyCompletedBanner}>
           <Text style={styles.alreadyCompletedText}>
-            ✓ Module already completed. You earned XP previously.
+            Module already completed. You earned XP previously.
           </Text>
         </View>
       )}
@@ -272,9 +273,10 @@ export function LearningModuleScreen({ module }: LearningModuleScreenProps) {
 
       {alreadyCompleted ? (
         <View style={styles.completedNotice}>
-          <Text style={styles.completedNoticeText}>
-            ✓ Completed
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <Ionicons name="checkmark-circle" size={16} color="#16A34A" style={{ marginRight: 6 }} />
+            <Text style={styles.completedNoticeText}>Completed</Text>
+          </View>
         </View>
       ) : (
         <TouchableOpacity

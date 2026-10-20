@@ -4,12 +4,12 @@ import * as FirebaseAuth from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCQB5tA5BkvAoFmyzntXnSu6Pi9LRO5ERA",
-  authDomain: "antidopx.firebaseapp.com",
-  projectId: "antidopx",
-  storageBucket: "antidopx.firebasestorage.app",
-  messagingSenderId: "431858822021",
-  appId: "1:431858822021:web:6b353132c8fa5e443332ec"
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY || "AIzaSyCQB5tA5BkvAoFmyzntXnSu6Pi9LRO5ERA",
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || "antidopx.firebaseapp.com",
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || "antidopx",
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET || "antidopx.firebasestorage.app",
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "431858822021",
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID || "1:431858822021:web:6b353132c8fa5e443332ec"
 };
 
 export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();

@@ -73,14 +73,17 @@ export default function ScenarioScreen() {
           <MaterialIcons name="arrow-back" size={28} color="#1E293B" />
         </TouchableOpacity>
 
-        <Text style={styles.xpText}>⚡ +{current?.xpReward || 0} XP</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <MaterialIcons name="bolt" size={16} color="#06B6D4" style={{ marginRight: 2 }} />
+          <Text style={styles.xpText}>+{current?.xpReward || 0} XP</Text>
+        </View>
       </View>
 
       {current ? (
         <>
           <Text style={styles.scenarioLabel}>
             {current.subtitle}
-            {isCompleted ? " ✅" : ""}
+            {isCompleted ? " (Completed)" : ""}
           </Text>
 
           <Text style={styles.title}>{current.title}</Text>
@@ -151,10 +154,7 @@ export default function ScenarioScreen() {
             >
               <Text style={styles.resultTitle}>
                 {result.outcome === "best"
-                  ? "🏆 Pro Move!"
-                  : result.outcome === "good"
-                  ? "✅ Smart Choice"
-                  : "⚠️ Be Careful"}
+                  ? "Pro Move!" : result.outcome === "good" ? "Smart Choice" : "Caution Required"}
               </Text>
 
               <Text style={styles.resultText}>{result.text}</Text>

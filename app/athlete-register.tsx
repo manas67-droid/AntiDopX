@@ -49,7 +49,6 @@ export default function AthleteRegisterScreen() {
     if (response?.type === 'success') {
       const idToken = response.params?.id_token;
       if (idToken) {
-        setIsAuthenticating(true);
         signInWithGoogleCredential(idToken).then((res) => {
           setIsAuthenticating(false);
           if (res.success) {

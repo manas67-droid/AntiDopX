@@ -70,11 +70,11 @@ export type DashboardData = {
 };
 
 const BADGE_ICONS: Record<AchievementKey, string> = {
-  firstModule: '🏅',
-  threeModules: '🛡️',
-  fiveModules: '🏆',
-  xp100: '⚡',
-  streak7: '🔥',
+  firstModule: 'medal',
+  threeModules: 'shield-check',
+  fiveModules: 'trophy',
+  xp100: 'lightning-bolt',
+  streak7: 'fire',
 };
 
 const DAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];

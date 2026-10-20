@@ -7,91 +7,87 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 
 export default function ChallengesScreen() {
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.header}>
-        🎮 Play & Compete
-      </Text>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+      <View style={styles.headerRow}>
+        <MaterialCommunityIcons name="gamepad-variant" size={28} color="#0284C7" style={{ marginRight: 8 }} />
+        <Text style={styles.header}>Play &amp; Compete</Text>
+      </View>
 
       <Text style={styles.subHeader}>
-        Fast games. Real knowledge.
+        Fast interactive simulations. Real anti-doping knowledge.
       </Text>
 
       <TouchableOpacity
         style={styles.featuredCard}
-        onPress={() => router.push('/scenario'as any)}
+        onPress={() => router.push('/scenario' as any)}
+        accessibilityRole="button"
       >
-        <Text style={styles.badge}>
-          FEATURED
-        </Text>
+        <Text style={styles.badge}>FEATURED SIMULATION</Text>
 
-        <Text style={styles.featuredTitle}>
-          What Would You Do?
-        </Text>
+        <Text style={styles.featuredTitle}>What Would You Do?</Text>
 
         <Text style={styles.featuredDescription}>
-          Make split-second decisions in real
-          anti-doping scenarios.
+          Make split-second decisions in real-life anti-doping testing and supplement scenarios.
         </Text>
 
-        <Text style={styles.xpText}>
-          ⚡ +80 XP per scenario
-        </Text>
-      </TouchableOpacity> 
+        <View style={styles.xpRow}>
+          <FontAwesome5 name="bolt" size={14} color="#FFFFFF" style={{ marginRight: 6 }} />
+          <Text style={styles.xpText}>+80 XP per completed scenario</Text>
+        </View>
+      </TouchableOpacity>
 
-    
       <View style={styles.grid}>
         <GameCard
-  title="Supplement Roulette"
-  subtitle="Spin to learn risks"
-  icon="dice"
-  iconColor="#FF8A3D"
-  route="/roulette"
-/>
-<GameCard
-  title="Medicine Scanner"
-  subtitle="AI label check"
-  icon="camera"
-  iconColor="#8B5CF6"
-  route="/medicinescanner"
-/>
-<GameCard
-  title="Quiz Arena"
-  subtitle="60s rapid fire"
-  icon="brain"
-  iconColor="#22C55E"
-  route="/quiz"
-/>
-
+          title="Supplement Roulette"
+          subtitle="Spin to assess risks"
+          icon="dice"
+          iconColor="#F97316"
+          route="/roulette"
+        />
         <GameCard
-  title="Scenarios"
-  subtitle="Branching outcomes"
-  icon="question-circle"
-  iconColor="#1EC6E8"
-  route="/scenario"
-/>
-</View>
+          title="Medicine Scanner"
+          subtitle="AI barcode verification"
+          icon="camera"
+          iconColor="#0284C7"
+          route="/medicinescanner"
+        />
+        <GameCard
+          title="Quiz Arena"
+          subtitle="Timed rapid fire"
+          icon="brain"
+          iconColor="#10B981"
+          route="/quiz"
+        />
+        <GameCard
+          title="Case Studies"
+          subtitle="Branching outcomes"
+          icon="question-circle"
+          iconColor="#06B6D4"
+          route="/scenario"
+        />
+      </View>
 
-
-      <Text style={styles.sectionTitle}>
-        🏆 Live Tournaments
-      </Text>
+      <View style={styles.sectionHeaderRow}>
+        <MaterialCommunityIcons name="trophy-outline" size={22} color="#0F172A" style={{ marginRight: 8 }} />
+        <Text style={styles.sectionTitle}>Live Tournaments</Text>
+      </View>
 
       <TournamentCard
-        title="Clean Sport Cup"
-        players="1,240 Players"
+        title="Clean Sport National Cup"
+        players="1,240 Athletes Competing"
         status="LIVE"
       />
 
       <TournamentCard
         title="Supplement Awareness Week"
-        players="Solo Event"
-        status="DAY 2"
+        players="Solo Knowledge Challenge"
+        status="ACTIVE"
       />
 
       <TournamentCard
-        title="TUE Mastery Bracket"
-        players="Team Battle"
-        status="SATURDAY"
+        title="TUE Regulatory Mastery"
+        players="National Curriculum Event"
+        status="UPCOMING"
       />
     </ScrollView>
   );
@@ -167,101 +163,115 @@ function TournamentCard({
 }
 
 const styles = StyleSheet.create({
- container: {
-  flex: 1,
-  backgroundColor: '#F8FBFE',
-  padding: 20,
-},
- header: {
-  color: '#0F172A',
-  fontSize: 38,
-  fontWeight: '800',
-  marginTop: 20,
-},
-
+  container: {
+    flex: 1,
+    backgroundColor: '#F8FAFC',
+    padding: 20,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  header: {
+    color: '#0F172A',
+    fontSize: 26,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+  },
   subHeader: {
-  color: '#64748B',
-  fontSize: 16,
-  marginBottom: 24,
-},
+    color: '#64748B',
+    fontSize: 14,
+    marginTop: 4,
+    marginBottom: 20,
+    fontWeight: '500',
+  },
   featuredCard: {
-  backgroundColor: '#06B6D4',
-  padding: 22,
-  borderRadius: 28,
-  marginBottom: 24,
-  shadowColor: '#000',
-  shadowOpacity: 0.08,
-  shadowRadius: 12,
-  elevation: 6,
-},
+    backgroundColor: '#0F172A',
+    padding: 20,
+    borderRadius: 24,
+    marginBottom: 20,
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.1,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#1E293B',
+  },
   badge: {
-  alignSelf: 'flex-start',
-  backgroundColor: 'rgba(255,255,255,0.25)',
-  color: 'white',
-  paddingHorizontal: 10,
-  paddingVertical: 4,
-  borderRadius: 20,
-  fontSize: 11,
-  fontWeight: '700',
-},
-featuredTitle: {
-  color: 'white',
-  fontSize: 34,
-  fontWeight: '800',
-  marginTop: 16,
-},
+    alignSelf: 'flex-start',
+    backgroundColor: '#0284C7',
+    color: '#FFFFFF',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  featuredTitle: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '800',
+    marginTop: 14,
+  },
   featuredDescription: {
-  color: '#EAF9FF',
-  fontSize: 17,
-  marginTop: 10,
-  lineHeight: 24,
-},
+    color: '#94A3B8',
+    fontSize: 14,
+    marginTop: 8,
+    lineHeight: 20,
+  },
+  xpRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+  },
   xpText: {
-  color: 'white',
-  marginTop: 20,
-  fontWeight: '700',
-  fontSize: 16,
-},
-
+    color: '#38BDF8',
+    fontWeight: '700',
+    fontSize: 13,
+  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-
   gameCard: {
-  width: '48%',
-  backgroundColor: '#FFFFFF',
-  borderRadius: 28,
-  padding: 22,
-  marginBottom: 18,
-
-  shadowColor: '#000',
-  shadowOpacity: 0.08,
-  shadowRadius: 10,
-  elevation: 5,
-
-  borderWidth: 1,
-  borderColor: '#EDF2F7',
-},
-gameTitle: {
-  color: '#111827',
-  fontWeight: '700',
-  fontSize: 22,
-  marginTop: 18,
-},
-
+    width: '48%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 14,
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  gameTitle: {
+    color: '#0F172A',
+    fontWeight: '700',
+    fontSize: 15,
+    marginTop: 12,
+  },
   gameSubtitle: {
-  color: '#64748B',
-  fontSize: 15,
-  marginTop: 8,
-},
-sectionTitle: {
-  color: '#111827',
-  fontSize: 28,
-  fontWeight: '800',
-  marginVertical: 24,
-},
+    color: '#64748B',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    color: '#0F172A',
+    fontSize: 18,
+    fontWeight: '800',
+  },
 
  tournamentCard: {
   backgroundColor: '#FFFFFF',

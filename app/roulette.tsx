@@ -132,7 +132,7 @@ export default function RouletteScreen() {
 
       Alert.alert(
         "Saved to Library! (+15 XP)",
-        `${result.name} added to your reference library.\n\n⚠️ ANTI-DOPING NOTICE:\nDietary supplements carry an inherent risk of inadvertent contamination. WADA does NOT certify any dietary supplement. Always demand third-party batch testing certificates.`
+        `${result.name} added to your reference library.\n\nANTI-DOPING NOTICE:\nDietary supplements carry an inherent risk of inadvertent contamination. WADA does NOT certify any dietary supplement. Always demand third-party batch testing certificates.`
       );
     } catch (error: any) {
       Alert.alert("Error Saving", error?.message || "Failed to save supplement.");
@@ -276,7 +276,7 @@ export default function RouletteScreen() {
             <View style={styles.statBox}>
               <Text style={styles.statLabel}>Testing</Text>
               <Text style={styles.statValue}>
-                {result.risk === "High" ? "Contaminated" : "Batch ✓"}
+                {result.risk === "High" ? "Contaminated" : "Batch Tested"}
               </Text>
             </View>
           </View>
@@ -293,7 +293,7 @@ export default function RouletteScreen() {
           >
             <Text style={styles.saveButtonText}>
               {isSaved
-                ? "✓ Saved in Library (+15 XP)"
+                ? "Saved in Library (+15 XP)"
                 : saving
                 ? "Saving..."
                 : "Save to Athlete Library"}

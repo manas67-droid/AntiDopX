@@ -203,7 +203,10 @@ export default function QuizScreen() {
               {newLevel ? (
                 <View style={styles.levelCard}>
                   <Text style={styles.levelCardLabel}>CURRENT LEVEL</Text>
-                  <Text style={styles.levelCardValue}>🏆 {newLevel}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+                    <Feather name="award" size={18} color="#0284C7" style={{ marginRight: 6 }} />
+                    <Text style={styles.levelCardValue}>{newLevel}</Text>
+                  </View>
                   {newTotalXP !== null && (
                     <Text style={styles.levelCardXP}>Total: {newTotalXP.toLocaleString()} XP</Text>
                   )}
@@ -321,7 +324,10 @@ export default function QuizScreen() {
 
         {showExplanation && currentQuestion.explanation ? (
           <View style={styles.explanationCard}>
-            <Text style={styles.explanationHeader}>💡 {t.quiz.explanation}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+              <Feather name="info" size={14} color="#0284C7" style={{ marginRight: 6 }} />
+              <Text style={styles.explanationHeader}>{t.quiz.explanation}</Text>
+            </View>
             <Text style={styles.explanationText}>
               {currentQuestion.explanation}
             </Text>

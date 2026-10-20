@@ -392,7 +392,7 @@ export default function ScannerScreen() {
             {activeIngredients.length > 0 ? (
               <View style={styles.ingredientsBox}>
                 <Text style={styles.ingredientsHeader}>
-                  🧪 {t.scanner.activeIngredients}:
+                  {t.scanner.activeIngredients}:
                 </Text>
                 {activeIngredients.map((item, index) => (
                   <Text key={`${item}-${index}`} style={styles.ingredientItem}>
@@ -404,7 +404,10 @@ export default function ScannerScreen() {
 
             {/* Official Guidance */}
             <View style={styles.guidanceBox}>
-              <Text style={styles.guidanceTitle}>📋 Anti-Doping Assessment:</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+                <Feather name="file-text" size={14} color="#0284C7" style={{ marginRight: 6 }} />
+                <Text style={styles.guidanceTitle}>Anti-Doping Assessment:</Text>
+              </View>
               <Text style={styles.guidanceText}>{selectedResult.guidance}</Text>
             </View>
 
@@ -433,7 +436,7 @@ export default function ScannerScreen() {
                   <ActivityIndicator size="small" color="#FFFFFF" />
                 ) : (
                   <Text style={styles.saveBtnText}>
-                    {saveSuccess ? `✓ ${t.common.saved}` : `+ ${t.scanner.saveToLibrary}`}
+                    {saveSuccess ? t.common.saved : t.scanner.saveToLibrary}
                   </Text>
                 )}
               </TouchableOpacity>
@@ -458,7 +461,10 @@ export default function ScannerScreen() {
 
         {/* Global Reference Info Card */}
         <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>🛡️ Official Reference Resources</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+            <Feather name="shield" size={16} color="#0284C7" style={{ marginRight: 6 }} />
+            <Text style={styles.infoTitle}>Official Reference Resources</Text>
+          </View>
           <Text style={styles.infoText}>
             AntiDopX cross-references active ingredients against the World Anti-Doping Agency (WADA) International Standard Prohibited List and National Anti-Doping Organization guidelines.
           </Text>

@@ -326,7 +326,9 @@ export default function ProfileScreen() {
               ]}
               onPress={() => toggleLanguage('en')}
             >
-              <Text style={styles.langEmoji}>🇬🇧</Text>
+              <View style={[styles.langCodeBadge, language === 'en' && styles.langCodeBadgeActive]}>
+                <Text style={[styles.langCodeText, language === 'en' && styles.langCodeTextActive]}>EN</Text>
+              </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.langName}>English</Text>
                 <Text style={styles.langSub}>Default international anti-doping terminology</Text>
@@ -343,7 +345,9 @@ export default function ProfileScreen() {
               ]}
               onPress={() => toggleLanguage('hi')}
             >
-              <Text style={styles.langEmoji}>🇮🇳</Text>
+              <View style={[styles.langCodeBadge, language === 'hi' && styles.langCodeBadgeActive]}>
+                <Text style={[styles.langCodeText, language === 'hi' && styles.langCodeTextActive]}>HI</Text>
+              </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.langName}>हिंदी (Hindi)</Text>
                 <Text style={styles.langSub}>खिलाड़ियों के लिए संपूर्ण डोपिंग-रोधी शिक्षा</Text>
@@ -665,9 +669,25 @@ const styles = StyleSheet.create({
     borderColor: '#06B6D4',
     backgroundColor: '#F0FDFA',
   },
-  langEmoji: {
-    fontSize: 28,
+  langCodeBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: '#F1F5F9',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 14,
+  },
+  langCodeBadgeActive: {
+    backgroundColor: '#E0F2FE',
+  },
+  langCodeText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#64748B',
+  },
+  langCodeTextActive: {
+    color: '#0284C7',
   },
   langName: {
     fontSize: 16,

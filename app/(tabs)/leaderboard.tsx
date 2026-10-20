@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import {
   getLeaderboard,
@@ -93,7 +94,7 @@ export default function LeaderboardScreen() {
             </View>
           </View>
           <View style={styles.centerPodium}>
-            <Text style={styles.crown}>👑</Text>
+            <MaterialCommunityIcons name="crown" size={26} color="#F59E0B" style={styles.crown} />
 
             <View style={styles.avatarGold}>
               <Text style={styles.avatarLabel}>{top3[0]?.name?.charAt(0)}</Text>

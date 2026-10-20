@@ -1,127 +1,95 @@
-import { router } from "expo-router";
-import { useState } from "react";
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
 import {
   FlatList,
   StyleSheet,
   Text,
-  TouchableOpacity
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-const sports = [
-  {
-    id: "athletics",
-    title: "Athletics",
-    icon: "🏃",
-  },
-  {
-    id: "football",
-    title: "Football",
-    icon: "⚽",
-  },
-  {
-    id: "cricket",
-    title: "Cricket",
-    icon: "🏏",
-  },
-  {
-    id: "swimming",
-    title: "Swimming",
-    icon: "🏊",
-  },
-  {
-    id: "boxing",
-    title: "Boxing",
-    icon: "🥊",
-  },
-  {
-    id: "badminton",
-    title: "Badminton",
-    icon: "🏸",
-  },
-  {
-    id: "weightlifting",
-    title: "Weightlifting",
-    icon: "🏋️",
-  },
-  {
-    id: "martial-arts",
-    title: "Martial Arts",
-    icon: "🥋",
-  },
-  {
-    id: "other",
-    title: "Other",
-    icon: "🎯",
-  },
+interface SportItem {
+  id: string;
+  title: string;
+  iconName: string;
+  isFeather?: boolean;
+}
+
+const sports: SportItem[] = [
+  { id: 'athletics', title: 'Athletics', iconName: 'run' },
+  { id: 'football', title: 'Football', iconName: 'soccer' },
+  { id: 'cricket', title: 'Cricket', iconName: 'cricket' },
+  { id: 'swimming', title: 'Swimming', iconName: 'swim' },
+  { id: 'boxing', title: 'Boxing', iconName: 'boxing-glove' },
+  { id: 'badminton', title: 'Badminton', iconName: 'badminton' },
+  { id: 'weightlifting', title: 'Weightlifting', iconName: 'weight-lifter' },
+  { id: 'martial-arts', title: 'Martial Arts', iconName: 'karate' },
+  { id: 'other', title: 'Other Sports', iconName: 'target', isFeather: true },
 ];
 
 export default function SportSelectionScreen() {
-  const [selectedSport, setSelectedSport] =
-    useState<string>("");
+  const [selectedSport, setSelectedSport] = useState<string>('');
 
- const handleContinue = () => {
-  router.push({
-    pathname: '/athlete-details',
-    params: {
-      sport: selectedSport,
-    },
-  });
-};
+  const handleContinue = () => {
+    router.push({
+      pathname: '/athlete-details',
+      params: {
+        sport: selectedSport,
+      },
+    });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>
-        What is your sport?
-      </Text>
-
+      <Text style={styles.title}>What is your sport?</Text>
       <Text style={styles.subtitle}>
-        We will personalize your learning
-        experience.
+        We will personalize your clean sport curriculum.
       </Text>
 
       <FlatList
         data={sports}
         numColumns={2}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{
-          paddingTop: 24,
-        }}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[
-              styles.card,
-              selectedSport === item.id &&
-                styles.activeCard,
-            ]}
-            onPress={() =>
-              setSelectedSport(item.id)
-            }
-          >
-            <Text style={styles.sportEmoji}>
-               {item.icon}
-            </Text>
+        contentContainerStyle={styles.listContent}
+        renderItem={({ item }) => {
+          const isSelected = selectedSport === item.id;
+          return (
+            <TouchableOpacity
+              style={[styles.card, isSelected && styles.activeCard]}
+              onPress={() => setSelectedSport(item.id)}
+            >
+              <View style={[styles.iconBox, isSelected && styles.activeIconBox]}>
+                {item.isFeather ? (
+                  <Feather
+                    name={item.iconName as any}
+                    size={36}
+                    color={isSelected ? '#0284C7' : '#0EA5E9'}
+                  />
+                ) : (
+                  <MaterialCommunityIcons
+                    name={item.iconName as any}
+                    size={38}
+                    color={isSelected ? '#0284C7' : '#0EA5E9'}
+                  />
+                )}
+              </View>
 
-            <Text style={styles.cardText}>
-              {item.title}
-            </Text>
-          </TouchableOpacity>
-        )}
+              <Text style={[styles.cardText, isSelected && styles.activeCardText]}>
+                {item.title}
+              </Text>
+            </TouchableOpacity>
+          );
+        }}
       />
 
       <TouchableOpacity
         disabled={!selectedSport}
-        style={[
-          styles.button,
-          !selectedSport && {
-            opacity: 0.5,
-          },
-        ]}
+        style={[styles.button, !selectedSport && { opacity: 0.5 }]}
         onPress={handleContinue}
       >
-        <Text style={styles.buttonText}>
-          Continue
-        </Text>
+        <Text style={styles.buttonText}>Continue</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -131,84 +99,84 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#06B6D4',
-    paddingHorizontal: 24,
-    paddingTop: 40,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
-
   title: {
     color: '#FFFFFF',
-    fontSize: 36,
-    fontWeight: '700',
+    fontSize: 30,
+    fontWeight: '800',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 6,
+    letterSpacing: -0.4,
   },
-
   subtitle: {
-    color: '#EAFBFF',
-    fontSize: 16,
+    color: '#E0F2FE',
+    fontSize: 15,
     textAlign: 'center',
-    marginBottom: 30,
-    lineHeight: 24,
+    marginBottom: 16,
+    lineHeight: 22,
   },
-
+  listContent: {
+    paddingBottom: 16,
+  },
   card: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 20,
-    margin: 8,
+    borderRadius: 20,
+    padding: 16,
+    margin: 6,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 150,
-
+    minHeight: 130,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 5,
+    shadowRadius: 8,
+    elevation: 4,
   },
-
   activeCard: {
-    borderWidth: 3,
-    borderColor: '#06B6D4',
+    borderWidth: 2.5,
+    borderColor: '#0284C7',
     transform: [{ scale: 1.02 }],
   },
-
+  iconBox: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#06B6D415',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  activeIconBox: {
+    backgroundColor: '#0284C720',
+  },
   cardText: {
     color: '#0F172A',
-    marginTop: 14,
     fontWeight: '700',
-    fontSize: 18,
+    fontSize: 15,
+    textAlign: 'center',
   },
-
-  sportEmoji: {
-    fontSize: 48,
+  activeCardText: {
+    color: '#0284C7',
   },
-
   button: {
     backgroundColor: '#FFFFFF',
-    paddingVertical: 18,
+    paddingVertical: 16,
     borderRadius: 999,
-    marginBottom: 30,
-    marginTop: 20,
-
+    marginBottom: 20,
+    marginTop: 10,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 6,
   },
-
   buttonText: {
     color: '#06B6D4',
     textAlign: 'center',
-    fontWeight: '700',
-    fontSize: 18,
+    fontWeight: '800',
+    fontSize: 16,
   },
 });
