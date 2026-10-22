@@ -164,9 +164,9 @@ AntiDopX follows strict defense-in-depth principles:
 
 ---
 
-## 9. GitHub Collaboration Workflow
+## 9. Development & Contribution Guidelines
 
-When contributing to this repository:
+When building and testing this repository:
 1. **Branching Strategy:**
    - `main`: Production-ready code.
    - `feature/<feature-name>`: New capabilities and screens.
@@ -177,3 +177,13 @@ When contributing to this repository:
    - Confirm no emojis are used as UI icons (use `@expo/vector-icons`).
 3. **Submitting Changes:**
    - Create a pull request targeting `main` with a clear description of changes and testing steps.
+
+---
+
+## 10. Author & Developer
+
+- **Creator & Lead Developer:** **Manas Motla**
+- **Project:** AntiDopX — Youth Athlete Anti-Doping Education & Mentorship Platform
+- **Architecture:** Full-Stack Architecture, UI/UX Design System, Cloud Firestore Backend, Admin Panel, and Grounded AI Engine
+
+
